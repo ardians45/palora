@@ -1,0 +1,4957 @@
+{
+  "metadata": {
+    "company": "PT Paletindo Prakarsa Unggul",
+    "document": "Sistem ERP - Master Data Stok & Pricelist Gudang",
+    "update_date": "12 April 2025"
+  },
+  "kategori_stok": [
+    {
+      "category": "Palet FUTARI FP 0303",
+      "items": [
+        {
+          "no": 1,
+          "nama_barang": "Merah",
+          "qty": 0,
+          "harga_jual": 31900,
+          "total": 0
+        },
+        {
+          "no": 2,
+          "nama_barang": "Hijau",
+          "qty": 1604,
+          "harga_jual": 31900,
+          "total": 51167600
+        },
+        {
+          "no": 3,
+          "nama_barang": "light Biru",
+          "qty": 17,
+          "harga_jual": 31900,
+          "total": 542300
+        },
+        {
+          "no": 4,
+          "nama_barang": "Coklat",
+          "qty": 696,
+          "harga_jual": 31900,
+          "total": 22202400
+        },
+        {
+          "no": 5,
+          "nama_barang": "Orange",
+          "qty": 1135,
+          "harga_jual": 31900,
+          "total": 36206500
+        },
+        {
+          "no": 6,
+          "nama_barang": "Grey",
+          "qty": 253,
+          "harga_jual": 31900,
+          "total": 8070700
+        },
+        {
+          "no": 7,
+          "nama_barang": "Dark Grey",
+          "qty": 210,
+          "harga_jual": 31900,
+          "total": 6699000
+        },
+        {
+          "no": 8,
+          "nama_barang": "Light Grey",
+          "qty": 1091,
+          "harga_jual": 31900,
+          "total": 34802900
+        },
+        {
+          "no": 9,
+          "nama_barang": "Dark Blue",
+          "qty": 462,
+          "harga_jual": 31900,
+          "total": 14737800
+        },
+        {
+          "no": 10,
+          "nama_barang": "Dark Red",
+          "qty": 320,
+          "harga_jual": 31900,
+          "total": 10208000
+        },
+        {
+          "no": null,
+          "nama_barang": "Chilli Red",
+          "qty": 0,
+          "harga_jual": 31900,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Kuning",
+          "qty": 1126,
+          "harga_jual": 31900,
+          "total": 35919400
+        },
+        {
+          "no": null,
+          "nama_barang": "putih",
+          "qty": 200,
+          "harga_jual": 31900,
+          "total": 6380000
+        }
+      ]
+    },
+    {
+      "category": "Palet FUTARI FLAT",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "Biru",
+          "qty": 120,
+          "harga_jual": 36500,
+          "total": 4380000
+        },
+        {
+          "no": null,
+          "nama_barang": "Merah",
+          "qty": 300,
+          "harga_jual": 36500,
+          "total": 10950000
+        },
+        {
+          "no": null,
+          "nama_barang": "Hijau",
+          "qty": 115,
+          "harga_jual": 36500,
+          "total": 4197500
+        }
+      ]
+    },
+    {
+      "category": "Part Case Futari Small",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "Merah",
+          "qty": 802,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Dark Grey",
+          "qty": 869,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Hijau",
+          "qty": 1000,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Pink",
+          "qty": 715,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Biru",
+          "qty": 1886,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Ungu",
+          "qty": 876,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "stick hitam",
+          "qty": 3404,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "stick cream",
+          "qty": 2808,
+          "harga_jual": 0,
+          "total": 0
+        }
+      ]
+    },
+    {
+      "category": "Keranjang solid Futari 481",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "Kuning",
+          "qty": 240,
+          "harga_jual": 57000,
+          "total": 13680000
+        },
+        {
+          "no": null,
+          "nama_barang": "Hijau",
+          "qty": 273,
+          "harga_jual": 57000,
+          "total": 15561000
+        },
+        {
+          "no": null,
+          "nama_barang": "Putih",
+          "qty": 91,
+          "harga_jual": 57000,
+          "total": 5187000
+        },
+        {
+          "no": null,
+          "nama_barang": "Merah",
+          "qty": 195,
+          "harga_jual": 57000,
+          "total": 11115000
+        }
+      ]
+    },
+    {
+      "category": "Lure Box",
+      "items": [
+        {
+          "no": 1,
+          "nama_barang": "L - 65",
+          "qty": 243,
+          "harga_jual": 15500,
+          "total": 3766500
+        },
+        {
+          "no": 2,
+          "nama_barang": "L - 85",
+          "qty": 459,
+          "harga_jual": 24500,
+          "total": 11245500
+        },
+        {
+          "no": 3,
+          "nama_barang": "L - 105",
+          "qty": 127,
+          "harga_jual": 34750,
+          "total": 4413250
+        },
+        {
+          "no": 4,
+          "nama_barang": "L - 145",
+          "qty": 42,
+          "harga_jual": 39000,
+          "total": 1638000
+        },
+        {
+          "no": 5,
+          "nama_barang": "L - 165",
+          "qty": 36,
+          "harga_jual": 55000,
+          "total": 1980000
+        },
+        {
+          "no": 6,
+          "nama_barang": "LB - S",
+          "qty": 21,
+          "harga_jual": 13750,
+          "total": 288750
+        },
+        {
+          "no": 7,
+          "nama_barang": "LB - M",
+          "qty": 39,
+          "harga_jual": 22000,
+          "total": 858000
+        },
+        {
+          "no": 8,
+          "nama_barang": "LB - L",
+          "qty": 70,
+          "harga_jual": 37000,
+          "total": 2590000
+        }
+      ]
+    },
+    {
+      "category": "Tackle Box",
+      "items": [
+        {
+          "no": 1,
+          "nama_barang": "SS - 150",
+          "qty": 86,
+          "harga_jual": 10000,
+          "total": 860000
+        },
+        {
+          "no": 2,
+          "nama_barang": "SS - 270 ( met blue )",
+          "qty": 71,
+          "harga_jual": 9500,
+          "total": 674500
+        },
+        {
+          "no": 3,
+          "nama_barang": "SS - 270 ( Dark green )",
+          "qty": 4,
+          "harga_jual": 9500,
+          "total": 38000
+        },
+        {
+          "no": 4,
+          "nama_barang": "SS - 270 ( 2 color blue )",
+          "qty": 44,
+          "harga_jual": 9500,
+          "total": 418000
+        },
+        {
+          "no": 5,
+          "nama_barang": "SS - 270 ( yellow )",
+          "qty": 21,
+          "harga_jual": 9500,
+          "total": 199500
+        },
+        {
+          "no": 6,
+          "nama_barang": "SS - 270 ( met red )",
+          "qty": 52,
+          "harga_jual": 9500,
+          "total": 494000
+        },
+        {
+          "no": 7,
+          "nama_barang": "SS - 270 ( blue )",
+          "qty": 0,
+          "harga_jual": 9500,
+          "total": 0
+        },
+        {
+          "no": 8,
+          "nama_barang": "SS - 270 ( pink)",
+          "qty": 40,
+          "harga_jual": 9500,
+          "total": 380000
+        },
+        {
+          "no": 9,
+          "nama_barang": "SS - 270 ( red )",
+          "qty": 16,
+          "harga_jual": 9500,
+          "total": 152000
+        },
+        {
+          "no": 10,
+          "nama_barang": "SS - 280",
+          "qty": 191,
+          "harga_jual": 11500,
+          "total": 2196500
+        },
+        {
+          "no": 11,
+          "nama_barang": "SS - 400 Clear",
+          "qty": 80,
+          "harga_jual": 12000,
+          "total": 960000
+        },
+        {
+          "no": 12,
+          "nama_barang": "SS - 400 Blue",
+          "qty": 67,
+          "harga_jual": 12000,
+          "total": 804000
+        },
+        {
+          "no": 13,
+          "nama_barang": "SS - 400 Yellow",
+          "qty": 31,
+          "harga_jual": 12000,
+          "total": 372000
+        },
+        {
+          "no": 14,
+          "nama_barang": "SS - 400 Orange",
+          "qty": 43,
+          "harga_jual": 12000,
+          "total": 516000
+        },
+        {
+          "no": 15,
+          "nama_barang": "SS - 450 Clear",
+          "qty": 14,
+          "harga_jual": 16500,
+          "total": 231000
+        },
+        {
+          "no": 16,
+          "nama_barang": "SS - 450 Orange",
+          "qty": 40,
+          "harga_jual": 16500,
+          "total": 660000
+        },
+        {
+          "no": 17,
+          "nama_barang": "SS - 450 Green",
+          "qty": 103,
+          "harga_jual": 16500,
+          "total": 1699500
+        },
+        {
+          "no": 18,
+          "nama_barang": "SS - 450 Yellow",
+          "qty": 40,
+          "harga_jual": 16500,
+          "total": 660000
+        },
+        {
+          "no": 19,
+          "nama_barang": "SS - 450 Red",
+          "qty": 61,
+          "harga_jual": 16500,
+          "total": 1006500
+        },
+        {
+          "no": 20,
+          "nama_barang": "SS - 650 Clear",
+          "qty": 167,
+          "harga_jual": 17800,
+          "total": 2972600
+        },
+        {
+          "no": 21,
+          "nama_barang": "SS - 650 Orange",
+          "qty": 65,
+          "harga_jual": 17800,
+          "total": 1157000
+        },
+        {
+          "no": 22,
+          "nama_barang": "SS - 800 Clear",
+          "qty": 20,
+          "harga_jual": 18800,
+          "total": 376000
+        },
+        {
+          "no": null,
+          "nama_barang": "SS - 800 Green",
+          "qty": 20,
+          "harga_jual": 18800,
+          "total": 376000
+        },
+        {
+          "no": 23,
+          "nama_barang": "SS - 800 Grey Trans",
+          "qty": 20,
+          "harga_jual": 18800,
+          "total": 376000
+        },
+        {
+          "no": 24,
+          "nama_barang": "SS - 800 Red",
+          "qty": 20,
+          "harga_jual": 18800,
+          "total": 376000
+        },
+        {
+          "no": 25,
+          "nama_barang": "SS - 800 Orange",
+          "qty": 20,
+          "harga_jual": 18800,
+          "total": 376000
+        },
+        {
+          "no": 26,
+          "nama_barang": "SS - 900",
+          "qty": 0,
+          "harga_jual": 18800,
+          "total": 0
+        },
+        {
+          "no": 30,
+          "nama_barang": "DS - 1500 Clear",
+          "qty": 94,
+          "harga_jual": 26900,
+          "total": 2528600
+        },
+        {
+          "no": 31,
+          "nama_barang": "SS - 1500 Grey Trans",
+          "qty": 9,
+          "harga_jual": 26900,
+          "total": 242100
+        },
+        {
+          "no": 32,
+          "nama_barang": "SS - 1500 Yellow",
+          "qty": 5,
+          "harga_jual": 26900,
+          "total": 134500
+        },
+        {
+          "no": 33,
+          "nama_barang": "SS - 1500 Orange",
+          "qty": 8,
+          "harga_jual": 26900,
+          "total": 215200
+        },
+        {
+          "no": 27,
+          "nama_barang": "SS - 2200 Clear",
+          "qty": 1,
+          "harga_jual": 36800,
+          "total": 36800
+        },
+        {
+          "no": 28,
+          "nama_barang": "SS - 2200 Orange",
+          "qty": 2,
+          "harga_jual": 36800,
+          "total": 73600
+        },
+        {
+          "no": 29,
+          "nama_barang": "SS - 2200 Yellow",
+          "qty": 33,
+          "harga_jual": 36800,
+          "total": 1214400
+        },
+        {
+          "no": 34,
+          "nama_barang": "DS - 3000",
+          "qty": 8,
+          "harga_jual": 99000,
+          "total": 792000
+        },
+        {
+          "no": 35,
+          "nama_barang": "TB - 3700 Red",
+          "qty": 20,
+          "harga_jual": 65500,
+          "total": 1310000
+        },
+        {
+          "no": 36,
+          "nama_barang": "TB - 3700 Blue",
+          "qty": 26,
+          "harga_jual": 65500,
+          "total": 1703000
+        },
+        {
+          "no": 37,
+          "nama_barang": "TB - 3700 Clear",
+          "qty": 1,
+          "harga_jual": 65500,
+          "total": 65500
+        },
+        {
+          "no": 38,
+          "nama_barang": "TB - 4700 (DL 700) Black Transp",
+          "qty": 4,
+          "harga_jual": 104500,
+          "total": 418000
+        },
+        {
+          "no": 39,
+          "nama_barang": "TB - 3007 red",
+          "qty": 1,
+          "harga_jual": 230000,
+          "total": 230000
+        },
+        {
+          "no": 40,
+          "nama_barang": "TB - 3007 Yellow",
+          "qty": 0,
+          "harga_jual": 230000,
+          "total": 0
+        },
+        {
+          "no": 41,
+          "nama_barang": "TB - 3007 biru",
+          "qty": 0,
+          "harga_jual": 230000,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "TB - 3007 hitam",
+          "qty": 2,
+          "harga_jual": 230000,
+          "total": 460000
+        }
+      ]
+    },
+    {
+      "category": "Tackle Box MT - 100",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "kuning",
+          "qty": 1,
+          "harga_jual": 100000,
+          "total": 100000
+        },
+        {
+          "no": null,
+          "nama_barang": "Orange",
+          "qty": 12,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "merah",
+          "qty": 12,
+          "harga_jual": 0,
+          "total": 0
+        }
+      ]
+    },
+    {
+      "category": "Tackle Box MT - 200",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "Merah",
+          "qty": 1,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "biru metalik",
+          "qty": 12,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Orange dk grey",
+          "qty": 12,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "merah metalik",
+          "qty": 12,
+          "harga_jual": 0,
+          "total": 0
+        }
+      ]
+    },
+    {
+      "category": "Tackle Box MT - 300",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "Orange/ Dk Grey",
+          "qty": 6,
+          "harga_jual": 183500,
+          "total": 1101000
+        },
+        {
+          "no": null,
+          "nama_barang": "merah",
+          "qty": 6,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "hijau",
+          "qty": 6,
+          "harga_jual": 0,
+          "total": 0
+        }
+      ]
+    },
+    {
+      "category": "Part Case Small",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "merah",
+          "qty": 2,
+          "harga_jual": 55000,
+          "total": 110000
+        },
+        {
+          "no": null,
+          "nama_barang": "Pink",
+          "qty": 22,
+          "harga_jual": 55000,
+          "total": 1210000
+        },
+        {
+          "no": null,
+          "nama_barang": "Kuning",
+          "qty": 5,
+          "harga_jual": 55000,
+          "total": 275000
+        },
+        {
+          "no": null,
+          "nama_barang": "Hijau",
+          "qty": 1,
+          "harga_jual": 55000,
+          "total": 55000
+        }
+      ]
+    },
+    {
+      "category": "Part Case MEDIUM",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "merah",
+          "qty": 0,
+          "harga_jual": 100300,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Kuning",
+          "qty": 0,
+          "harga_jual": 100300,
+          "total": 0
+        }
+      ]
+    },
+    {
+      "category": "Part Case BESAR",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "merah",
+          "qty": 24,
+          "harga_jual": 158000,
+          "total": 3792000
+        },
+        {
+          "no": null,
+          "nama_barang": "Kuning",
+          "qty": 0,
+          "harga_jual": 158000,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Hijau",
+          "qty": 16,
+          "harga_jual": 158000,
+          "total": 2528000
+        },
+        {
+          "no": null,
+          "nama_barang": "Stick Partcase small",
+          "qty": 69,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Stick Partcase medium",
+          "qty": 21,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Stick Partcase Large",
+          "qty": 58,
+          "harga_jual": 0,
+          "total": 0
+        }
+      ]
+    },
+    {
+      "category": "Folding Container ( Medium )",
+      "items": [
+        {
+          "no": 1,
+          "nama_barang": "Orange",
+          "qty": 0,
+          "harga_jual": 34000,
+          "total": 0
+        },
+        {
+          "no": 2,
+          "nama_barang": "Green",
+          "qty": 19,
+          "harga_jual": 34000,
+          "total": 646000
+        },
+        {
+          "no": 3,
+          "nama_barang": "Pink",
+          "qty": 25,
+          "harga_jual": 34000,
+          "total": 850000
+        }
+      ]
+    },
+    {
+      "category": "Lunch Box Victory",
+      "items": [
+        {
+          "no": 1,
+          "nama_barang": "Pink",
+          "qty": 37,
+          "harga_jual": 17000,
+          "total": 629000
+        },
+        {
+          "no": 2,
+          "nama_barang": "kuning",
+          "qty": 51,
+          "harga_jual": 17000,
+          "total": 867000
+        },
+        {
+          "no": 3,
+          "nama_barang": "Peach",
+          "qty": 0,
+          "harga_jual": 17000,
+          "total": 0
+        },
+        {
+          "no": 4,
+          "nama_barang": "Orange",
+          "qty": 14,
+          "harga_jual": 17000,
+          "total": 238000
+        },
+        {
+          "no": 5,
+          "nama_barang": "Merah",
+          "qty": 36,
+          "harga_jual": 17000,
+          "total": 612000
+        },
+        {
+          "no": 6,
+          "nama_barang": "Hijau",
+          "qty": 28,
+          "harga_jual": 17000,
+          "total": 476000
+        },
+        {
+          "no": 7,
+          "nama_barang": "Biru",
+          "qty": 30,
+          "harga_jual": 17000,
+          "total": 510000
+        },
+        {
+          "no": 8,
+          "nama_barang": "Coklat",
+          "qty": 40,
+          "harga_jual": 17000,
+          "total": 680000
+        }
+      ]
+    },
+    {
+      "category": "Lunch Box Melva",
+      "items": [
+        {
+          "no": 1,
+          "nama_barang": "Orange trendy",
+          "qty": 116,
+          "harga_jual": 17000,
+          "total": 1972000
+        },
+        {
+          "no": 2,
+          "nama_barang": "Hijau",
+          "qty": 143,
+          "harga_jual": 17000,
+          "total": 2431000
+        },
+        {
+          "no": 3,
+          "nama_barang": "Blue",
+          "qty": 123,
+          "harga_jual": 17000,
+          "total": 2091000
+        },
+        {
+          "no": 4,
+          "nama_barang": "Violet",
+          "qty": 106,
+          "harga_jual": 17000,
+          "total": 1802000
+        },
+        {
+          "no": 5,
+          "nama_barang": "Magenta",
+          "qty": 6,
+          "harga_jual": 17000,
+          "total": 102000
+        },
+        {
+          "no": 6,
+          "nama_barang": "Orange",
+          "qty": 108,
+          "harga_jual": 17000,
+          "total": 1836000
+        },
+        {
+          "no": 7,
+          "nama_barang": "biru bulat",
+          "qty": 104,
+          "harga_jual": 23600,
+          "total": 2454400
+        },
+        {
+          "no": 8,
+          "nama_barang": "hijau bulat",
+          "qty": 108,
+          "harga_jual": 23600,
+          "total": 2548800
+        },
+        {
+          "no": 9,
+          "nama_barang": "orange bulat",
+          "qty": 86,
+          "harga_jual": 23600,
+          "total": 2029600
+        },
+        {
+          "no": null,
+          "nama_barang": "Tutup TMM",
+          "qty": 0,
+          "harga_jual": 7500,
+          "total": 0
+        }
+      ]
+    },
+    {
+      "category": "Lunch Box Harper",
+      "items": [
+        {
+          "no": 1,
+          "nama_barang": "Biru",
+          "qty": 104,
+          "harga_jual": 18000,
+          "total": 1872000
+        },
+        {
+          "no": 2,
+          "nama_barang": "Hijau",
+          "qty": 97,
+          "harga_jual": 18000,
+          "total": 1746000
+        }
+      ]
+    },
+    {
+      "category": "Lunch Box Tori",
+      "items": [
+        {
+          "no": 1,
+          "nama_barang": "Hijau",
+          "qty": 12,
+          "harga_jual": 13000,
+          "total": 156000
+        },
+        {
+          "no": 2,
+          "nama_barang": "Biru",
+          "qty": 11,
+          "harga_jual": 13000,
+          "total": 143000
+        },
+        {
+          "no": 3,
+          "nama_barang": "Pink",
+          "qty": 10,
+          "harga_jual": 13000,
+          "total": 130000
+        }
+      ]
+    },
+    {
+      "category": "Rantang Sasha",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "Hijau",
+          "qty": 11,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Biru",
+          "qty": 20,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "merah",
+          "qty": 20,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Lotus 100",
+          "qty": 0,
+          "harga_jual": 162000,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Keranjang Belanja",
+          "qty": 7,
+          "harga_jual": 49500,
+          "total": 346500
+        }
+      ]
+    },
+    {
+      "category": "Kotak makan Numan",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "Hijau Muda",
+          "qty": 32,
+          "harga_jual": 19000,
+          "total": 608000
+        },
+        {
+          "no": null,
+          "nama_barang": "Hijau Tua",
+          "qty": 9,
+          "harga_jual": 19000,
+          "total": 171000
+        },
+        {
+          "no": null,
+          "nama_barang": "Biru Tua",
+          "qty": 19,
+          "harga_jual": 19000,
+          "total": 361000
+        },
+        {
+          "no": null,
+          "nama_barang": "Biru Muda",
+          "qty": 6,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Pink",
+          "qty": 4,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Krat gelas",
+          "qty": 1,
+          "harga_jual": 57000,
+          "total": 57000
+        },
+        {
+          "no": 1,
+          "nama_barang": "Milano",
+          "qty": 0,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "biru",
+          "qty": 31,
+          "harga_jual": 14600,
+          "total": 452600
+        },
+        {
+          "no": null,
+          "nama_barang": "magenta",
+          "qty": 16,
+          "harga_jual": 14600,
+          "total": 233600
+        },
+        {
+          "no": null,
+          "nama_barang": "orange",
+          "qty": 14,
+          "harga_jual": 14600,
+          "total": 204400
+        },
+        {
+          "no": null,
+          "nama_barang": "pink",
+          "qty": 31,
+          "harga_jual": 14600,
+          "total": 452600
+        }
+      ]
+    },
+    {
+      "category": "sendok Numan,",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "putih",
+          "qty": 2,
+          "harga_jual": 14500,
+          "total": 29000
+        },
+        {
+          "no": null,
+          "nama_barang": "biru",
+          "qty": 24,
+          "harga_jual": 14500,
+          "total": 348000
+        },
+        {
+          "no": null,
+          "nama_barang": "hijau",
+          "qty": 14,
+          "harga_jual": 14500,
+          "total": 203000
+        }
+      ]
+    },
+    {
+      "category": "Garpu Numan",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "Putih",
+          "qty": 27,
+          "harga_jual": 14500,
+          "total": 391500
+        },
+        {
+          "no": null,
+          "nama_barang": "biru",
+          "qty": 64,
+          "harga_jual": 14500,
+          "total": 928000
+        }
+      ]
+    },
+    {
+      "category": "Kacamata Cross",
+      "items": [
+        {
+          "no": 1,
+          "nama_barang": "Merah",
+          "qty": 13,
+          "harga_jual": 67000,
+          "total": 871000
+        },
+        {
+          "no": 2,
+          "nama_barang": "Putih",
+          "qty": 6,
+          "harga_jual": 67000,
+          "total": 402000
+        },
+        {
+          "no": null,
+          "nama_barang": "hijau",
+          "qty": 3,
+          "harga_jual": 67000,
+          "total": 201000
+        },
+        {
+          "no": null,
+          "nama_barang": "kaca helm clear",
+          "qty": 22,
+          "harga_jual": 38000,
+          "total": 836000
+        },
+        {
+          "no": null,
+          "nama_barang": "kaca helm smoke",
+          "qty": 23,
+          "harga_jual": 38000,
+          "total": 874000
+        }
+      ]
+    },
+    {
+      "category": "Kotak Makan Victory Kipit",
+      "items": [
+        {
+          "no": 1,
+          "nama_barang": "TTR10",
+          "qty": 24,
+          "harga_jual": 17500,
+          "total": 420000
+        },
+        {
+          "no": 2,
+          "nama_barang": "TTR10+Sekat",
+          "qty": 101,
+          "harga_jual": 20500,
+          "total": 2070500
+        },
+        {
+          "no": 3,
+          "nama_barang": "TTR20",
+          "qty": 0,
+          "harga_jual": 28400,
+          "total": 0
+        },
+        {
+          "no": 4,
+          "nama_barang": "TTR20+Sekat",
+          "qty": 52,
+          "harga_jual": 36300,
+          "total": 1887600
+        },
+        {
+          "no": 5,
+          "nama_barang": "TTR30",
+          "qty": 83,
+          "harga_jual": 29100,
+          "total": 2415300
+        },
+        {
+          "no": 6,
+          "nama_barang": "TTR30+Sekat",
+          "qty": 33,
+          "harga_jual": 37000,
+          "total": 1221000
+        },
+        {
+          "no": 7,
+          "nama_barang": "TTR40",
+          "qty": 12,
+          "harga_jual": 47600,
+          "total": 571200
+        },
+        {
+          "no": 8,
+          "nama_barang": "TTR40+Sekat",
+          "qty": 21,
+          "harga_jual": 66000,
+          "total": 1386000
+        },
+        {
+          "no": null,
+          "nama_barang": "TTR 20 Mix",
+          "qty": 34,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "TTR 40 Mix",
+          "qty": 10,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": 9,
+          "nama_barang": "Multi Kip Box 5L Blue",
+          "qty": 0,
+          "harga_jual": 26400,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Multi Kip Box 5L yellow",
+          "qty": 2,
+          "harga_jual": 26400,
+          "total": 52800
+        },
+        {
+          "no": null,
+          "nama_barang": "Multi Kip Box 5L Green",
+          "qty": 3,
+          "harga_jual": 26400,
+          "total": 79200
+        },
+        {
+          "no": null,
+          "nama_barang": "Multi Kip Box 5L Pink",
+          "qty": 1,
+          "harga_jual": 26400,
+          "total": 26400
+        },
+        {
+          "no": null,
+          "nama_barang": "LPF 810",
+          "qty": 30,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "LPC 820",
+          "qty": 37,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "LPY 810",
+          "qty": 24,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "LPY 820",
+          "qty": 59,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "LPY 850",
+          "qty": 14,
+          "harga_jual": 0,
+          "total": 0
+        }
+      ]
+    },
+    {
+      "category": "Food Box 500",
+      "items": [
+        {
+          "no": 1,
+          "nama_barang": "Blue/ Clear",
+          "qty": 42,
+          "harga_jual": 6000,
+          "total": 252000
+        },
+        {
+          "no": 2,
+          "nama_barang": "Red/ Clear",
+          "qty": 22,
+          "harga_jual": 6000,
+          "total": 132000
+        },
+        {
+          "no": 3,
+          "nama_barang": "Pink/ Clear",
+          "qty": 54,
+          "harga_jual": 6000,
+          "total": 324000
+        },
+        {
+          "no": 4,
+          "nama_barang": "Peach/ Clear",
+          "qty": 60,
+          "harga_jual": 6000,
+          "total": 360000
+        },
+        {
+          "no": 5,
+          "nama_barang": "Grey Trans/ Blue",
+          "qty": 34,
+          "harga_jual": 6000,
+          "total": 204000
+        },
+        {
+          "no": 5,
+          "nama_barang": "Grey Trans/ Green",
+          "qty": 10,
+          "harga_jual": 6000,
+          "total": 60000
+        },
+        {
+          "no": 6,
+          "nama_barang": "Grey Trans/ Yellow",
+          "qty": 102,
+          "harga_jual": 6000,
+          "total": 612000
+        },
+        {
+          "no": 8,
+          "nama_barang": "Grey Trans/ Orange",
+          "qty": 18,
+          "harga_jual": 6000,
+          "total": 108000
+        }
+      ]
+    },
+    {
+      "category": "Food Box 1000",
+      "items": [
+        {
+          "no": 1,
+          "nama_barang": "Blue/ Clear",
+          "qty": 12,
+          "harga_jual": 8300,
+          "total": 99600
+        },
+        {
+          "no": 2,
+          "nama_barang": "Red/ Clear",
+          "qty": 12,
+          "harga_jual": 8300,
+          "total": 99600
+        },
+        {
+          "no": 3,
+          "nama_barang": "Pink/ Clear",
+          "qty": 12,
+          "harga_jual": 8300,
+          "total": 99600
+        },
+        {
+          "no": 4,
+          "nama_barang": "Peach/ Clear",
+          "qty": 12,
+          "harga_jual": 8300,
+          "total": 99600
+        },
+        {
+          "no": 5,
+          "nama_barang": "Grey Trans/ Green",
+          "qty": 21,
+          "harga_jual": 8300,
+          "total": 174300
+        },
+        {
+          "no": 6,
+          "nama_barang": "Grey Trans/ Yellow",
+          "qty": 39,
+          "harga_jual": 8300,
+          "total": 323700
+        },
+        {
+          "no": 7,
+          "nama_barang": "Grey Trans/ Blue",
+          "qty": 45,
+          "harga_jual": 8300,
+          "total": 373500
+        },
+        {
+          "no": 8,
+          "nama_barang": "Grey Trans/ Orange",
+          "qty": 32,
+          "harga_jual": 8300,
+          "total": 265600
+        }
+      ]
+    },
+    {
+      "category": "Mak Cook ( Panci )",
+      "items": [
+        {
+          "no": 1,
+          "nama_barang": "Panci Rubina RN 20",
+          "qty": 0,
+          "harga_jual": 88000,
+          "total": 0
+        },
+        {
+          "no": 2,
+          "nama_barang": "Panci Rubina RN 24 ( 3 in 1 )",
+          "qty": 4,
+          "harga_jual": 148000,
+          "total": 592000
+        }
+      ]
+    },
+    {
+      "category": "Mak Cook ( Frypan )",
+      "items": [
+        {
+          "no": 1,
+          "nama_barang": "Rubina RC 18",
+          "qty": 3,
+          "harga_jual": 52000,
+          "total": 156000
+        },
+        {
+          "no": 2,
+          "nama_barang": "Rubina RC 20",
+          "qty": 3,
+          "harga_jual": 59000,
+          "total": 177000
+        },
+        {
+          "no": 3,
+          "nama_barang": "Rubina RC 22",
+          "qty": 21,
+          "harga_jual": 67000,
+          "total": 1407000
+        },
+        {
+          "no": 4,
+          "nama_barang": "Rubina RC 24",
+          "qty": 16,
+          "harga_jual": 75000,
+          "total": 1200000
+        },
+        {
+          "no": 5,
+          "nama_barang": "Rubina RC 26",
+          "qty": 17,
+          "harga_jual": 84000,
+          "total": 1428000
+        },
+        {
+          "no": null,
+          "nama_barang": "Panci susu  non tutup",
+          "qty": 2,
+          "harga_jual": 25500,
+          "total": 51000
+        },
+        {
+          "no": 6,
+          "nama_barang": "Panci susu + tutup",
+          "qty": 0,
+          "harga_jual": 40000,
+          "total": 0
+        },
+        {
+          "no": 7,
+          "nama_barang": "Dandang 24 cm",
+          "qty": 5,
+          "harga_jual": 53000,
+          "total": 265000
+        },
+        {
+          "no": 8,
+          "nama_barang": "Teko mane S",
+          "qty": 0,
+          "harga_jual": 57000,
+          "total": 0
+        },
+        {
+          "no": 9,
+          "nama_barang": "Teko mane L",
+          "qty": 0,
+          "harga_jual": 85000,
+          "total": 0
+        },
+        {
+          "no": 10,
+          "nama_barang": "Teko Arab 1 L",
+          "qty": 0,
+          "harga_jual": 49500,
+          "total": 0
+        },
+        {
+          "no": 10,
+          "nama_barang": "Teko Arab 2 L",
+          "qty": 0,
+          "harga_jual": 64000,
+          "total": 0
+        }
+      ]
+    },
+    {
+      "category": "Teko Siul 22 cm",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "Teko Siul 24 cm",
+          "qty": 12,
+          "harga_jual": 105000,
+          "total": 1260000
+        },
+        {
+          "no": 11,
+          "nama_barang": "Tempat cuci tangan 20 L",
+          "qty": 11,
+          "harga_jual": 79000,
+          "total": 869000
+        },
+        {
+          "no": 12,
+          "nama_barang": "Tempat cuci tangan 44 L",
+          "qty": 0,
+          "harga_jual": 162000,
+          "total": 0
+        },
+        {
+          "no": 13,
+          "nama_barang": "Gentong 44 L",
+          "qty": 0,
+          "harga_jual": 152000,
+          "total": 0
+        },
+        {
+          "no": 14,
+          "nama_barang": "Tempat sampah 5 L",
+          "qty": 108,
+          "harga_jual": 33000,
+          "total": 3564000
+        },
+        {
+          "no": 15,
+          "nama_barang": "Tempat sampah 15 L",
+          "qty": 12,
+          "harga_jual": 62000,
+          "total": 744000
+        },
+        {
+          "no": 16,
+          "nama_barang": "Tempat sampah 20 L",
+          "qty": 7,
+          "harga_jual": 86000,
+          "total": 602000
+        },
+        {
+          "no": null,
+          "nama_barang": "Tempat sampah Bulat",
+          "qty": 10,
+          "harga_jual": 33000,
+          "total": 330000
+        },
+        {
+          "no": 17,
+          "nama_barang": "keranjang pasar orlando",
+          "qty": 10,
+          "harga_jual": 79000,
+          "total": 790000
+        },
+        {
+          "no": 18,
+          "nama_barang": "Keranjang pasar miami",
+          "qty": 5,
+          "harga_jual": 64000,
+          "total": 320000
+        },
+        {
+          "no": 19,
+          "nama_barang": "Keranjang pasar melodi",
+          "qty": 44,
+          "harga_jual": 45000,
+          "total": 1980000
+        },
+        {
+          "no": 20,
+          "nama_barang": "bangku jongkok mini",
+          "qty": 30,
+          "harga_jual": 25000,
+          "total": 750000
+        },
+        {
+          "no": 21,
+          "nama_barang": "Bangku sender mini",
+          "qty": 31,
+          "harga_jual": 33000,
+          "total": 1023000
+        },
+        {
+          "no": 22,
+          "nama_barang": "Rak piring praktis",
+          "qty": 0,
+          "harga_jual": 72000,
+          "total": 0
+        },
+        {
+          "no": 23,
+          "nama_barang": "Rak piring inova",
+          "qty": 0,
+          "harga_jual": 156000,
+          "total": 0
+        },
+        {
+          "no": 24,
+          "nama_barang": "Rak bumbu",
+          "qty": 15,
+          "harga_jual": 24000,
+          "total": 360000
+        },
+        {
+          "no": 25,
+          "nama_barang": "Kitchen Mate 5 set",
+          "qty": 45,
+          "harga_jual": 34000,
+          "total": 1530000
+        },
+        {
+          "no": 26,
+          "nama_barang": "Hanger 30 stick",
+          "qty": 18,
+          "harga_jual": 53000,
+          "total": 954000
+        },
+        {
+          "no": 27,
+          "nama_barang": "keranjang baju elegance",
+          "qty": 17,
+          "harga_jual": 75000,
+          "total": 1275000
+        },
+        {
+          "no": 28,
+          "nama_barang": "keranjang serbaguna kml",
+          "qty": 6,
+          "harga_jual": 86000,
+          "total": 516000
+        },
+        {
+          "no": 29,
+          "nama_barang": "Gayung pendek",
+          "qty": 1,
+          "harga_jual": 14000,
+          "total": 14000
+        },
+        {
+          "no": 30,
+          "nama_barang": "Gayung panjang",
+          "qty": 218,
+          "harga_jual": 13000,
+          "total": 2834000
+        },
+        {
+          "no": 31,
+          "nama_barang": "Helm biru",
+          "qty": 17,
+          "harga_jual": 38000,
+          "total": 646000
+        },
+        {
+          "no": 32,
+          "nama_barang": "helm merah",
+          "qty": 21,
+          "harga_jual": 38000,
+          "total": 798000
+        },
+        {
+          "no": 33,
+          "nama_barang": "TC 50",
+          "qty": 1,
+          "harga_jual": 233000,
+          "total": 233000
+        },
+        {
+          "no": 34,
+          "nama_barang": "SRC 01 ( 60 pcs )",
+          "qty": 197,
+          "harga_jual": 13000,
+          "total": 2561000
+        },
+        {
+          "no": null,
+          "nama_barang": "SRC 03 ( 36 pcs )",
+          "qty": 71,
+          "harga_jual": 23000,
+          "total": 1633000
+        },
+        {
+          "no": 34,
+          "nama_barang": "SRC 05 ( 24 pcs )",
+          "qty": 15,
+          "harga_jual": 38000,
+          "total": 570000
+        },
+        {
+          "no": null,
+          "nama_barang": "SRC 10 ( 24 pcs )",
+          "qty": 15,
+          "harga_jual": 53000,
+          "total": 795000
+        },
+        {
+          "no": null,
+          "nama_barang": "SRC 20 ( 12 pcs )",
+          "qty": 1,
+          "harga_jual": 88000,
+          "total": 88000
+        },
+        {
+          "no": null,
+          "nama_barang": "Keranjang industri T 16",
+          "qty": 54,
+          "harga_jual": 169000,
+          "total": 9126000
+        },
+        {
+          "no": null,
+          "nama_barang": "laci omega",
+          "qty": 9,
+          "harga_jual": 57500,
+          "total": 517500
+        },
+        {
+          "no": null,
+          "nama_barang": "ember 12L Biru",
+          "qty": 4,
+          "harga_jual": 48000,
+          "total": 192000
+        },
+        {
+          "no": null,
+          "nama_barang": "ember 12L Merah",
+          "qty": 8,
+          "harga_jual": 48000,
+          "total": 384000
+        },
+        {
+          "no": null,
+          "nama_barang": "ember 12L Hijau",
+          "qty": 3,
+          "harga_jual": 48000,
+          "total": 144000
+        },
+        {
+          "no": null,
+          "nama_barang": "ember 15L Biru",
+          "qty": 1,
+          "harga_jual": 62000,
+          "total": 62000
+        },
+        {
+          "no": null,
+          "nama_barang": "ember 15L Merah",
+          "qty": 7,
+          "harga_jual": 62000,
+          "total": 434000
+        },
+        {
+          "no": null,
+          "nama_barang": "ember 15L Hijau",
+          "qty": 3,
+          "harga_jual": 62000,
+          "total": 186000
+        },
+        {
+          "no": null,
+          "nama_barang": "Baskom USA",
+          "qty": 5,
+          "harga_jual": 148000,
+          "total": 740000
+        },
+        {
+          "no": null,
+          "nama_barang": "Rice Bucket 6",
+          "qty": 11,
+          "harga_jual": 70000,
+          "total": 770000
+        },
+        {
+          "no": null,
+          "nama_barang": "Rice Bucket 8",
+          "qty": 11,
+          "harga_jual": 85000,
+          "total": 935000
+        },
+        {
+          "no": null,
+          "nama_barang": "Rice Bucket 10",
+          "qty": 9,
+          "harga_jual": 95000,
+          "total": 855000
+        },
+        {
+          "no": null,
+          "nama_barang": "Periuk 16 cm",
+          "qty": 0,
+          "harga_jual": 35950,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Periuk 18 cm",
+          "qty": 0,
+          "harga_jual": 42500,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Periuk 20 cm",
+          "qty": 3,
+          "harga_jual": 49500,
+          "total": 148500
+        },
+        {
+          "no": null,
+          "nama_barang": "Periuk 22 cm",
+          "qty": 0,
+          "harga_jual": 58000,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Periuk 24 cm",
+          "qty": 0,
+          "harga_jual": 68500,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Baskom segi Large",
+          "qty": 38,
+          "harga_jual": 49000,
+          "total": 1862000
+        },
+        {
+          "no": null,
+          "nama_barang": "Reducer 2 - 1/2 inch",
+          "qty": 17,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Plug 1/2 inch",
+          "qty": 15,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Tutup pipa polos 1/2",
+          "qty": 62,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Sokdrat Dalam 1/2",
+          "qty": 650,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Sokdrat Luar 1/2",
+          "qty": 68,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Knee 1/2",
+          "qty": 100,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Knee Drat Dalam 1/2",
+          "qty": 114,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Tee 1/2",
+          "qty": 175,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Sokdrat Dalam 3/4",
+          "qty": 16,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Sokdrat Luar 3/4",
+          "qty": 18,
+          "harga_jual": 0,
+          "total": 0
+        }
+      ]
+    },
+    {
+      "category": "Rabbit",
+      "items": [
+        {
+          "no": 1,
+          "nama_barang": "Tipe 7001 Krat gelas 25",
+          "qty": 10,
+          "harga_jual": 66000,
+          "total": 660000
+        },
+        {
+          "no": 2,
+          "nama_barang": "Tipe 7202 Krat gelas 50",
+          "qty": 9,
+          "harga_jual": 107000,
+          "total": 963000
+        },
+        {
+          "no": 3,
+          "nama_barang": "Tipe 9001 Krat telur",
+          "qty": 85,
+          "harga_jual": 15000,
+          "total": 1275000
+        },
+        {
+          "no": 4,
+          "nama_barang": "Tipe 0111",
+          "qty": 21,
+          "harga_jual": 88000,
+          "total": 1848000
+        },
+        {
+          "no": 5,
+          "nama_barang": "Tipe 0222",
+          "qty": 25,
+          "harga_jual": 60000,
+          "total": 1500000
+        },
+        {
+          "no": 6,
+          "nama_barang": "Tipe 0333",
+          "qty": 18,
+          "harga_jual": 49000,
+          "total": 882000
+        },
+        {
+          "no": null,
+          "nama_barang": "Tipe 0444",
+          "qty": 13,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": 40,
+          "nama_barang": "Tipe 4022",
+          "qty": 9,
+          "harga_jual": 71000,
+          "total": 639000
+        },
+        {
+          "no": 7,
+          "nama_barang": "Tipe 0555",
+          "qty": 13,
+          "harga_jual": 32000,
+          "total": 416000
+        },
+        {
+          "no": 8,
+          "nama_barang": "Tipe 1001 + gagang",
+          "qty": 10,
+          "harga_jual": 211000,
+          "total": 2110000
+        },
+        {
+          "no": 9,
+          "nama_barang": "Tipe 1002",
+          "qty": 3,
+          "harga_jual": 115000,
+          "total": 345000
+        },
+        {
+          "no": 10,
+          "nama_barang": "Tipe 1004",
+          "qty": 2,
+          "harga_jual": 133000,
+          "total": 266000
+        },
+        {
+          "no": 11,
+          "nama_barang": "Tipe 1006",
+          "qty": 8,
+          "harga_jual": 81000,
+          "total": 648000
+        },
+        {
+          "no": null,
+          "nama_barang": "Tipe 1008",
+          "qty": 3,
+          "harga_jual": 211000,
+          "total": 633000
+        },
+        {
+          "no": null,
+          "nama_barang": "Tipe 1101",
+          "qty": 3,
+          "harga_jual": 236000,
+          "total": 708000
+        },
+        {
+          "no": 12,
+          "nama_barang": "Tipe 1223",
+          "qty": 1,
+          "harga_jual": 170000,
+          "total": 170000
+        },
+        {
+          "no": 13,
+          "nama_barang": "Tipe 2001",
+          "qty": 17,
+          "harga_jual": 73000,
+          "total": 1241000
+        },
+        {
+          "no": 14,
+          "nama_barang": "Tipe 2011",
+          "qty": 33,
+          "harga_jual": 94000,
+          "total": 3102000
+        },
+        {
+          "no": 15,
+          "nama_barang": "Tipe 2002",
+          "qty": 51,
+          "harga_jual": 93000,
+          "total": 4743000
+        },
+        {
+          "no": 16,
+          "nama_barang": "Tipe 2022",
+          "qty": 17,
+          "harga_jual": 106000,
+          "total": 1802000
+        },
+        {
+          "no": 17,
+          "nama_barang": "Tipe 2122",
+          "qty": 12,
+          "harga_jual": 112000,
+          "total": 1344000
+        },
+        {
+          "no": 18,
+          "nama_barang": "Tipe 2003",
+          "qty": 11,
+          "harga_jual": 109000,
+          "total": 1199000
+        },
+        {
+          "no": 19,
+          "nama_barang": "Tipe 2033",
+          "qty": 5,
+          "harga_jual": 117000,
+          "total": 585000
+        },
+        {
+          "no": null,
+          "nama_barang": "Tipe 2233",
+          "qty": 18,
+          "harga_jual": 120000,
+          "total": 2160000
+        },
+        {
+          "no": 20,
+          "nama_barang": "Tipe 2004",
+          "qty": 12,
+          "harga_jual": 117000,
+          "total": 1404000
+        },
+        {
+          "no": 21,
+          "nama_barang": "Tipe 2244",
+          "qty": 18,
+          "harga_jual": 123000,
+          "total": 2214000
+        },
+        {
+          "no": 22,
+          "nama_barang": "Tipe 2404",
+          "qty": 6,
+          "harga_jual": 104000,
+          "total": 624000
+        },
+        {
+          "no": 23,
+          "nama_barang": "Tipe 2009",
+          "qty": 3,
+          "harga_jual": 159000,
+          "total": 477000
+        },
+        {
+          "no": 24,
+          "nama_barang": "Tipe 2010",
+          "qty": 3,
+          "harga_jual": 181000,
+          "total": 543000
+        },
+        {
+          "no": 25,
+          "nama_barang": "Tipe 2112",
+          "qty": 18,
+          "harga_jual": 59000,
+          "total": 1062000
+        },
+        {
+          "no": 26,
+          "nama_barang": "Tipe 2166",
+          "qty": 9,
+          "harga_jual": 125000,
+          "total": 1125000
+        },
+        {
+          "no": null,
+          "nama_barang": "Tipe 2266",
+          "qty": 0,
+          "harga_jual": 145000,
+          "total": 0
+        },
+        {
+          "no": 27,
+          "nama_barang": "Tipe 2606",
+          "qty": 16,
+          "harga_jual": 122000,
+          "total": 1952000
+        },
+        {
+          "no": 28,
+          "nama_barang": "Tipe 2666 tutup 2606",
+          "qty": 5,
+          "harga_jual": 62000,
+          "total": 310000
+        },
+        {
+          "no": 29,
+          "nama_barang": "Tipe 2808",
+          "qty": 16,
+          "harga_jual": 129000,
+          "total": 2064000
+        },
+        {
+          "no": 30,
+          "nama_barang": "Tipe 2288",
+          "qty": 9,
+          "harga_jual": 155000,
+          "total": 1395000
+        },
+        {
+          "no": null,
+          "nama_barang": "Tipe 2322",
+          "qty": 4,
+          "harga_jual": 96000,
+          "total": 384000
+        },
+        {
+          "no": null,
+          "nama_barang": "Tutup 2322",
+          "qty": 6,
+          "harga_jual": 48000,
+          "total": 288000
+        },
+        {
+          "no": 31,
+          "nama_barang": "Tipe 3003",
+          "qty": 24,
+          "harga_jual": 98000,
+          "total": 2352000
+        },
+        {
+          "no": 32,
+          "nama_barang": "Tipe 3033",
+          "qty": 14,
+          "harga_jual": 109000,
+          "total": 1526000
+        },
+        {
+          "no": 33,
+          "nama_barang": "Tutup 3333",
+          "qty": 9,
+          "harga_jual": 57000,
+          "total": 513000
+        },
+        {
+          "no": 34,
+          "nama_barang": "Tipe 3009",
+          "qty": 12,
+          "harga_jual": 88000,
+          "total": 1056000
+        },
+        {
+          "no": 35,
+          "nama_barang": "Tipe T 3302 ( TUTUP )",
+          "qty": 3,
+          "harga_jual": 62000,
+          "total": 186000
+        },
+        {
+          "no": null,
+          "nama_barang": "Tipe 3322",
+          "qty": 9,
+          "harga_jual": 116000,
+          "total": 1044000
+        },
+        {
+          "no": null,
+          "nama_barang": "Tipe 3303",
+          "qty": 9,
+          "harga_jual": 114000,
+          "total": 1026000
+        },
+        {
+          "no": null,
+          "nama_barang": "Tipe 3323",
+          "qty": 7,
+          "harga_jual": 128000,
+          "total": 896000
+        },
+        {
+          "no": 36,
+          "nama_barang": "Tipe 3326",
+          "qty": 8,
+          "harga_jual": 162000,
+          "total": 1296000
+        },
+        {
+          "no": 37,
+          "nama_barang": "Tipe 3308",
+          "qty": 3,
+          "harga_jual": 156000,
+          "total": 468000
+        },
+        {
+          "no": 38,
+          "nama_barang": "Tipe 3328",
+          "qty": 2,
+          "harga_jual": 180000,
+          "total": 360000
+        },
+        {
+          "no": 39,
+          "nama_barang": "Tipe 3329",
+          "qty": 7,
+          "harga_jual": 195000,
+          "total": 1365000
+        },
+        {
+          "no": 41,
+          "nama_barang": "Tipe 4303 ( tray )",
+          "qty": 3,
+          "harga_jual": 73000,
+          "total": 219000
+        },
+        {
+          "no": 42,
+          "nama_barang": "Tipe 4609 ( tray roti tawar )",
+          "qty": 8,
+          "harga_jual": 123000,
+          "total": 984000
+        },
+        {
+          "no": 43,
+          "nama_barang": "Tipe 5000 + tutup",
+          "qty": 8,
+          "harga_jual": 190000,
+          "total": 1520000
+        },
+        {
+          "no": 44,
+          "nama_barang": "Tipe 5002",
+          "qty": 25,
+          "harga_jual": 59000,
+          "total": 1475000
+        },
+        {
+          "no": 45,
+          "nama_barang": "Tipe 5004",
+          "qty": 22,
+          "harga_jual": 101000,
+          "total": 2222000
+        },
+        {
+          "no": null,
+          "nama_barang": "Tipe 5031",
+          "qty": 0,
+          "harga_jual": 74000,
+          "total": 0
+        },
+        {
+          "no": 46,
+          "nama_barang": "Tipe 5034 ( sekat )",
+          "qty": 4,
+          "harga_jual": 165000,
+          "total": 660000
+        },
+        {
+          "no": 47,
+          "nama_barang": "Tipe 5040 ( rak roti )",
+          "qty": 10,
+          "harga_jual": 111000,
+          "total": 1110000
+        },
+        {
+          "no": 48,
+          "nama_barang": "Tipe 5056 keranjang krat telur",
+          "qty": 2,
+          "harga_jual": 207000,
+          "total": 414000
+        },
+        {
+          "no": 49,
+          "nama_barang": "Tipe 6011",
+          "qty": 11,
+          "harga_jual": 79000,
+          "total": 869000
+        },
+        {
+          "no": 50,
+          "nama_barang": "Tutup 6101",
+          "qty": 13,
+          "harga_jual": 43000,
+          "total": 559000
+        },
+        {
+          "no": null,
+          "nama_barang": "Tipe 6012",
+          "qty": 17,
+          "harga_jual": 133000,
+          "total": 2261000
+        },
+        {
+          "no": null,
+          "nama_barang": "Tipe 6013",
+          "qty": 3,
+          "harga_jual": 144000,
+          "total": 432000
+        },
+        {
+          "no": null,
+          "nama_barang": "Tipe 6022",
+          "qty": 27,
+          "harga_jual": 79000,
+          "total": 2133000
+        },
+        {
+          "no": 51,
+          "nama_barang": "Tipe 6033",
+          "qty": 15,
+          "harga_jual": 94000,
+          "total": 1410000
+        },
+        {
+          "no": 52,
+          "nama_barang": "tutup 6303",
+          "qty": 23,
+          "harga_jual": 51000,
+          "total": 1173000
+        },
+        {
+          "no": 53,
+          "nama_barang": "Tipe 6004",
+          "qty": 3,
+          "harga_jual": 99000,
+          "total": 297000
+        },
+        {
+          "no": null,
+          "nama_barang": "Tipe 6044",
+          "qty": 66,
+          "harga_jual": 79000,
+          "total": 5214000
+        },
+        {
+          "no": 54,
+          "nama_barang": "Tipe 6053",
+          "qty": 45,
+          "harga_jual": 85000,
+          "total": 3825000
+        },
+        {
+          "no": 55,
+          "nama_barang": "sekat 6053 pendek",
+          "qty": 14,
+          "harga_jual": 7500,
+          "total": 105000
+        },
+        {
+          "no": 56,
+          "nama_barang": "sekat 6053 panjang",
+          "qty": 14,
+          "harga_jual": 7500,
+          "total": 105000
+        },
+        {
+          "no": 57,
+          "nama_barang": "Tipe 6055",
+          "qty": 11,
+          "harga_jual": 94000,
+          "total": 1034000
+        },
+        {
+          "no": 58,
+          "nama_barang": "sekat 6055 pendek",
+          "qty": 20,
+          "harga_jual": 7500,
+          "total": 150000
+        },
+        {
+          "no": 59,
+          "nama_barang": "sekat 6055 panjang",
+          "qty": 15,
+          "harga_jual": 7500,
+          "total": 112500
+        },
+        {
+          "no": 60,
+          "nama_barang": "Tipe 6068",
+          "qty": 30,
+          "harga_jual": 86000,
+          "total": 2580000
+        },
+        {
+          "no": 61,
+          "nama_barang": "Tipe 6069",
+          "qty": 20,
+          "harga_jual": 98000,
+          "total": 1960000
+        },
+        {
+          "no": 62,
+          "nama_barang": "Tipe 6111",
+          "qty": 20,
+          "harga_jual": 48000,
+          "total": 960000
+        },
+        {
+          "no": 63,
+          "nama_barang": "Tipe 6333",
+          "qty": 21,
+          "harga_jual": 58000,
+          "total": 1218000
+        },
+        {
+          "no": 65,
+          "nama_barang": "Tipe 6363",
+          "qty": 22,
+          "harga_jual": 63000,
+          "total": 1386000
+        },
+        {
+          "no": 66,
+          "nama_barang": "Tipe 6464",
+          "qty": 11,
+          "harga_jual": 58000,
+          "total": 638000
+        },
+        {
+          "no": 67,
+          "nama_barang": "tutup 6464",
+          "qty": 5,
+          "harga_jual": 39000,
+          "total": 195000
+        },
+        {
+          "no": null,
+          "nama_barang": "Tipe 6553",
+          "qty": 45,
+          "harga_jual": 78000,
+          "total": 3510000
+        },
+        {
+          "no": null,
+          "nama_barang": "Tipe 6558",
+          "qty": 6,
+          "harga_jual": 169000,
+          "total": 1014000
+        },
+        {
+          "no": 69,
+          "nama_barang": "Tipe 6611",
+          "qty": 42,
+          "harga_jual": 70000,
+          "total": 2940000
+        },
+        {
+          "no": 70,
+          "nama_barang": "Tipe 6655",
+          "qty": 6,
+          "harga_jual": 143000,
+          "total": 858000
+        },
+        {
+          "no": 71,
+          "nama_barang": "Tipe 6656",
+          "qty": 10,
+          "harga_jual": 159000,
+          "total": 1590000
+        },
+        {
+          "no": 72,
+          "nama_barang": "Tipe 6658",
+          "qty": 3,
+          "harga_jual": 182000,
+          "total": 546000
+        },
+        {
+          "no": 73,
+          "nama_barang": "Tipe 6673",
+          "qty": 5,
+          "harga_jual": 133000,
+          "total": 665000
+        },
+        {
+          "no": 74,
+          "nama_barang": "Tipe 6675",
+          "qty": 9,
+          "harga_jual": 182000,
+          "total": 1638000
+        },
+        {
+          "no": 75,
+          "nama_barang": "Tipe 6676",
+          "qty": 6,
+          "harga_jual": 198000,
+          "total": 1188000
+        },
+        {
+          "no": null,
+          "nama_barang": "Tipe 6678",
+          "qty": 2,
+          "harga_jual": 205000,
+          "total": 410000
+        },
+        {
+          "no": 76,
+          "nama_barang": "Tipe 6687",
+          "qty": 18,
+          "harga_jual": 138000,
+          "total": 2484000
+        },
+        {
+          "no": 77,
+          "nama_barang": "Tipe 6688",
+          "qty": 13,
+          "harga_jual": 245000,
+          "total": 3185000
+        },
+        {
+          "no": 78,
+          "nama_barang": "Tipe 6689",
+          "qty": 4,
+          "harga_jual": 274000,
+          "total": 1096000
+        },
+        {
+          "no": 79,
+          "nama_barang": "Tipe 6699",
+          "qty": 4,
+          "harga_jual": 299000,
+          "total": 1196000
+        },
+        {
+          "no": null,
+          "nama_barang": "Tipe 7000",
+          "qty": 2,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": 80,
+          "nama_barang": "Tipe 7004",
+          "qty": 5,
+          "harga_jual": 192000,
+          "total": 960000
+        },
+        {
+          "no": 81,
+          "nama_barang": "Tipe 7006",
+          "qty": 7,
+          "harga_jual": 344000,
+          "total": 2408000
+        },
+        {
+          "no": 82,
+          "nama_barang": "Tipe 7007",
+          "qty": 5,
+          "harga_jual": 213000,
+          "total": 1065000
+        },
+        {
+          "no": 83,
+          "nama_barang": "Tipe 7008",
+          "qty": 1,
+          "harga_jual": 316000,
+          "total": 316000
+        },
+        {
+          "no": 84,
+          "nama_barang": "Tipe 7022",
+          "qty": 11,
+          "harga_jual": 186000,
+          "total": 2046000
+        },
+        {
+          "no": 85,
+          "nama_barang": "Tipe 7033",
+          "qty": 4,
+          "harga_jual": 222000,
+          "total": 888000
+        },
+        {
+          "no": 86,
+          "nama_barang": "Tipe 7055",
+          "qty": 3,
+          "harga_jual": 150000,
+          "total": 450000
+        },
+        {
+          "no": 87,
+          "nama_barang": "Tutup 7055",
+          "qty": 6,
+          "harga_jual": 75000,
+          "total": 450000
+        },
+        {
+          "no": 88,
+          "nama_barang": "Tipe 6000",
+          "qty": 10,
+          "harga_jual": 205000,
+          "total": 2050000
+        },
+        {
+          "no": null,
+          "nama_barang": "Tipe 7000",
+          "qty": 1,
+          "harga_jual": 225000,
+          "total": 225000
+        },
+        {
+          "no": 89,
+          "nama_barang": "Tipe 7100",
+          "qty": 13,
+          "harga_jual": 225000,
+          "total": 2925000
+        },
+        {
+          "no": 90,
+          "nama_barang": "Tipe 7303",
+          "qty": 4,
+          "harga_jual": 203000,
+          "total": 812000
+        },
+        {
+          "no": null,
+          "nama_barang": "Tipe 7908",
+          "qty": 0,
+          "harga_jual": 359000,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Tipe 7099",
+          "qty": 0,
+          "harga_jual": 1078000,
+          "total": 0
+        },
+        {
+          "no": 91,
+          "nama_barang": "Tipe 8000+tutup",
+          "qty": 0,
+          "harga_jual": 225000,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Tutup 8000",
+          "qty": 3,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": 92,
+          "nama_barang": "Tipe 8002 Krat botol kecil",
+          "qty": 25,
+          "harga_jual": 109000,
+          "total": 2725000
+        },
+        {
+          "no": 93,
+          "nama_barang": "Tipe 8003 Krat galon",
+          "qty": 0,
+          "harga_jual": 178000,
+          "total": 0
+        },
+        {
+          "no": 94,
+          "nama_barang": "Tipe 8005 Krat galon new model",
+          "qty": 0,
+          "harga_jual": 153000,
+          "total": 0
+        },
+        {
+          "no": 95,
+          "nama_barang": "Tipe 8006 Krat botol besar isi 24",
+          "qty": 21,
+          "harga_jual": 145000,
+          "total": 3045000
+        },
+        {
+          "no": 96,
+          "nama_barang": "Tipe 8008 Krat botol besar isi 12",
+          "qty": 6,
+          "harga_jual": 122000,
+          "total": 732000
+        },
+        {
+          "no": 97,
+          "nama_barang": "Tipe 9606 keranjang ayam  besar",
+          "qty": 3,
+          "harga_jual": 385000,
+          "total": 1155000
+        },
+        {
+          "no": 98,
+          "nama_barang": "Tipe 9009 Slat",
+          "qty": 9,
+          "harga_jual": 191000,
+          "total": 1719000
+        },
+        {
+          "no": 99,
+          "nama_barang": "palet NPK 1005 (100 x 50 x 8)",
+          "qty": 10,
+          "harga_jual": 305000,
+          "total": 3050000
+        },
+        {
+          "no": 100,
+          "nama_barang": "Palet NPS 1205 (120x50x13,2 )",
+          "qty": 1,
+          "harga_jual": 457000,
+          "total": 457000
+        },
+        {
+          "no": null,
+          "nama_barang": "Palet NPS 1206 (120x60x13,2 )",
+          "qty": 1,
+          "harga_jual": 663000,
+          "total": 663000
+        },
+        {
+          "no": 101,
+          "nama_barang": "Palet NPS 1208 (120x80x13,2 )",
+          "qty": 2,
+          "harga_jual": 685000,
+          "total": 1370000
+        },
+        {
+          "no": 104,
+          "nama_barang": "Palet NPA 0808",
+          "qty": 3,
+          "harga_jual": 483000,
+          "total": 1449000
+        }
+      ]
+    },
+    {
+      "category": "LINHUI",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "box solid 43147",
+          "qty": 24,
+          "harga_jual": 44000,
+          "total": 1056000
+        },
+        {
+          "no": null,
+          "nama_barang": "box solid 43170",
+          "qty": 16,
+          "harga_jual": 51000,
+          "total": 816000
+        },
+        {
+          "no": null,
+          "nama_barang": "box solid 43230",
+          "qty": 19,
+          "harga_jual": 55000,
+          "total": 1045000
+        },
+        {
+          "no": null,
+          "nama_barang": "box solid 64120",
+          "qty": 9,
+          "harga_jual": 70000,
+          "total": 630000
+        },
+        {
+          "no": null,
+          "nama_barang": "box solid 64170",
+          "qty": 10,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "box solid 64280",
+          "qty": 5,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "box solid 64330",
+          "qty": 6,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Palet mangkuk 1111 hitam",
+          "qty": 0,
+          "harga_jual": 185000,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Palet mangkuk 1111 biru",
+          "qty": 4,
+          "harga_jual": 230000,
+          "total": 920000
+        },
+        {
+          "no": null,
+          "nama_barang": "Palet mangkuk 1210 hitam",
+          "qty": 4,
+          "harga_jual": 185000,
+          "total": 740000
+        },
+        {
+          "no": null,
+          "nama_barang": "Palet mangkuk 1210 biru",
+          "qty": 4,
+          "harga_jual": 230000,
+          "total": 920000
+        }
+      ]
+    },
+    {
+      "category": "KIMPLAST",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "Keranjang piring",
+          "qty": 20,
+          "harga_jual": 43000,
+          "total": 860000
+        }
+      ]
+    },
+    {
+      "category": "MASPION",
+      "items": [
+        {
+          "no": 1,
+          "nama_barang": "Box 2315",
+          "qty": 0,
+          "harga_jual": 33500,
+          "total": 0
+        },
+        {
+          "no": 2,
+          "nama_barang": "Box 2823",
+          "qty": 0,
+          "harga_jual": 43000,
+          "total": 0
+        },
+        {
+          "no": 3,
+          "nama_barang": "TB Classy 13\"",
+          "qty": 2,
+          "harga_jual": 65000,
+          "total": 130000
+        },
+        {
+          "no": 4,
+          "nama_barang": "TB Classy 17\"",
+          "qty": 106,
+          "harga_jual": 91000,
+          "total": 9646000
+        },
+        {
+          "no": 5,
+          "nama_barang": "Tatakan Setrika",
+          "qty": 0,
+          "harga_jual": 23500,
+          "total": 0
+        },
+        {
+          "no": 6,
+          "nama_barang": "Fancy Grill 33 cm",
+          "qty": 0,
+          "harga_jual": 87000,
+          "total": 0
+        },
+        {
+          "no": 7,
+          "nama_barang": "Teko Regoletto spring 2,5 L",
+          "qty": 3,
+          "harga_jual": 76000,
+          "total": 228000
+        },
+        {
+          "no": 8,
+          "nama_barang": "Keranjang Rio Besar",
+          "qty": 0,
+          "harga_jual": 78500,
+          "total": 0
+        },
+        {
+          "no": 9,
+          "nama_barang": "Tempat sendok",
+          "qty": 17,
+          "harga_jual": 35000,
+          "total": 595000
+        }
+      ]
+    },
+    {
+      "category": "GBU",
+      "items": [
+        {
+          "no": 2,
+          "nama_barang": "Gelas Kimmy",
+          "qty": 0,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "putih",
+          "qty": 60,
+          "harga_jual": 7300,
+          "total": 438000
+        },
+        {
+          "no": null,
+          "nama_barang": "biru",
+          "qty": 60,
+          "harga_jual": 7300,
+          "total": 438000
+        },
+        {
+          "no": null,
+          "nama_barang": "peach",
+          "qty": 60,
+          "harga_jual": 7300,
+          "total": 438000
+        },
+        {
+          "no": null,
+          "nama_barang": "coklat",
+          "qty": 5,
+          "harga_jual": 7300,
+          "total": 36500
+        },
+        {
+          "no": 3,
+          "nama_barang": "Gelas gagang boston",
+          "qty": 142,
+          "harga_jual": 16200,
+          "total": 2300400
+        },
+        {
+          "no": 4,
+          "nama_barang": "Tempat sendok clara",
+          "qty": 0,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Pink",
+          "qty": 6,
+          "harga_jual": 38000,
+          "total": 228000
+        },
+        {
+          "no": null,
+          "nama_barang": "Biru",
+          "qty": 4,
+          "harga_jual": 38000,
+          "total": 152000
+        },
+        {
+          "no": null,
+          "nama_barang": "Hijau",
+          "qty": 6,
+          "harga_jual": 38000,
+          "total": 228000
+        },
+        {
+          "no": null,
+          "nama_barang": "Ungu",
+          "qty": 5,
+          "harga_jual": 38000,
+          "total": 190000
+        }
+      ]
+    },
+    {
+      "category": "Ember MIZU 12 ltr Warna",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "biru",
+          "qty": 14,
+          "harga_jual": 35000,
+          "total": 490000
+        },
+        {
+          "no": null,
+          "nama_barang": "hijau",
+          "qty": 15,
+          "harga_jual": 35000,
+          "total": 525000
+        },
+        {
+          "no": null,
+          "nama_barang": "pink",
+          "qty": 15,
+          "harga_jual": 35000,
+          "total": 525000
+        }
+      ]
+    },
+    {
+      "category": "Ember MIZU 12 ltr Mono",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "coklat",
+          "qty": 29,
+          "harga_jual": 33000,
+          "total": 957000
+        },
+        {
+          "no": null,
+          "nama_barang": "abu-abu",
+          "qty": 26,
+          "harga_jual": 33000,
+          "total": 858000
+        }
+      ]
+    },
+    {
+      "category": "Ember MIZU 15 ltr",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "biru",
+          "qty": 6,
+          "harga_jual": 40000,
+          "total": 240000
+        },
+        {
+          "no": null,
+          "nama_barang": "hijau",
+          "qty": 9,
+          "harga_jual": 40000,
+          "total": 360000
+        },
+        {
+          "no": null,
+          "nama_barang": "pink",
+          "qty": 11,
+          "harga_jual": 40000,
+          "total": 440000
+        }
+      ]
+    },
+    {
+      "category": "BIOPLAST",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "ember putih 4 L",
+          "qty": 110,
+          "harga_jual": 20000,
+          "total": 2200000
+        },
+        {
+          "no": null,
+          "nama_barang": "ember hitam 4L",
+          "qty": 30,
+          "harga_jual": 20000,
+          "total": 600000
+        },
+        {
+          "no": null,
+          "nama_barang": "ember putih 20 L",
+          "qty": 65,
+          "harga_jual": 73000,
+          "total": 4745000
+        },
+        {
+          "no": null,
+          "nama_barang": "ember hitam 20 L",
+          "qty": 10,
+          "harga_jual": 73000,
+          "total": 730000
+        },
+        {
+          "no": null,
+          "nama_barang": "ember navy 20 L",
+          "qty": 0,
+          "harga_jual": 73000,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "ember pull up putih",
+          "qty": 0,
+          "harga_jual": 92000,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "ember pull up navy",
+          "qty": 0,
+          "harga_jual": 92000,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "ember pull up kuning",
+          "qty": 0,
+          "harga_jual": 92000,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "ember pull up hitam",
+          "qty": 32,
+          "harga_jual": 92000,
+          "total": 2944000
+        },
+        {
+          "no": null,
+          "nama_barang": "Toples 500 ml",
+          "qty": 269,
+          "harga_jual": 4450,
+          "total": 1197050
+        },
+        {
+          "no": null,
+          "nama_barang": "Toples 800 ml",
+          "qty": 147,
+          "harga_jual": 6450,
+          "total": 948150
+        },
+        {
+          "no": null,
+          "nama_barang": "Toples 1000 ml",
+          "qty": 117,
+          "harga_jual": 6950,
+          "total": 813150
+        },
+        {
+          "no": null,
+          "nama_barang": "Toples 1200 ml",
+          "qty": 79,
+          "harga_jual": 7450,
+          "total": 588550
+        },
+        {
+          "no": null,
+          "nama_barang": "tutup bening",
+          "qty": 512,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "tutup putih",
+          "qty": 249,
+          "harga_jual": 0,
+          "total": 0
+        }
+      ]
+    },
+    {
+      "category": "GOLDEN",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "Bak Segi",
+          "qty": 0,
+          "harga_jual": 12500,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Keranjang Kelengkeng",
+          "qty": 310,
+          "harga_jual": 19000,
+          "total": 5890000
+        }
+      ]
+    },
+    {
+      "category": "ASIA PLAST",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "Kontainer Lipat solid",
+          "qty": 0,
+          "harga_jual": 172000,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Kontainer Lipat solid+tutup",
+          "qty": 0,
+          "harga_jual": 197000,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Kontainer Lipat lubang+tutup",
+          "qty": 0,
+          "harga_jual": 180000,
+          "total": 0
+        }
+      ]
+    },
+    {
+      "category": "Greenleaf",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "T 1455",
+          "qty": 57,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "T 1456",
+          "qty": 25,
+          "harga_jual": 61500,
+          "total": 1537500
+        }
+      ]
+    },
+    {
+      "category": "BEKAS",
+      "items": [
+        {
+          "no": null,
+          "nama_barang": "1001 bekas",
+          "qty": 0,
+          "harga_jual": 98000,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "6068 bekas",
+          "qty": 5,
+          "harga_jual": 48000,
+          "total": 240000
+        },
+        {
+          "no": null,
+          "nama_barang": "5077 bekas",
+          "qty": 40,
+          "harga_jual": 78000,
+          "total": 3120000
+        },
+        {
+          "no": null,
+          "nama_barang": "5078 bekas gompel",
+          "qty": 7,
+          "harga_jual": 0,
+          "total": 0
+        },
+        {
+          "no": null,
+          "nama_barang": "Palet Bekas 110*110*12 cm",
+          "qty": 0,
+          "harga_jual": 150000,
+          "total": 0
+        }
+      ]
+    }
+  ],
+  "master_pricelist_modal": [
+    {
+      "tipe": "Tipe 7001 Krat gelas 25",
+      "pricelist": 44000.0,
+      "modal_lama": 39072.0,
+      "modal_baru": 48840.0
+    },
+    {
+      "tipe": "Tipe 7202 Krat gelas 50",
+      "pricelist": 87000.0,
+      "modal_lama": 77256.0,
+      "modal_baru": 96570.0
+    },
+    {
+      "tipe": "Tipe 9001 Krat telur",
+      "pricelist": 10000.0,
+      "modal_lama": 8880.0,
+      "modal_baru": 11100.0
+    },
+    {
+      "tipe": "Tipe 0111",
+      "pricelist": 69000.0,
+      "modal_lama": 61272.0,
+      "modal_baru": 76590.0
+    },
+    {
+      "tipe": "Tipe 0222",
+      "pricelist": 45000.0,
+      "modal_lama": 39960.0,
+      "modal_baru": 49950.0
+    },
+    {
+      "tipe": "Tipe 0333",
+      "pricelist": 34000.0,
+      "modal_lama": 30192.0,
+      "modal_baru": 37740.0
+    },
+    {
+      "tipe": "Tipe 0555",
+      "pricelist": 25000.0,
+      "modal_lama": 22200.0,
+      "modal_baru": 27750.0
+    },
+    {
+      "tipe": "Tipe 1001 + GG",
+      "pricelist": 190000.0,
+      "modal_lama": 168720.0,
+      "modal_baru": 210900.0
+    },
+    {
+      "tipe": "Tipe 1002",
+      "pricelist": 95000.0,
+      "modal_lama": 84360.0,
+      "modal_baru": 105450.0
+    },
+    {
+      "tipe": "Tipe 1004",
+      "pricelist": 112000.0,
+      "modal_lama": 99456.0,
+      "modal_baru": 124320.0
+    },
+    {
+      "tipe": "Tipe 1006",
+      "pricelist": 73000.0,
+      "modal_lama": 64824.0,
+      "modal_baru": 81030.0
+    },
+    {
+      "tipe": "Tipe 1008",
+      "pricelist": 190000.0,
+      "modal_lama": 168720.0,
+      "modal_baru": 210900.0
+    },
+    {
+      "tipe": "Tipe 1101",
+      "pricelist": 220000.0,
+      "modal_lama": 195360.0,
+      "modal_baru": 244200.0
+    },
+    {
+      "tipe": "Tipe 1223 ( krj buah bulat )",
+      "pricelist": 146000.0,
+      "modal_lama": 129648.0,
+      "modal_baru": 162060.0
+    },
+    {
+      "tipe": "Tipe 2112",
+      "pricelist": 43000.0,
+      "modal_lama": 38184.0,
+      "modal_baru": 47730.0
+    },
+    {
+      "tipe": "Tipe 2001",
+      "pricelist": 57000.0,
+      "modal_lama": 50616.0,
+      "modal_baru": 63270.0
+    },
+    {
+      "tipe": "Tipe 2011",
+      "pricelist": 78000.0,
+      "modal_lama": 69264.0,
+      "modal_baru": 86580.0
+    },
+    {
+      "tipe": "Tipe 2002",
+      "pricelist": 74000.0,
+      "modal_lama": 65712.0,
+      "modal_baru": 82140.0
+    },
+    {
+      "tipe": "Tipe 2022",
+      "pricelist": 89000.0,
+      "modal_lama": 79032.0,
+      "modal_baru": 98790.0
+    },
+    {
+      "tipe": "Tipe 2122",
+      "pricelist": 95000.0,
+      "modal_lama": 84360.0,
+      "modal_baru": 105450.0
+    },
+    {
+      "tipe": "Tipe 2003",
+      "pricelist": 92000.0,
+      "modal_lama": 81696.0,
+      "modal_baru": 102120.0
+    },
+    {
+      "tipe": "Tipe 2033",
+      "pricelist": 99000.0,
+      "modal_lama": 87912.0,
+      "modal_baru": 109890.0
+    },
+    {
+      "tipe": "Tipe 2233",
+      "pricelist": 104000.0,
+      "modal_lama": 92352.0,
+      "modal_baru": 115440.0
+    },
+    {
+      "tipe": "Tipe 2004",
+      "pricelist": 95000.0,
+      "modal_lama": 84360.0,
+      "modal_baru": 105450.0
+    },
+    {
+      "tipe": "Tipe 2244",
+      "pricelist": 104000.0,
+      "modal_lama": 92352.0,
+      "modal_baru": 115440.0
+    },
+    {
+      "tipe": "Tipe 2404",
+      "pricelist": 96000.0,
+      "modal_lama": 85248.0,
+      "modal_baru": 106560.0
+    },
+    {
+      "tipe": "Tipe 2009",
+      "pricelist": 141000.0,
+      "modal_lama": 125208.0,
+      "modal_baru": 156510.0
+    },
+    {
+      "tipe": "Tipe 2010",
+      "pricelist": 165000.0,
+      "modal_lama": 146520.0,
+      "modal_baru": 183150.0
+    },
+    {
+      "tipe": "Tipe 2066",
+      "pricelist": 137000.0,
+      "modal_lama": 121656.0,
+      "modal_baru": 152070.0
+    },
+    {
+      "tipe": "Tipe 2166",
+      "pricelist": 103000.0,
+      "modal_lama": 91464.0,
+      "modal_baru": 114330.0
+    },
+    {
+      "tipe": "Tipe 2266",
+      "pricelist": 123000.0,
+      "modal_lama": 109224.0,
+      "modal_baru": 136530.0
+    },
+    {
+      "tipe": "Tipe 2606",
+      "pricelist": 101000.0,
+      "modal_lama": 89688.0,
+      "modal_baru": 112110.0
+    },
+    {
+      "tipe": "Tipe 2666 tutup 2606",
+      "pricelist": 52000.0,
+      "modal_lama": 46176.0,
+      "modal_baru": 57720.0
+    },
+    {
+      "tipe": "Tipe 2008",
+      "pricelist": 121000.0,
+      "modal_lama": 107448.0,
+      "modal_baru": 134310.0
+    },
+    {
+      "tipe": "Tipe 2808",
+      "pricelist": 104000.0,
+      "modal_lama": 92352.0,
+      "modal_baru": 115440.0
+    },
+    {
+      "tipe": "Tipe 2288",
+      "pricelist": 134000.0,
+      "modal_lama": 118992.0,
+      "modal_baru": 148740.0
+    },
+    {
+      "tipe": "Tipe 2303",
+      "pricelist": 109000.0,
+      "modal_lama": 96792.0,
+      "modal_baru": 120990.0
+    },
+    {
+      "tipe": "Tipe 2322",
+      "pricelist": 83000.0,
+      "modal_lama": 73704.0,
+      "modal_baru": 92130.0
+    },
+    {
+      "tipe": "Tutup 2322",
+      "pricelist": 44000.0,
+      "modal_lama": 39072.0,
+      "modal_baru": 48840.0
+    },
+    {
+      "tipe": "Tipe 3003",
+      "pricelist": 82000.0,
+      "modal_lama": 72816.0,
+      "modal_baru": 91020.0
+    },
+    {
+      "tipe": "Tipe 3033",
+      "pricelist": 93000.0,
+      "modal_lama": 82584.0,
+      "modal_baru": 103230.0
+    },
+    {
+      "tipe": "Tipe 3333 ( tutup )",
+      "pricelist": 48000.0,
+      "modal_lama": 42624.0,
+      "modal_baru": 53280.0
+    },
+    {
+      "tipe": "Tipe 3033 + tutup",
+      "pricelist": 141000.0,
+      "modal_lama": 125208.0,
+      "modal_baru": 156510.0
+    },
+    {
+      "tipe": "Tipe 3009",
+      "pricelist": 77000.0,
+      "modal_lama": 68376.0,
+      "modal_baru": 85470.0
+    },
+    {
+      "tipe": "Tipe 3303",
+      "pricelist": 97000.0,
+      "modal_lama": 86136.0,
+      "modal_baru": 107670.0
+    },
+    {
+      "tipe": "Tipe 3304",
+      "pricelist": 112000.0,
+      "modal_lama": 99456.0,
+      "modal_baru": 124320.0
+    },
+    {
+      "tipe": "Tipe 3308",
+      "pricelist": 142000.0,
+      "modal_lama": 126096.0,
+      "modal_baru": 157620.0
+    },
+    {
+      "tipe": "Tipe 3309",
+      "pricelist": 154000.0,
+      "modal_lama": 136752.0,
+      "modal_baru": 170940.0
+    },
+    {
+      "tipe": "Tipe 3322",
+      "pricelist": 100000.0,
+      "modal_lama": 88800.0,
+      "modal_baru": 111000.0
+    },
+    {
+      "tipe": "Tipe 3323",
+      "pricelist": 112000.0,
+      "modal_lama": 99456.0,
+      "modal_baru": 124320.0
+    },
+    {
+      "tipe": "Tipe 3326",
+      "pricelist": 145000.0,
+      "modal_lama": 128760.0,
+      "modal_baru": 160950.0
+    },
+    {
+      "tipe": "Tipe 3328",
+      "pricelist": 156000.0,
+      "modal_lama": 138528.0,
+      "modal_baru": 173160.0
+    },
+    {
+      "tipe": "Tipe 3329",
+      "pricelist": 173000.0,
+      "modal_lama": 153624.0,
+      "modal_baru": 192030.0
+    },
+    {
+      "tipe": "Tipe 4022",
+      "pricelist": 58000.0,
+      "modal_lama": 51504.0,
+      "modal_baru": 64380.0
+    },
+    {
+      "tipe": "Tipe 4303",
+      "pricelist": 57000.0,
+      "modal_lama": 50616.0,
+      "modal_baru": 63270.0
+    },
+    {
+      "tipe": "Tipe 4609",
+      "pricelist": 102000.0,
+      "modal_lama": 90576.0,
+      "modal_baru": 113220.0
+    },
+    {
+      "tipe": "Tipe 5000 + tutup",
+      "pricelist": 144000.0,
+      "modal_lama": 127872.0,
+      "modal_baru": 159840.0
+    },
+    {
+      "tipe": "Tipe 5002",
+      "pricelist": 48000.0,
+      "modal_lama": 42624.0,
+      "modal_baru": 53280.0
+    },
+    {
+      "tipe": "Tipe 5004",
+      "pricelist": 89000.0,
+      "modal_lama": 79032.0,
+      "modal_baru": 98790.0
+    },
+    {
+      "tipe": "Tipe 5031",
+      "pricelist": 55000.0,
+      "modal_lama": 48840.0,
+      "modal_baru": 61050.0
+    },
+    {
+      "tipe": "Tipe 5034",
+      "pricelist": 148000.0,
+      "modal_lama": 131424.0,
+      "modal_baru": 164280.0
+    },
+    {
+      "tipe": "Tipe 5040",
+      "pricelist": 103000.0,
+      "modal_lama": 91464.0,
+      "modal_baru": 114330.0
+    },
+    {
+      "tipe": "Tipe 5056 keranjang krat telur",
+      "pricelist": 179000.0,
+      "modal_lama": 158952.0,
+      "modal_baru": 198690.0
+    },
+    {
+      "tipe": "Tipe 5077",
+      "pricelist": 142000.0,
+      "modal_lama": 126096.0,
+      "modal_baru": 157620.0
+    },
+    {
+      "tipe": "Tipe 5505",
+      "pricelist": 115000.0,
+      "modal_lama": 102120.0,
+      "modal_baru": 127650.0
+    },
+    {
+      "tipe": "Tipe 6011",
+      "pricelist": 64000.0,
+      "modal_lama": 56832.0,
+      "modal_baru": 71040.0
+    },
+    {
+      "tipe": "Tutup 6011",
+      "pricelist": 34000.0,
+      "modal_lama": 30192.0,
+      "modal_baru": 37740.0
+    },
+    {
+      "tipe": "Tipe 6012",
+      "pricelist": 113000.0,
+      "modal_lama": 100344.0,
+      "modal_baru": 125430.0
+    },
+    {
+      "tipe": "Tipe 6013",
+      "pricelist": 125000.0,
+      "modal_lama": 111000.0,
+      "modal_baru": 138750.0
+    },
+    {
+      "tipe": "Tipe 6022",
+      "pricelist": 64000.0,
+      "modal_lama": 56832.0,
+      "modal_baru": 71040.0
+    },
+    {
+      "tipe": "Tipe 6033",
+      "pricelist": 78000.0,
+      "modal_lama": 69264.0,
+      "modal_baru": 86580.0
+    },
+    {
+      "tipe": "tutup 6303",
+      "pricelist": 39000.0,
+      "modal_lama": 34632.0,
+      "modal_baru": 43290.0
+    },
+    {
+      "tipe": "Tipe 6033 + tutup 6033",
+      "pricelist": 117000.0,
+      "modal_lama": 103896.0,
+      "modal_baru": 129870.0
+    },
+    {
+      "tipe": "Tipe 6004",
+      "pricelist": 87000.0,
+      "modal_lama": 77256.0,
+      "modal_baru": 96570.0
+    },
+    {
+      "tipe": "Tipe 6044",
+      "pricelist": 64000.0,
+      "modal_lama": 56832.0,
+      "modal_baru": 71040.0
+    },
+    {
+      "tipe": "Sekat 6053/6055 ( panjang pendek )",
+      "pricelist": 6500.0,
+      "modal_lama": 5772.0,
+      "modal_baru": 7215.0
+    },
+    {
+      "tipe": "Tipe 6053",
+      "pricelist": 68000.0,
+      "modal_lama": 60384.0,
+      "modal_baru": 75480.0
+    },
+    {
+      "tipe": "Tipe 6053 + S 4",
+      "pricelist": 94000.0,
+      "modal_lama": 83472.0,
+      "modal_baru": 104340.0
+    },
+    {
+      "tipe": "Tipe 6055",
+      "pricelist": 74000.0,
+      "modal_lama": 65712.0,
+      "modal_baru": 82140.0
+    },
+    {
+      "tipe": "Tipe 6055 + S 7",
+      "pricelist": 119500.0,
+      "modal_lama": 106116.0,
+      "modal_baru": 132645.0
+    },
+    {
+      "tipe": "Tipe 6068",
+      "pricelist": 72000.0,
+      "modal_lama": 63936.0,
+      "modal_baru": 79920.0
+    },
+    {
+      "tipe": "Tipe 6069",
+      "pricelist": 74000.0,
+      "modal_lama": 65712.0,
+      "modal_baru": 82140.0
+    },
+    {
+      "tipe": "Tipe 6111",
+      "pricelist": 36000.0,
+      "modal_lama": 31968.0,
+      "modal_baru": 39960.0
+    },
+    {
+      "tipe": "Tipe 6333",
+      "pricelist": 47000.0,
+      "modal_lama": 41736.0,
+      "modal_baru": 52170.0
+    },
+    {
+      "tipe": "Tipe 6363",
+      "pricelist": 47000.0,
+      "modal_lama": 41736.0,
+      "modal_baru": 52170.0
+    },
+    {
+      "tipe": "Tipe 6464",
+      "pricelist": 47000.0,
+      "modal_lama": 41736.0,
+      "modal_baru": 52170.0
+    },
+    {
+      "tipe": "tutup 6464",
+      "pricelist": 32000.0,
+      "modal_lama": 28416.0,
+      "modal_baru": 35520.0
+    },
+    {
+      "tipe": "Tipe 6553",
+      "pricelist": 61000.0,
+      "modal_lama": 54168.0,
+      "modal_baru": 67710.0
+    },
+    {
+      "tipe": "Tipe 6558",
+      "pricelist": 139000.0,
+      "modal_lama": 123432.0,
+      "modal_baru": 154290.0
+    },
+    {
+      "tipe": "Tipe 6611",
+      "pricelist": 60000.0,
+      "modal_lama": 53280.0,
+      "modal_baru": 66600.0
+    },
+    {
+      "tipe": "Tipe 6655",
+      "pricelist": 112000.0,
+      "modal_lama": 99456.0,
+      "modal_baru": 124320.0
+    },
+    {
+      "tipe": "Tipe 6656",
+      "pricelist": 128000.0,
+      "modal_lama": 113664.0,
+      "modal_baru": 142080.0
+    },
+    {
+      "tipe": "Tipe 6658",
+      "pricelist": 153000.0,
+      "modal_lama": 135864.0,
+      "modal_baru": 169830.0
+    },
+    {
+      "tipe": "Tipe 6673",
+      "pricelist": 108000.0,
+      "modal_lama": 95904.0,
+      "modal_baru": 119880.0
+    },
+    {
+      "tipe": "Tipe 6675",
+      "pricelist": 137000.0,
+      "modal_lama": 121656.0,
+      "modal_baru": 152070.0
+    },
+    {
+      "tipe": "Tipe 6676",
+      "pricelist": 153000.0,
+      "modal_lama": 135864.0,
+      "modal_baru": 169830.0
+    },
+    {
+      "tipe": "Tipe 6678",
+      "pricelist": 187000.0,
+      "modal_lama": 166056.0,
+      "modal_baru": 207570.0
+    },
+    {
+      "tipe": "Tipe 6687",
+      "pricelist": 115000.0,
+      "modal_lama": 102120.0,
+      "modal_baru": 127650.0
+    },
+    {
+      "tipe": "Tipe 6688",
+      "pricelist": 221000.0,
+      "modal_lama": 196248.0,
+      "modal_baru": 245310.0
+    },
+    {
+      "tipe": "Tipe 6689",
+      "pricelist": 247000.0,
+      "modal_lama": 219336.0,
+      "modal_baru": 274170.0
+    },
+    {
+      "tipe": "Tipe 6699",
+      "pricelist": 276000.0,
+      "modal_lama": 245088.0,
+      "modal_baru": 306360.0
+    },
+    {
+      "tipe": "Tipe 7303",
+      "pricelist": 162000.0,
+      "modal_lama": 143856.0,
+      "modal_baru": 179820.0
+    },
+    {
+      "tipe": "Tipe 7004",
+      "pricelist": 166000.0,
+      "modal_lama": 147408.0,
+      "modal_baru": 184260.0
+    },
+    {
+      "tipe": "Tipe 7006",
+      "pricelist": 326000.0,
+      "modal_lama": 289488.0,
+      "modal_baru": 361860.0
+    },
+    {
+      "tipe": "Tipe 7007",
+      "pricelist": 195000.0,
+      "modal_lama": 173160.0,
+      "modal_baru": 216450.0
+    },
+    {
+      "tipe": "Tipe 7008",
+      "pricelist": 295000.0,
+      "modal_lama": 261960.0,
+      "modal_baru": 327450.0
+    },
+    {
+      "tipe": "Tipe 7022",
+      "pricelist": 155000.0,
+      "modal_lama": 137640.0,
+      "modal_baru": 172050.0
+    },
+    {
+      "tipe": "Tipe 7033",
+      "pricelist": 193000.0,
+      "modal_lama": 171384.0,
+      "modal_baru": 214230.0
+    },
+    {
+      "tipe": "Tipe 7055",
+      "pricelist": 110000.0,
+      "modal_lama": 97680.0,
+      "modal_baru": 122100.0
+    },
+    {
+      "tipe": "Tipe 7555 ( tutup 7055)",
+      "pricelist": 61000.0,
+      "modal_lama": 54168.0,
+      "modal_baru": 67710.0
+    },
+    {
+      "tipe": "Tipe 7055 + tutup",
+      "pricelist": 171000.0,
+      "modal_lama": 151848.0,
+      "modal_baru": 189810.0
+    },
+    {
+      "tipe": "Tipe 7077",
+      "pricelist": 279000.0,
+      "modal_lama": 247752.0,
+      "modal_baru": 309690.0
+    },
+    {
+      "tipe": "Tipe 7009",
+      "pricelist": 350000.0,
+      "modal_lama": 310800.0,
+      "modal_baru": 388500.0
+    },
+    {
+      "tipe": "Tipe 7099",
+      "pricelist": 1030000.0,
+      "modal_lama": 914640.0,
+      "modal_baru": 1143300.0
+    },
+    {
+      "tipe": "Tipe 7099+Kaki",
+      "pricelist": 1300000.0,
+      "modal_lama": 1154400.0,
+      "modal_baru": 1443000.0
+    },
+    {
+      "tipe": "Tipe 7908",
+      "pricelist": 338000.0,
+      "modal_lama": 300144.0,
+      "modal_baru": 375180.0
+    },
+    {
+      "tipe": "Tipe 7909",
+      "pricelist": 830000.0,
+      "modal_lama": 737040.0,
+      "modal_baru": 921300.0
+    },
+    {
+      "tipe": "Tipe 6000",
+      "pricelist": 177000.0,
+      "modal_lama": 157176.0,
+      "modal_baru": 196470.0
+    },
+    {
+      "tipe": "Tipe 7100",
+      "pricelist": 192000.0,
+      "modal_lama": 170496.0,
+      "modal_baru": 213120.0
+    },
+    {
+      "tipe": "Tipe 7200",
+      "pricelist": 0,
+      "modal_lama": 250000.0,
+      "modal_baru": 0.0
+    },
+    {
+      "tipe": "Tipe 8000",
+      "pricelist": 137000.0,
+      "modal_lama": 121656.0,
+      "modal_baru": 152070.0
+    },
+    {
+      "tipe": "Tipe 8000 + tutup",
+      "pricelist": 192000.0,
+      "modal_lama": 170496.0,
+      "modal_baru": 213120.0
+    },
+    {
+      "tipe": "Tipe 8002 Krat botol kecil",
+      "pricelist": 81000.0,
+      "modal_lama": 71928.0,
+      "modal_baru": 89910.0
+    },
+    {
+      "tipe": "Tipe 8006 Krat botol besar isi 24",
+      "pricelist": 113000.0,
+      "modal_lama": 100344.0,
+      "modal_baru": 125430.0
+    },
+    {
+      "tipe": "Tipe 8008 Krat botol besar isi 12",
+      "pricelist": 101000.0,
+      "modal_lama": 89688.0,
+      "modal_baru": 112110.0
+    },
+    {
+      "tipe": "Tipe 8003 Krat Galon",
+      "pricelist": 153000.0,
+      "modal_lama": 135864.0,
+      "modal_baru": 169830.0
+    },
+    {
+      "tipe": "Tipe 8005 Krat Galon",
+      "pricelist": 127000.0,
+      "modal_lama": 112776.0,
+      "modal_baru": 140970.0
+    },
+    {
+      "tipe": "Tipe 9606 keranjang ayam  besar",
+      "pricelist": 390000.0,
+      "modal_lama": 346320.0,
+      "modal_baru": 432900.0
+    },
+    {
+      "tipe": "Tipe 9006keranjang ayam  kecil",
+      "pricelist": 370000.0,
+      "modal_lama": 328560.0,
+      "modal_baru": 410700.0
+    },
+    {
+      "tipe": "Tipe 9009 Slat",
+      "pricelist": 157000.0,
+      "modal_lama": 139416.0,
+      "modal_baru": 174270.0
+    },
+    {
+      "tipe": "palet NPK 1005S (100 x 50 x 8)",
+      "pricelist": 280000.0,
+      "modal_lama": 248640.0,
+      "modal_baru": 310800.0
+    },
+    {
+      "tipe": "Palet NPS 1205 (120x50x13,2 )",
+      "pricelist": 435000.0,
+      "modal_lama": 386280.0,
+      "modal_baru": 482850.0
+    },
+    {
+      "tipe": "Palet NPS 1206 (120x60x13,2 )",
+      "pricelist": 580000.0,
+      "modal_lama": 515040.0,
+      "modal_baru": 643800.0
+    },
+    {
+      "tipe": "Palet NPS 1208 (120x80x13,2 )",
+      "pricelist": 600000.0,
+      "modal_lama": 532800.0,
+      "modal_baru": 666000.0
+    },
+    {
+      "tipe": "palet NPA 0808 (80X80X15)",
+      "pricelist": 450000.0,
+      "modal_lama": 399600.0,
+      "modal_baru": 499500.0
+    },
+    {
+      "tipe": "palet NPA 1210 (120x100x14)",
+      "pricelist": 630000.0,
+      "modal_lama": 559440.0,
+      "modal_baru": 699300.0
+    },
+    {
+      "tipe": "palet NPA 1212 (120x120x16)",
+      "pricelist": 840000.0,
+      "modal_lama": 745920.0,
+      "modal_baru": 932400.0
+    },
+    {
+      "tipe": "palet NPF 1210 (120x100x14)",
+      "pricelist": 450000.0,
+      "modal_lama": 399600.0,
+      "modal_baru": 499500.0
+    },
+    {
+      "tipe": "palet NPL 1110",
+      "pricelist": 575000.0,
+      "modal_lama": 510600.0,
+      "modal_baru": 638250.0
+    },
+    {
+      "tipe": "palet NPL 1210",
+      "pricelist": 635000.0,
+      "modal_lama": 563880.0,
+      "modal_baru": 704850.0
+    },
+    {
+      "tipe": "palet NPL 1311",
+      "pricelist": 450000.0,
+      "modal_lama": 399600.0,
+      "modal_baru": 499500.0
+    },
+    {
+      "tipe": "palet NPJ 1111",
+      "pricelist": 570000.0,
+      "modal_lama": 506160.0,
+      "modal_baru": 632700.0
+    },
+    {
+      "tipe": "palet NPI 1212 S",
+      "pricelist": 590000.0,
+      "modal_lama": 523920.0,
+      "modal_baru": 654900.0
+    },
+    {
+      "tipe": "palet NPR 1210 New",
+      "pricelist": 790000.0,
+      "modal_lama": 701520.0,
+      "modal_baru": 876900.0
+    },
+    {
+      "tipe": "palet NPR 1212 ST ( belum besi )",
+      "pricelist": 850000.0,
+      "modal_lama": 754800.0,
+      "modal_baru": 943500.0
+    },
+    {
+      "tipe": "palet NPD 1212",
+      "pricelist": 1050000.0,
+      "modal_lama": 932400.0,
+      "modal_baru": 1165500.0
+    },
+    {
+      "tipe": "palet NPD 1311",
+      "pricelist": 1150000.0,
+      "modal_lama": 1021200.0,
+      "modal_baru": 1276500.0
+    },
+    {
+      "tipe": "palet NPD 1512",
+      "pricelist": 1350000.0,
+      "modal_lama": 1198800.0,
+      "modal_baru": 1498500.0
+    },
+    {
+      "tipe": "palet NPN 1210",
+      "pricelist": 610000.0,
+      "modal_lama": 541680.0,
+      "modal_baru": 677100.0
+    },
+    {
+      "tipe": "palet NPN 1212",
+      "pricelist": 725000.0,
+      "modal_lama": 643800.0,
+      "modal_baru": 804750.0
+    },
+    {
+      "tipe": "besinya",
+      "pricelist": 0,
+      "modal_lama": 0.0,
+      "modal_baru": 0.0
+    },
+    {
+      "tipe": "besi panjang ( belum ppn 11 % )",
+      "pricelist": 32000.0,
+      "modal_lama": 0,
+      "modal_baru": 35520.0
+    },
+    {
+      "tipe": "besi pendek",
+      "pricelist": 27000.0,
+      "modal_lama": 0,
+      "modal_baru": 29970.0
+    },
+    {
+      "tipe": "palet 1188",
+      "pricelist": 2250000.0,
+      "modal_lama": 1998000.0,
+      "modal_baru": 2497500.0
+    },
+    {
+      "tipe": "Tipe 1199 + kaki palet",
+      "pricelist": 2100000.0,
+      "modal_lama": 1864800.0,
+      "modal_baru": 2331000.0
+    },
+    {
+      "tipe": "paket 2166 + 2001 ( Tipe 1 )",
+      "pricelist": 160000.0,
+      "modal_lama": 142080.0,
+      "modal_baru": 177600.0
+    },
+    {
+      "tipe": "paket 2288 + 2001 ( Tipe 2 )",
+      "pricelist": 191000.0,
+      "modal_lama": 169608.0,
+      "modal_baru": 212010.0
+    },
+    {
+      "tipe": "paket 2606 + 2001 ( Tipe 3 )",
+      "pricelist": 158000.0,
+      "modal_lama": 140304.0,
+      "modal_baru": 175380.0
+    },
+    {
+      "tipe": "Paket 2808 + 2001 ( Tipe 4 )",
+      "pricelist": 161000.0,
+      "modal_lama": 142968.0,
+      "modal_baru": 178710.0
+    },
+    {
+      "tipe": "Paket 5056 + 14 krat telur",
+      "pricelist": 319000.0,
+      "modal_lama": 283272.0,
+      "modal_baru": 354090.0
+    },
+    {
+      "tipe": "LINHUI",
+      "pricelist": 0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "Palet Hitam",
+      "pricelist": 130000.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "Palet Biru",
+      "pricelist": 168000.0,
+      "modal_lama": 643800.0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "Palet solid 1210",
+      "pricelist": 365000.0,
+      "modal_lama": 248640.0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "Palet 1111 hitam",
+      "pricelist": 180000.0,
+      "modal_lama": 892440.0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "43147",
+      "pricelist": 24750.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "43170",
+      "pricelist": 31500.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "43230",
+      "pricelist": 33750.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "64120",
+      "pricelist": 44000.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "64170",
+      "pricelist": 52000.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "64280",
+      "pricelist": 60750.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "64330",
+      "pricelist": 83000.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "86280",
+      "pricelist": 135000.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "86340",
+      "pricelist": 165000.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "tutup 40 x 1",
+      "pricelist": 12500.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "tutup 60 x 1",
+      "pricelist": 25000.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "keranjang roti 60*40*11,5",
+      "pricelist": 30000.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "keranjang buah 60*40*31",
+      "pricelist": 60000.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "Kontainer logistik linhui ( 3,37 kg )",
+      "pricelist": 95000.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "GOLDEN",
+      "pricelist": 0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "Bak persegi silver ( 1 koli 72 pcs )",
+      "pricelist": 9083.0,
+      "modal_lama": 7970.3324999999995,
+      "modal_baru": 12500.0
+    },
+    {
+      "tipe": "Krat Industri ORI 61x42x32",
+      "pricelist": 90000.0,
+      "modal_lama": 78975.0,
+      "modal_baru": 95000.0
+    },
+    {
+      "tipe": "Krat Industri KW1 61x42x33",
+      "pricelist": 68000.0,
+      "modal_lama": 59670.0,
+      "modal_baru": 75000.0
+    },
+    {
+      "tipe": "Krat Industri hitam 61x42x34",
+      "pricelist": 55500.0,
+      "modal_lama": 48701.25,
+      "modal_baru": 64000.0
+    },
+    {
+      "tipe": "KOTAMAS",
+      "pricelist": 0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "Harper",
+      "pricelist": 0,
+      "modal_lama": 12765.0,
+      "modal_baru": 19500.0
+    },
+    {
+      "tipe": "Lotus 100",
+      "pricelist": 0,
+      "modal_lama": 130500.0,
+      "modal_baru": 159000.0
+    },
+    {
+      "tipe": "MASPION",
+      "pricelist": 0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "Box 2315",
+      "pricelist": 0,
+      "modal_lama": 15261.0,
+      "modal_baru": 25500.0
+    },
+    {
+      "tipe": "Box 2823 ( harga baru ) 8-8-24",
+      "pricelist": 0,
+      "modal_lama": 28101.0,
+      "modal_baru": 43000.0
+    },
+    {
+      "tipe": "TB Classy 13\" ( harga baru )",
+      "pricelist": 0,
+      "modal_lama": 43282.0,
+      "modal_baru": 65000.0
+    },
+    {
+      "tipe": "TB Classy 17\" ( harga baru )",
+      "pricelist": 0,
+      "modal_lama": 67992.0,
+      "modal_baru": 91000.0
+    },
+    {
+      "tipe": "Tatakan Setrika",
+      "pricelist": 0,
+      "modal_lama": 13163.0,
+      "modal_baru": 23500.0
+    },
+    {
+      "tipe": "Fancy Grill 33 cm",
+      "pricelist": 0,
+      "modal_lama": 71060.0,
+      "modal_baru": 87000.0
+    },
+    {
+      "tipe": "Teko Regoletto spring 2,5 L",
+      "pricelist": 0,
+      "modal_lama": 55717.0,
+      "modal_baru": 76000.0
+    },
+    {
+      "tipe": "Keranjang Rio Besar",
+      "pricelist": 0,
+      "modal_lama": 60401.0,
+      "modal_baru": 78500.0
+    },
+    {
+      "tipe": "Tempat Sendok",
+      "pricelist": 0,
+      "modal_lama": 19703.0,
+      "modal_baru": 35000.0
+    },
+    {
+      "tipe": "GBU",
+      "pricelist": 0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "Tempat sendok clara",
+      "pricelist": 0,
+      "modal_lama": 26000.0,
+      "modal_baru": 38000.0
+    },
+    {
+      "tipe": "Kotak makan milano",
+      "pricelist": 0,
+      "modal_lama": 10935.0,
+      "modal_baru": 14600.0
+    },
+    {
+      "tipe": "Gelas Boston",
+      "pricelist": 0,
+      "modal_lama": 10733.0,
+      "modal_baru": 16200.0
+    },
+    {
+      "tipe": "Cangkir Kimmy",
+      "pricelist": 0,
+      "modal_lama": 4219.0,
+      "modal_baru": 7300.0
+    },
+    {
+      "tipe": "ember 12 L mono",
+      "pricelist": 0,
+      "modal_lama": 17496.0,
+      "modal_baru": 33000.0
+    },
+    {
+      "tipe": "ember 12 L warna",
+      "pricelist": 0,
+      "modal_lama": 19440.0,
+      "modal_baru": 35000.0
+    },
+    {
+      "tipe": "ember 15 L mono",
+      "pricelist": 0,
+      "modal_lama": 21384.0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "ember 15 L warna",
+      "pricelist": 0,
+      "modal_lama": 24624.0,
+      "modal_baru": 40000.0
+    },
+    {
+      "tipe": "SUNLIFE",
+      "pricelist": 0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "Harper",
+      "pricelist": 0,
+      "modal_lama": 12765.0,
+      "modal_baru": 19500.0
+    },
+    {
+      "tipe": "Rantang 3 susun",
+      "pricelist": 0,
+      "modal_lama": 16250.0,
+      "modal_baru": 23000.0
+    },
+    {
+      "tipe": "Keranjang pasar",
+      "pricelist": 0,
+      "modal_lama": 32737.0,
+      "modal_baru": 49500.0
+    },
+    {
+      "tipe": "Lotus 100",
+      "pricelist": 174000.0,
+      "modal_lama": 130500.0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "Tori",
+      "pricelist": 0,
+      "modal_lama": 8000.0,
+      "modal_baru": 13000.0
+    },
+    {
+      "tipe": "BIOPLAST",
+      "pricelist": 0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "ember filter kolam",
+      "pricelist": 0,
+      "modal_lama": 103665.0,
+      "modal_baru": 153000.0
+    },
+    {
+      "tipe": "Ember 1 L",
+      "pricelist": 0,
+      "modal_lama": 5883.0,
+      "modal_baru": 11000.0
+    },
+    {
+      "tipe": "Ember 4 L",
+      "pricelist": 0,
+      "modal_lama": 13875.0,
+      "modal_baru": 20000.0
+    },
+    {
+      "tipe": "Ember 10 L",
+      "pricelist": 0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "Ember 20 L",
+      "pricelist": 0,
+      "modal_lama": 53280.0,
+      "modal_baru": 73000.0
+    },
+    {
+      "tipe": "Ember 20 L Navy PROMO",
+      "pricelist": 0,
+      "modal_lama": 35520.0,
+      "modal_baru": 51000.0
+    },
+    {
+      "tipe": "Ember pul up",
+      "pricelist": 0,
+      "modal_lama": 64380.0,
+      "modal_baru": 92000.0
+    },
+    {
+      "tipe": "Ember filter",
+      "pricelist": 0,
+      "modal_lama": 102165.0,
+      "modal_baru": 153000.0
+    },
+    {
+      "tipe": "Toples 500 ml",
+      "pricelist": 0,
+      "modal_lama": 3330.0,
+      "modal_baru": 4450.0
+    },
+    {
+      "tipe": "Toples 800 ml",
+      "pricelist": 0,
+      "modal_lama": 3163.5,
+      "modal_baru": 6450.0
+    },
+    {
+      "tipe": "Toples 1000 ml",
+      "pricelist": 0,
+      "modal_lama": 3330.0,
+      "modal_baru": 6950.0
+    },
+    {
+      "tipe": "Toples 1200 ml",
+      "pricelist": 0,
+      "modal_lama": 3441.0,
+      "modal_baru": 7450.0
+    },
+    {
+      "tipe": "Toples 500 ml tutup aluminiun",
+      "pricelist": 0,
+      "modal_lama": 4565.0,
+      "modal_baru": 7500.0
+    },
+    {
+      "tipe": "Toples 800 ml tutup aluminiun",
+      "pricelist": 0,
+      "modal_lama": 4620.0,
+      "modal_baru": 8000.0
+    },
+    {
+      "tipe": "Toples 1000 ml tutup aluminiun",
+      "pricelist": 0,
+      "modal_lama": 4675.0,
+      "modal_baru": 8500.0
+    },
+    {
+      "tipe": "Toples 1200 ml tutup aluminiun",
+      "pricelist": 0,
+      "modal_lama": 4730.0,
+      "modal_baru": 9000.0
+    },
+    {
+      "tipe": "Kontainer Lipat",
+      "pricelist": 0,
+      "modal_lama": 172050.0,
+      "modal_baru": 198600.0
+    },
+    {
+      "tipe": "Bento 3 sekat",
+      "pricelist": 0,
+      "modal_lama": 3552.0,
+      "modal_baru": 4850.0
+    },
+    {
+      "tipe": "Tutup ember 20L",
+      "pricelist": 0,
+      "modal_lama": 15540.0,
+      "modal_baru": 29000.0
+    },
+    {
+      "tipe": "NUMAN",
+      "pricelist": 0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "kotak makan 5 sekat",
+      "pricelist": 0,
+      "modal_lama": 13500.0,
+      "modal_baru": 19000.0
+    },
+    {
+      "tipe": "krat gelas",
+      "pricelist": 0,
+      "modal_lama": 34000.0,
+      "modal_baru": 55000.0
+    },
+    {
+      "tipe": "Tutup kotak makan",
+      "pricelist": 0,
+      "modal_lama": 5500.0,
+      "modal_baru": 7500.0
+    },
+    {
+      "tipe": "gelas 350 ml",
+      "pricelist": 0,
+      "modal_lama": 1738.0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "sendok/garpu 12 pcs",
+      "pricelist": 0,
+      "modal_lama": 9161.0,
+      "modal_baru": 14500.0
+    },
+    {
+      "tipe": "piring 9\"",
+      "pricelist": 0,
+      "modal_lama": 2625.0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "nampan uk 2",
+      "pricelist": 0,
+      "modal_lama": 3557.0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "nampan uk 4",
+      "pricelist": 0,
+      "modal_lama": 6353.0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "PT ASIA PLAST",
+      "pricelist": 0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "Kontainer Lipat",
+      "pricelist": 0,
+      "modal_lama": 139364.0,
+      "modal_baru": 172000.0
+    },
+    {
+      "tipe": "Kontainer Lipat Berlubang + Tutup",
+      "pricelist": 0,
+      "modal_lama": 145000.0,
+      "modal_baru": 180000.0
+    },
+    {
+      "tipe": "Kontainer Lipat Solid + Tutup",
+      "pricelist": 0,
+      "modal_lama": 169103.0,
+      "modal_baru": 197000.0
+    },
+    {
+      "tipe": "ATARI",
+      "pricelist": 0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "Keranjang durian",
+      "pricelist": 0,
+      "modal_lama": 95000.0,
+      "modal_baru": 135000.0
+    },
+    {
+      "tipe": "GREENLIFE",
+      "pricelist": 0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "Hasienda 1455",
+      "pricelist": 0,
+      "modal_lama": 23520.0,
+      "modal_baru": 39950.0
+    },
+    {
+      "tipe": "Hasienda 1456",
+      "pricelist": 0,
+      "modal_lama": 44020.0,
+      "modal_baru": 61500.0
+    },
+    {
+      "tipe": "KIMPLAST",
+      "pricelist": 0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "Keranjang piring",
+      "pricelist": 30500.0,
+      "modal_lama": 24629.0,
+      "modal_baru": 43000.0
+    },
+    {
+      "tipe": "MODAL Ember Filter",
+      "pricelist": 0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "Ember",
+      "pricelist": 53280.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "pipa 1/2 inch 50 cm",
+      "pricelist": 7500.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "pipa 3/4 inch 20 cm",
+      "pricelist": 3000.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "SDL 1 inch ( 1 pcs )",
+      "pricelist": 1138.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "SDD 1 inch ( 1 pcs )",
+      "pricelist": 1261.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "SDL 1/2 inch ( 2 x 559 )",
+      "pricelist": 1118.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "SDD 1/2 inch",
+      "pricelist": 726.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "Knee Drat Dalam 1/2 inch",
+      "pricelist": 871.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "Knee 1/2 inch ( 3 x 845 )",
+      "pricelist": 2535.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "Tee",
+      "pricelist": 1125.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    },
+    {
+      "tipe": "Tutup pipa 1/2 inch",
+      "pricelist": 358.0,
+      "modal_lama": 0,
+      "modal_baru": 0
+    }
+  ]
+}

@@ -1,0 +1,11065 @@
+
+
+
+Product Requirement Document (PRD): 
+Sistem
+ 
+Operasional
+ &amp; ERP (PALORA) 
+Pergudangan
+ PT 
+Paletindo
+ Prakarsa 
+Unggul
+
+
+1. Product Overview
+
+Nama / Jenis 
+Sistem
+: PALORA / 
+Sistem
+ ERP 
+Pergudangan
+ &amp; 
+Operasional
+ 
+Terintegrasi
+ PT 
+Paletindo
+ Prakarsa 
+Unggul
+. 
+
+
+
+Tujuan 
+Sistem
+: 
+Mendigitalisasi
+ dan 
+menyederhanakan
+ 
+alur
+ 
+operasional
+ 
+pengadaan
+ 
+barang
+ (
+pembelian
+ 
+ke
+ supplier), 
+penerimaan
+ 
+gudang
+, 
+kontrol
+ 
+stok
+ 
+fisik
+, 
+penjualan
+ 
+langsung
+ (POS) dan 
+pesanan
+ 
+partai
+ 
+besar
+, 
+serta
+ 
+pencatatan
+ 
+arsip
+ 
+dokumen
+ agar 
+tidak
+ 
+ada
+ data yang 
+hilang
+ 
+atau
+ 
+tidak
+ 
+sinkron
+. 
+
+
+
+
+Masalah
+ 
+Bisnis
+ yang 
+Ingin
+ 
+Diselesaikan
+:
+
+
+
+
+Seringnya
+ salah 
+ketik
+/salah 
+hitung
+ pada 
+pembuatan
+ Purchase Order (PO) manual (salah 
+kode
+, salah 
+harga
+ modal, salah 
+hitung
+ total nominal). 
+
+
+
+
+Ketidaksinkronan
+ data 
+stok
+ 
+antara
+ 
+catatan
+ file Excel Mas Heri dan 
+fisik
+ 
+nyata
+ di 
+gudang
+. 
+
+
+
+Sering 
+hilangnya
+ 
+dokumen
+ 
+fisik
+ (
+surat
+ 
+jalan
+, nota, invoice 
+tagihan
+) yang 
+diletakkan
+ di 
+keranjang
+/
+meja
+. 
+
+
+
+
+Ketiadaan
+ 
+pelacakan
+ 
+piutang
+ 
+penjualan
+ 
+dengan
+ 
+sistem
+ tempo/
+termin
+, 
+sehingga
+ 
+penagihan
+ 
+sering
+ 
+terlupakan
+ 
+jika
+ 
+hanya
+ 
+mengandalkan
+ 
+riwayat
+ WhatsApp. 
+
+
+
+
+Penolakan
+ user 
+terhadap
+ 
+sistem
+ ERP lama yang 
+rumit
+, 
+membutuhkan
+ 
+banyak
+ 
+langkah
+/
+klik
+, 
+serta
+ 
+memaksakan
+ 
+perubahan
+ 
+Standar
+ 
+Operasional
+ 
+Prosedur
+ (SOP) 
+lapangan
+. 
+
+
+
+
+Pengguna
+ 
+Sistem
+: Pak Yanto (Owner/
+Pimpinan
+ Bisnis), Bude (
+Administrasi
+ 
+Finansial
+ &amp; 
+Perpajakan
+), Mas Heri (Admin Gudang &amp; Kasir), 
+serta
+ 
+staf
+ 
+pembantu
+/
+supir
+ 
+logistik
+. 
+
+
+
+Ruang 
+Lingkup
+ ERP: 
+Manajemen
+ 
+Pengadaan
+ (Purchasing/PO Supplier), 
+Manajemen
+ 
+Inventaris
+ &amp; Gudang (Warehouse &amp; Stock In/Out), 
+Penjualan
+ Kasir (POS) &amp; 
+Pesanan
+ Besar (Sales Order), 
+Pengarsipan
+ 
+Dokumen
+ 
+Terpusat
+ (Document Management), 
+serta
+ 
+Pelacakan
+ 
+Piutang
+ 
+Pembayaran
+ Tempo. 
+
+
+
+Proses 
+Bisnis
+ Utama:
+
+
+
+Procure-to-Pay (P2P): 
+Pembuatan
+ PO 
+ke
+ supplier $\
+rightarrow
+$ 
+Pengambilan
+ 
+barang
+ oleh 
+supir
+ $\
+rightarrow
+$ 
+Penerimaan
+ 
+fisik
+ &amp; 
+pencocokan
+ Surat Jalan (SJ) $\
+rightarrow
+$ Masuk 
+stok
+ $\
+rightarrow
+$ 
+Verifikasi
+ Invoice &amp; 
+Faktur
+. 
+
+
+
+Order-to-Cash (O2C) 
+Pesanan
+ Besar: 
+Permintaan
+ 
+pesanan
+ $\
+rightarrow
+$ Cek 
+ketersediaan
+ 
+stok
+ $\
+rightarrow
+$ 
+Negosiasi
+ 
+harga
+/
+diskon
+ $\
+rightarrow
+$ DP minimal 25% $\
+rightarrow
+$ 
+Penerbitan
+ Nota DP $\
+rightarrow
+$ 
+Pelunasan
+ 100% $\
+rightarrow
+$ 
+Penerbitan
+ Surat Jalan &amp; 
+barang
+ 
+keluar
+. 
+
+
+
+
+Penjualan
+ 
+Langsung
+ (POS): Customer 
+datang
+ $\
+rightarrow
+$ 
+Pilih
+ 
+barang
+ via 
+kode
+ $\
+rightarrow
+$ 
+Penyesuaian
+ 
+harga
+ 
+khusus
+ $\
+rightarrow
+$ Bayar 
+lunas
+ $\
+rightarrow
+$ 
+Cetak
+ nota $\
+rightarrow
+$ Stok 
+otomatis
+ 
+terpotong
+. 
+
+
+
+Multi-Channel Consolidation: 
+Rekapitulasi
+ 
+transaksi
+ marketplace (Shopee, Tokopedia, Lazada, Blibli) via 
+impor
+ 
+laporan
+ 
+berkala
+ 
+untuk
+ 
+memotong
+ 
+stok
+. 
+
+
+
+2. Business Process Overview
+
+
+Perbandingan
+ Alur Proses As-Is dan To-Be
+
+Area Proses
+
+Proses Saat Ini (As-Is / Manual)
+
+Proses 
+Sistem
+ ERP (To-Be / Digital)
+
+
+Catatan
+ / Alasan Tetap 
+Dilakukan
+ 
+Fisik
+
+
+
+Pembuatan
+ PO Supplier
+
+Pak Yanto/Mas Heri 
+menulis
+ 
+tangan
+ di memo/
+kertas
+ 
+atau
+ chat WA. Sering salah 
+kode
+ 
+produk
+, salah 
+hitung
+ 
+perkalian
+ nominal, dan salah 
+harga
+ modal. 
+
+
+
+
+Sistem
+ 
+menyediakan
+ form 
+ringkas
+ 
+berbasis
+ dropdown 
+kode
+ 
+barang
+ (SKU). Harga modal 
+otomatis
+ 
+muncul
+ 
+sesuai
+ 
+katalog
+/
+diskon
+ 
+rujukan
+, total 
+terhitung
+ 
+otomatis
+, dan template PO 
+dapat
+ 
+langsung
+ 
+dikirim
+ via WA/Email. 
+
+
+
+
+Pengambilan
+ 
+keputusan
+ 
+negosiasi
+ 
+harga
+ 
+ke
+ supplier 
+tetap
+ 
+dilakukan
+ via 
+kontak
+ manual/
+telepon
+. 
+
+
+
+
+Penerimaan
+ Barang Masuk
+
+
+Supir
+ 
+membawa
+ 
+barang
+ 
+bersama
+ Surat Jalan 
+fisik
+ 
+dari
+ supplier. 
+Dokumen
+ 
+diletakkan
+ di 
+keranjang
+ 
+meja
+. Stok 
+ditulis
+ 
+ulang
+ manual di Excel 
+jika
+ 
+ingat
+. 
+
+
+
+Mas Heri 
+membuka
+ 
+nomor
+ PO 
+terkait
+ di 
+sistem
+ (
+komputer
+ 
+gudang
+/
+ponsel
+), 
+memasukkan
+ 
+jumlah
+ 
+barang
+ 
+fisik
+ yang lolos QC, 
+mengambil
+ 
+foto
+ Surat Jalan 
+fisik
+, 
+lalu
+ 
+klik
+ "
+Terima
+". Stok 
+bertambah
+ 
+otomatis
+. 
+
+
+
+
+Pengecekan
+ 
+kondisi
+ 
+fisik
+ 
+barang
+ (
+retur
+, 
+pecah
+/
+cacat
+) 
+tetap
+ 
+dilakukan
+ 
+secara
+ manual di 
+bak
+ 
+truk
+/
+gudang
+ 
+sebelum
+ 
+diinput
+ 
+ke
+ 
+sistem
+. 
+
+
+
+
+Penyimpanan
+ 
+Dokumen
+
+
+
+Dokumen
+ 
+ditaruh
+ di 
+keranjang
+/map binder 
+fisik
+, 
+sering
+ 
+terselip
+ 
+atau
+ 
+hilang
+ 
+sebelum
+ 
+direkap
+ oleh Bude. 
+
+
+
+Mas Heri 
+memfoto
+ 
+surat
+ 
+jalan
+/
+faktur
+/nota 
+menggunakan
+ 
+kamera
+ HP 
+atau
+ web dan 
+langsung
+ 
+mengunggahnya
+ 
+ke
+ 
+nomor
+ PO/Order 
+terkait
+. 
+
+
+
+
+Fisik
+ 
+kertas
+ 
+asli
+ 
+tetap
+ 
+disimpan
+ di binder/map 
+sebagai
+ 
+arsip
+ legal dan 
+bukti
+ 
+fisik
+. 
+
+
+
+
+Pesanan
+ 
+Pelanggan
+ (
+Partai
+ Besar)
+
+
+Dicatat
+ di 
+kertas
+ nota 
+biasa
+ via 
+telepon
+/WA. 
+Validasi
+ DP dan 
+pelunasan
+ 
+hanya
+ 
+lewat
+ screenshot chat WA. Sering 
+lupa
+ 
+menagih
+ 
+piutang
+ tempo. 
+
+
+
+
+Sistem
+ 
+mencatat
+ 
+pesanan
+, 
+menghitung
+ minimum DP 25%. Status 
+pesanan
+ 
+terkunci
+ "
+Menunggu
+ DP". 
+Setelah
+ DP 
+dicatat
+, 
+terbit
+ Nota DP. 
+Sistem
+ 
+memblokir
+ 
+penerbitan
+ Surat Jalan 
+keluar
+ 
+sebelum
+ status 
+pembayaran
+ 
+lunas
+ (100%). 
+Dilengkapi
+ 
+tabel
+ 
+pengingat
+ 
+jatuh
+ tempo. 
+
+
+
+
+Komunikasi
+ 
+negosiasi
+ 
+awal
+ dan transfer dana bank 
+tetap
+ 
+berjalan
+ di 
+luar
+ 
+sistem
+ (
+konfirmasi
+ 
+pembayaran
+ manual via input 
+bukti
+ transfer). 
+
+
+
+
+Penjualan
+ Kasir (POS 
+Langsung
+)
+
+Mas Heri 
+menulis
+ nota manual 
+pakai
+ 
+bolpoin
+. 
+Perhitungan
+ manual dan 
+stok
+ di Excel 
+tidak
+ 
+langsung
+ 
+dipotong
+. 
+
+
+
+
+Antarmuka
+ 
+kasir
+ 
+satu
+ 
+halaman
+ (Single Page): Mas Heri 
+mengetik
+ 
+kode
+ 
+barang
+ (
+misal
+: 2808), 
+harga
+ default 
+muncul
+ 
+otomatis
+ 
+namun
+ 
+dapat
+ 
+ditimpa
+ (override) 
+jika
+ 
+ada
+ 
+tawar-menawar
+, 
+lalu
+ 
+klik
+ 
+simpan
+/
+cetak
+ nota. Stok 
+langsung
+ 
+terpotong
+ 
+seketika
+. 
+
+
+
+
+Penyerahan
+ 
+fisik
+ 
+produk
+ dan uang 
+tunai
+ 
+dilakukan
+ 
+secara
+ 
+langsung
+ di 
+meja
+ 
+kasir
+. 
+
+
+
+
+Penjualan
+ Marketplace
+
+
+Membuka
+ 7 
+akun
+ 
+toko
+ 
+terpisah
+ (Shopee 3, Tokopedia 2, Lazada 1, Blibli 1). Data 
+tidak
+ 
+terintegrasi
+ dan 
+stok
+ 
+gudang
+ 
+rawan
+ 
+jebol
+. 
+
+
+
+Mas Heri 
+mengunduh
+ 
+rekapan
+ 
+laporan
+ 
+penjualan
+ 
+bulanan
+/
+mingguan
+ 
+dari
+ seller center marketplace (format file spreadsheet), 
+lalu
+ 
+mengunggahnya
+ 
+ke
+ menu Sync Marketplace. 
+Sistem
+ 
+membaca
+ 
+kode
+ 
+barang
+ dan 
+memotong
+ 
+stok
+ 
+gudang
+. 
+
+
+
+Proses 
+pemenuhan
+ 
+pesanan
+ dan packing 
+resi
+ marketplace 
+tetap
+ 
+dilakukan
+ pada 
+aplikasi
+ masing-masing marketplace. 
+
+
+
+3. Aktor dan Role
+
+1. Pak Yanto (Owner / Business Head)
+
+
+Tanggung
+ Jawab: 
+Menyetujui
+ 
+harga
+ 
+pembelian
+/
+penjualan
+ 
+khusus
+, 
+membuat
+ 
+pesanan
+ 
+pembelian
+ (PO) 
+ke
+ 
+pabrik
+/supplier, dan 
+menjalin
+ 
+negosiasi
+ 
+bisnis
+. 
+
+
+
+
+Aktivitas
+: 
+Mengisi
+ form PO supplier, 
+mengirim
+ PO digital 
+ke
+ supplier, 
+memantau
+ 
+ketersediaan
+ 
+stok
+ 
+riil
+, 
+serta
+ 
+memonitor
+ 
+laporan
+ 
+tagihan
+/
+piutang
+ customer. 
+
+
+
+Data yang Dapat Dilihat: 
+Seluruh
+ data master 
+barang
+, 
+harga
+ modal, 
+harga
+ 
+katalog
+, 
+harga
+ 
+jual
+, 
+seluruh
+ PO supplier, 
+laporan
+ 
+stok
+, 
+laporan
+ 
+penjualan
+, dan 
+piutang
+ tempo. 
+
+
+
+Data yang Dapat Dibuat: PO Supplier, 
+Pesanan
+ 
+Pelanggan
+ (Sales Order), data 
+penyesuaian
+ 
+harga
+ 
+khusus
+. 
+
+
+
+Data yang Dapat Diubah: Nilai 
+harga
+ 
+beli
+ di PO, status approval 
+pesanan
+ 
+khusus
+, data master supplier. 
+
+
+
+Data yang Dapat Disetujui: 
+Pengiriman
+ 
+barang
+ di 
+luar
+ 
+ketentuan
+ 
+standar
+ (
+misal
+: 
+pesanan
+ 
+partai
+ 
+langsung
+ 
+dari
+ supplier 
+ke
+ customer 
+tanpa
+ 
+lewat
+ 
+gudang
+). 
+
+
+
+Batasan Akses: Akses 
+penuh
+ (
+Superadmin
+). 
+
+
+
+2. Mas Heri (Admin Gudang &amp; Kasir)
+
+
+Tanggung
+ Jawab: 
+Bertanggung
+ 
+jawab
+ 
+atas
+ 
+keluar-masuknya
+ 
+barang
+ 
+fisik
+ di 
+gudang
+, 
+penerimaan
+ 
+kiriman
+ 
+dari
+ 
+supir
+, 
+melayani
+ customer yang 
+datang
+ 
+langsung
+ (
+kasir
+), dan 
+memelihara
+ data 
+stok
+ 
+harian
+. 
+
+
+
+
+Aktivitas
+: 
+Mencari
+ 
+barang
+ 
+menggunakan
+ 
+kode
+/SKU, 
+menerima
+ 
+barang
+ supplier 
+berdasarkan
+ PO, 
+mengunggah
+ 
+foto
+ 
+surat
+ 
+jalan
+ 
+masuk
+, 
+membuat
+ 
+transaksi
+ POS 
+langsung
+, 
+mengedit
+ 
+harga
+ 
+satuan
+ 
+sesuai
+ 
+diskon
+ 
+kesepakatan
+, dan 
+mengimpor
+ 
+laporan
+ marketplace 
+bulanan
+. 
+
+
+
+Data yang Dapat Dilihat: 
+Katalog
+ 
+barang
+ 
+gudang
+ (
+kode
+, 
+dimensi
+, 
+varian
+ 
+warna
+, 
+stok
+ 
+tersedia
+, 
+harga
+ 
+jual
+ 
+acuan
+), daftar PO supplier yang 
+menunggu
+ 
+kedatangan
+ 
+barang
+, 
+riwayat
+ nota 
+kasir
+. [
+Perlu
+ 
+Konfirmasi
+: 
+Apakah
+ Mas Heri 
+diizinkan
+ 
+melihat
+ margin 
+keuntungan
+ dan 
+harga
+ modal supplier, 
+atau
+ 
+hanya
+ 
+harga
+ 
+jual
+?] 
+
+
+
+Data yang Dapat Dibuat: 
+Transaksi
+ POS 
+langsung
+, data 
+tanda
+ 
+terima
+ Surat Jalan 
+masuk
+ (Goods Receipt), 
+unggahan
+ 
+foto
+ 
+dokumen
+, 
+penyesuaian
+ 
+stok
+ 
+opname
+. 
+
+
+
+Data yang Dapat Diubah: 
+Mengubah
+ 
+harga
+ 
+transaksi
+ POS (price override 
+saat
+ 
+tawar-menawar
+), 
+kuantitas
+ 
+barang
+ 
+diterima
+ 
+aktual
+. 
+
+
+
+Data yang Dapat Disetujui: 
+Konfirmasi
+ 
+barang
+ 
+fisik
+ 
+telah
+ 
+tiba
+ dan 
+sesuai
+ 
+dengan
+ 
+surat
+ 
+jalan
+ supplier. 
+
+
+
+Batasan Akses: Tidak 
+memiliki
+ 
+hak
+ 
+akses
+ 
+untuk
+ 
+menghapus
+ data audit 
+transaksi
+, 
+tidak
+ 
+dapat
+ 
+mengubah
+ 
+pengaturan
+ 
+sistem
+ global, dan 
+tidak
+ 
+dapat
+ 
+mengubah
+ master 
+pajak
+/
+faktur
+ 
+milik
+ Bude. 
+
+
+
+3. Bude (Finance, Accounting &amp; Tax)
+
+
+Tanggung
+ Jawab: 
+Rekonsiliasi
+ 
+dokumen
+ 
+finansial
+, 
+pencatatan
+ 
+pelunasan
+ 
+tagihan
+ tempo, 
+validasi
+ 
+faktur
+ 
+pajak
+, dan 
+pemantauan
+ 
+pembayaran
+ supplier. 
+
+
+
+
+Aktivitas
+: 
+Mengambil
+ 
+arsip
+ digital 
+dokumen
+, 
+mencocokkan
+ PO 
+dengan
+ Surat Jalan dan Invoice 
+tagihan
+ supplier, 
+menerbitkan
+ 
+faktur
+ 
+penagihan
+, 
+memvalidasi
+ 
+bukti
+ 
+pelunasan
+ customer tempo, dan 
+memantau
+ status 
+jatuh
+ tempo. 
+
+
+
+Data yang Dapat Dilihat: 
+Seluruh
+ 
+dokumen
+ 
+transaksi
+, 
+harga
+ modal, 
+harga
+ 
+jual
+, status 
+pembayaran
+ DP/Lunas, invoice supplier, data 
+faktur
+ 
+pajak
+, dan 
+ringkasan
+ 
+piutang
+ customer. 
+
+
+
+Data yang Dapat Dibuat: 
+Catatan
+ 
+pembayaran
+ (
+pelunasan
+ 
+cicilan
+/tempo), status 
+kelengkapan
+ 
+dokumen
+ 
+finansial
+. 
+
+
+
+Data yang Dapat Diubah: Status 
+pembayaran
+ 
+transaksi
+ (
+dari
+ DP 
+menjadi
+ Lunas), 
+catatan
+ 
+tagihan
+ tempo. 
+
+
+
+Data yang Dapat Disetujui: 
+Validasi
+ 
+kelayakan
+ 
+dokumen
+ 
+untuk
+ 
+penagihan
+/
+pelunasan
+. 
+
+
+
+Batasan Akses: Tidak 
+mengelola
+ 
+operasional
+ 
+fisik
+ 
+pergudangan
+ (input 
+barang
+ 
+masuk
+/
+keluar
+ 
+harian
+). 
+
+
+
+4. 
+Supir
+ / Logistik 
+Lapangan
+ [
+Perlu
+ Konfirmasi]
+
+
+Tanggung
+ Jawab: 
+Mengambil
+ 
+barang
+ 
+ke
+ supplier dan 
+mengantarkan
+ 
+pesanan
+ 
+ke
+ customer. 
+
+
+
+
+Aktivitas
+: 
+Menyerahkan
+ 
+surat
+ 
+jalan
+ supplier 
+ke
+ Mas Heri 
+saat
+ 
+tiba
+ di 
+gudang
+. 
+
+
+
+Batasan Akses: Saat 
+ini
+ 
+belum
+ 
+membutuhkan
+ 
+akun
+ 
+sistem
+ 
+mandiri
+ (proses 
+dicatat
+ 
+melalui
+ Mas Heri). 
+
+
+
+4. Daftar Fitur Utama
+
+Fitur 1: 
+Pembuatan
+ &amp; 
+Penerbitan
+ Purchase Order (PO) Supplier
+
+Tujuan: 
+Mencegah
+ 
+kesalahan
+ 
+penulisan
+ 
+kode
+ 
+barang
+, salah 
+perkalian
+ total nominal, dan 
+ketidaktahuan
+ 
+harga
+ modal 
+saat
+ 
+memesan
+ 
+stok
+ 
+ke
+ supplier/
+pabrik
+. 
+
+
+
+Aktor: Pak Yanto, Mas Heri. 
+
+
+
+
+Kondisi
+ Awal: Master data 
+produk
+ (
+kode
+/SKU, nama, 
+harga
+ modal 
+standar
+) dan master supplier 
+sudah
+ 
+terdaftar
+ di 
+sistem
+. 
+
+
+
+Trigger: Stok di 
+gudang
+ 
+menipis
+ 
+atau
+ 
+adanya
+ 
+permintaan
+ 
+pesanan
+ 
+dalam
+ 
+jumlah
+ 
+besar
+ 
+dari
+ customer. 
+
+
+
+Alur Bisnis:
+
+
+
+User 
+membuka
+ menu PO Supplier $\
+rightarrow
+$ 
+klik
+ 
+Buat
+ PO Baru. 
+
+
+
+
+Sistem
+ 
+otomatis
+ 
+menghasilkan
+ 
+Nomor
+ PO 
+unik
+ 
+secara
+ 
+berurutan
+. 
+
+
+
+User 
+memilih
+ nama Supplier 
+dari
+ dropdown. 
+
+
+
+User 
+memilih
+ 
+barang
+ 
+berdasarkan
+ 
+pencarian
+ Kode Barang / SKU. 
+
+
+
+
+Sistem
+ 
+otomatis
+ 
+menampilkan
+ 
+harga
+ modal default 
+dari
+ master data. 
+
+
+
+Jika 
+harga
+ supplier 
+sedang
+ naik/
+turun
+, user 
+dapat
+ 
+langsung
+ 
+mengedit
+ 
+nilai
+ 
+harga
+ modal pada baris 
+tersebut
+. 
+
+
+
+User 
+memasukkan
+ 
+kuantitas
+ (Qty) 
+barang
+ yang 
+dipesan
+. 
+
+
+
+
+Sistem
+ 
+menghitung
+ subtotal dan grand total 
+secara
+ 
+otomatis
+ 
+tanpa
+ 
+perlu
+ 
+kalkulasi
+ manual. 
+
+
+
+User 
+menambahkan
+ 
+catatan
+ 
+tujuan
+ 
+alokasi
+: "Masuk Stok Gudang" 
+atau
+ "
+Kirim
+ 
+Langsung
+ 
+ke
+ Customer (Direct Ship)". 
+
+
+
+User 
+mengklik
+ 
+Simpan
+ &amp; 
+Terbitkan
+ PO. 
+
+
+
+
+Sistem
+ 
+menyediakan
+ 
+tombol
+ 
+aksi
+ 
+cepat
+: 
+Kirim
+ via WhatsApp (
+otomatis
+ 
+membuka
+ API WhatsApp 
+dengan
+ template 
+teks
+ 
+rapi
+) dan 
+Kirim
+ via Email (
+membuka
+ 
+pratinjau
+ 
+lampiran
+ PDF 
+dokumen
+ PO 
+resmi
+). 
+
+
+
+Input: ID Supplier, Daftar Item (SKU, Qty, Harga 
+Satuan
+ yang 
+dapat
+ 
+diedit
+), 
+Catatan
+ PO. 
+
+
+
+Process: 
+Perhitungan
+ subtotal ($Qty \times Harga$), 
+validasi
+ 
+nomor
+ 
+urut
+ PO, 
+pembentukan
+ 
+dokumen
+ PDF PO 
+standar
+ 
+Paletindo
+. 
+
+
+
+Output: 
+Dokumen
+ 
+elektronik
+ PO (PDF), 
+tautan
+ 
+kirim
+ WA/Email, 
+entitas
+ PO 
+dengan
+ status "
+Diterbitkan
+". 
+
+
+
+Business Rules:
+
+
+
+
+Penomoran
+ PO 
+dikontrol
+ 
+secara
+ 
+terpusat
+ oleh 
+Paletindo
+, 
+bukan
+ 
+mengikuti
+ supplier. 
+
+
+
+Harga modal pada baris PO 
+bersifat
+ 
+dinamis
+ (editable) 
+untuk
+ 
+mengakomodasi
+ 
+diskon
+ 
+atau
+ 
+fluktuasi
+ 
+harga
+ supplier 
+tanpa
+ 
+merusak
+ master data 
+dasar
+ 
+secara
+ 
+permanen
+. 
+
+
+
+Validation: Qty minimal 1; Harga 
+satuan
+ 
+tidak
+ 
+boleh
+ 
+kosong
+ 
+atau
+ 
+negatif
+; 
+Nomor
+ PO 
+tidak
+ 
+boleh
+ 
+duplikat
+. 
+
+
+
+Status: Draft $\
+rightarrow
+$ 
+Diterbitkan
+ (Issued) $\
+rightarrow
+$ 
+Diproses
+ Sebagian (Partial Received) $\
+rightarrow
+$ 
+Selesai
+ (Completed) $\
+rightarrow
+$ 
+Dibatalkan
+ (Cancelled). 
+
+
+
+Approval: Jika 
+dibuat
+ oleh Mas Heri 
+dengan
+ 
+selisih
+ 
+harga
+ modal di 
+atas
+ 
+toleransi
+ 
+tertentu
+, 
+membutuhkan
+ 
+persetujuan
+ Pak Yanto [
+Perlu
+ 
+Konfirmasi
+].
+
+
+
+Notification: 
+Sistem
+ 
+memunculkan
+ badge 
+notifikasi
+ di dashboard 
+bahwa
+ 
+terdapat
+ PO yang 
+menunggu
+ 
+kedatangan
+ 
+barang
+. 
+
+
+
+Data Relationship: 
+Terhubung
+ 
+dengan
+ Master Supplier, Master Barang, dan 
+Penerimaan
+ Barang (Goods Receipt). 
+
+
+
+Audit Trail: 
+Mencatat
+ user 
+pembuat
+ PO, 
+tanggal
+/jam 
+pembuatan
+, dan 
+riwayat
+ 
+revisi
+ 
+harga
+/
+kuantitas
+. 
+
+
+
+Exception / Edge Case: Jika supplier 
+mengabarkan
+ 
+stok
+ 
+warna
+ 
+barang
+ 
+kosong
+ 
+setelah
+ PO 
+terbit
+, user 
+dapat
+ 
+melakukan
+ 
+revisi
+ item PO 
+sebelum
+ 
+barang
+ 
+dikirim
+ 
+dari
+ 
+pabrik
+. 
+
+
+
+UI/UX Requirement:
+
+
+
+Halaman Form 
+Pembuatan
+ PO 
+bergaya
+ 
+ringkas
+ (
+satu
+ 
+halaman
+). 
+
+
+
+
+Tombol
+ baris 
+cepat
+: "
+Tambah
+ Barang" 
+dengan
+ 
+autofokus
+ 
+ke
+ 
+kolom
+ 
+pencarian
+ 
+kode
+ 
+barang
+. 
+
+
+
+
+Ringkasan
+ 
+kalkulasi
+ total yang 
+menempel
+ (sticky) di 
+sudut
+ 
+kanan
+ 
+bawah
+. 
+
+
+
+Modal 
+pratinjau
+ 
+pesan
+ WhatsApp dan 
+pratinjau
+ 
+cetak
+ PDF 
+sebelum
+ 
+dikirim
+. 
+
+
+
+Fitur 2: 
+Penerimaan
+ Barang Masuk &amp; 
+Digitalisasi
+ Surat Jalan (Goods Receipt)
+
+Tujuan: 
+Memastikan
+ 
+stok
+ 
+gudang
+ 
+hanya
+ 
+bertambah
+ 
+jika
+ 
+fisik
+ 
+barang
+ 
+nyata
+ 
+telah
+ 
+tiba
+ dan 
+mencegah
+ 
+hilangnya
+ 
+arsip
+ 
+fisik
+ 
+surat
+ 
+jalan
+ supplier. 
+
+
+
+Aktor: Mas Heri (Admin Gudang). 
+
+
+
+
+Kondisi
+ Awal: 
+Nomor
+ PO Supplier 
+sudah
+ 
+berstatus
+ 
+Diterbitkan
+ 
+atau
+ 
+Diproses
+ Sebagian. 
+
+
+
+Trigger: 
+Supir
+ 
+Paletindo
+ 
+tiba
+ di 
+gudang
+ 
+membawa
+ 
+fisik
+ 
+barang
+ dan Surat Jalan 
+dari
+ 
+pabrik
+/supplier. 
+
+
+
+Alur Bisnis:
+
+
+
+Mas Heri 
+membuka
+ menu 
+Penerimaan
+ Barang di 
+komputer
+ 
+atau
+ 
+ponsel
+ 
+gudang
+. 
+
+
+
+Mas Heri 
+mencari
+ 
+nomor
+ PO 
+terkait
+ 
+atau
+ nama supplier. 
+
+
+
+Mas Heri 
+memasukkan
+ 
+Nomor
+ Surat Jalan 
+resmi
+ 
+dari
+ supplier. 
+
+
+
+Mas Heri 
+memasukkan
+ 
+kuantitas
+ 
+aktual
+ 
+barang
+ yang 
+diterima
+ 
+dalam
+ 
+kondisi
+ 
+baik
+. 
+
+
+
+Jika 
+terdapat
+ 
+barang
+ 
+cacat
+/
+rusak
+/
+pecah
+, Mas Heri 
+mengisi
+ 
+kolom
+ "Qty Rusak/Reject". 
+
+
+
+Mas Heri 
+mengambil
+ 
+foto
+ 
+dokumen
+ Surat Jalan 
+fisik
+ 
+menggunakan
+ 
+kamera
+ 
+ponsel
+/webcam dan 
+mengunggahnya
+ 
+ke
+ 
+formulir
+. 
+
+
+
+Mas Heri 
+mengklik
+ 
+Konfirmasi
+ 
+Penerimaan
+ Barang. 
+
+
+
+
+Sistem
+ 
+otomatis
+ 
+menambahkan
+ Qty 
+barang
+ yang 
+baik
+ 
+ke
+ 
+dalam
+ 
+saldo
+ 
+stok
+ 
+gudang
+. 
+
+
+
+
+Sistem
+ 
+mengecek
+ total 
+akumulasi
+ 
+penerimaan
+ 
+terhadap
+ Qty PO:
+
+
+
+Jika Qty 
+terpenuhi
+ 
+seluruhnya
+, status PO 
+menjadi
+ 
+Selesai
+. 
+
+
+
+Jika Qty 
+baru
+ 
+terkirim
+ 
+sebagian
+ (
+karena
+ armada 
+mobil
+ 
+tidak
+ 
+muat
+), status PO 
+menjadi
+ 
+Diproses
+ Sebagian dan 
+siap
+ 
+menerima
+ Surat Jalan 
+berikutnya
+. 
+
+
+
+Input: 
+Nomor
+ 
+Referensi
+ PO, 
+Nomor
+ Surat Jalan Supplier, 
+Tanggal
+ 
+Penerimaan
+, Qty 
+Diterima
+ Baik, Qty Rusak, File Foto/Scan 
+Dokumen
+ Surat Jalan. 
+
+
+
+Process: 
+Penambahan
+ 
+stok
+ 
+aktif
+ ($Stok_{
+baru
+} = Stok_{lama} + Qty_{
+diterima
+}$), 
+pencatatan
+ 
+barang
+ 
+cacat
+ di log 
+retur
+ 
+terpisah
+, 
+penyimpanan
+ 
+lampiran
+ 
+foto
+ 
+dokumen
+ 
+ke
+ 
+penyimpanan
+ cloud. 
+
+
+
+Output: Bukti 
+Penerimaan
+ Barang digital, 
+penambahan
+ 
+stok
+ 
+realtime
+, 
+tautan
+ 
+unduh
+ 
+arsip
+ 
+foto
+ 
+surat
+ 
+jalan
+. 
+
+
+
+Business Rules:
+
+
+
+Barang 
+cetakan
+ 
+jasa
+ 
+pihak
+ 
+ketiga
+ 
+tidak
+ 
+boleh
+ 
+masuk
+ 
+ke
+ 
+perhitungan
+ 
+stok
+ 
+gudang
+ 
+Paletindo
+ 
+sebelum
+ 
+surat
+ 
+jalan
+ 
+pengiriman
+ 
+ke
+ 
+gudang
+ 
+diterbitkan
+ dan 
+diterima
+ 
+fisik
+. 
+
+
+
+Satu 
+nomor
+ PO 
+dapat
+ 
+memiliki
+ 
+lebih
+ 
+dari
+ 
+satu
+ Surat Jalan 
+penerimaan
+ (
+pengiriman
+ 
+bertahap
+ 
+akibat
+ 
+kendala
+ 
+muatan
+ 
+mobil
+). 
+
+
+
+Satu Surat Jalan 
+tidak
+ 
+boleh
+ 
+menggabungkan
+ dua 
+nomor
+ PO yang 
+berbeda
+. 
+
+
+
+Barang 
+cacat
+/
+rusak
+ supplier 
+tidak
+ 
+boleh
+ 
+dimasukkan
+ 
+ke
+ 
+dalam
+ 
+stok
+ 
+jual
+ 
+aktif
+. 
+
+
+
+Validation: 
+Jumlah
+ 
+akumulasi
+ Qty 
+diterima
+ 
+tidak
+ 
+boleh
+ 
+melebihi
+ batas 
+toleransi
+ Qty PO 
+asal
+; Format 
+berkas
+ 
+foto
+ 
+harus
+ JPG/PNG/PDF 
+dengan
+ 
+ukuran
+ 
+maksimal
+ 5 MB. 
+
+
+
+Status: 
+Dokumen
+ 
+Penerimaan
+: 
+Diterima
+ 
+Penuh
+ (Full Received) 
+atau
+ 
+Diterima
+ Sebagian (Partial Received). 
+
+
+
+Approval: Mas Heri 
+memvalidasi
+ 
+kesesuaian
+ 
+fisik
+; approval 
+manajerial
+ 
+otomatis
+ 
+jika
+ 
+sesuai
+ Qty PO. 
+
+
+
+Notification: 
+Sistem
+ 
+memunculkan
+ status Goods Received pada daftar PO yang 
+dapat
+ 
+dipantau
+ oleh Pak Yanto dan Bude. 
+
+
+
+Data Relationship: 
+Terhubung
+ 
+langsung
+ 
+ke
+ 
+tabel
+ PO Supplier, 
+Mutasi
+ Stok Gudang, dan Tabel 
+Pengarsipan
+ 
+Dokumen
+ 
+Finansial
+ Bude. 
+
+
+
+Audit Trail: 
+Mencatat
+ user 
+penerima
+ (Mas Heri), 
+waktu
+ 
+penerimaan
+, nama file 
+foto
+ yang 
+diunggah
+, dan 
+jumlah
+ 
+mutasi
+ 
+masuk
+. 
+
+
+
+Exception / Edge Case:
+
+
+
+
+Muatan
+ 
+mobil
+ 
+penuh
+ 
+sehingga
+ 
+barang
+ 
+hanya
+ 
+terambil
+ 
+sebagian
+: 
+Sistem
+ 
+mengizinkan
+ status 
+parsial
+ 
+tanpa
+ 
+menutup
+ PO. 
+
+
+
+Surat 
+jalan
+ 
+fisik
+ 
+basah
+/
+sobek
+: Foto 
+kondisi
+ 
+fisik
+ 
+surat
+ 
+jalan
+ 
+apa
+ 
+adanya
+ 
+wajib
+ 
+diunggah
+ 
+dengan
+ 
+catatan
+ 
+tertulis
+ di 
+sistem
+. 
+
+
+
+UI/UX Requirement:
+
+
+
+
+Tombol
+ 
+unggah
+ 
+dokumen
+ 
+berukuran
+ 
+besar
+ (mobile-friendly) 
+dengan
+ 
+opsi
+ 
+langsung
+ 
+aktifkan
+ 
+kamera
+ HP. 
+
+
+
+
+Indikator
+ 
+progres
+ 
+penerimaan
+: Misal "1.000 
+dari
+ 2.000 pcs 
+diterima
+" 
+dengan
+ 
+bilah
+ 
+progres
+ 
+berwarna
+ 
+hijau-kuning
+. 
+
+
+
+Fitur 3: 
+Manajemen
+ 
+Pesanan
+ 
+Penjualan
+ 
+Partai
+ Besar &amp; 
+Kontrol
+ 
+Pembayaran
+ (Sales Order)
+
+Tujuan: 
+Menghindari
+ 
+kelalaian
+ 
+pengiriman
+ 
+barang
+ yang 
+belum
+ 
+lunas
+, 
+mengontrol
+ DP minimal 25%, dan 
+mengorganisasi
+ 
+pesanan
+ 
+pelanggan
+ 
+kuantitas
+ 
+besar
+. 
+
+
+
+Aktor: Pak Yanto, Mas Heri, Bude. 
+
+
+
+
+Kondisi
+ Awal: Customer 
+menghubungi
+ via WhatsApp/
+telepon
+ 
+untuk
+ 
+memesan
+ 
+produk
+ 
+dalam
+ 
+jumlah
+ 
+banyak
+. 
+
+
+
+Trigger: 
+Kesepakatan
+ 
+harga
+ 
+awal
+ 
+antara
+ 
+staf
+ 
+Paletindo
+ dan customer. 
+
+
+
+Alur Bisnis:
+
+
+
+
+Staf
+ 
+membuka
+ menu 
+Pesanan
+ Customer (SO) $\
+rightarrow
+$ 
+klik
+ 
+Tambah
+ 
+Pesanan
+ Baru. 
+
+
+
+Masukkan data nama 
+pelanggan
+, 
+nomor
+ 
+kontak
+ WhatsApp, dan 
+alamat
+ 
+pengiriman
+. 
+
+
+
+
+Pilih
+ daftar 
+barang
+ 
+berdasarkan
+ 
+kode
+; 
+sesuaikan
+ 
+harga
+ 
+satuan
+ 
+sesuai
+ 
+negosiasi
+. 
+
+
+
+
+Sistem
+ 
+menghitung
+ total 
+tagihan
+ dan 
+menentukan
+ 
+nilai
+ minimal DP (25% 
+dari
+ total) 
+secara
+ 
+otomatis
+. 
+
+
+
+
+Pesanan
+ 
+tersimpan
+ 
+dengan
+ status 
+Menunggu
+ 
+Pembayaran
+ DP. Pada 
+kondisi
+ 
+ini
+, 
+sistem
+ 
+mengunci
+ 
+opsi
+ 
+penerbitan
+ Surat Jalan 
+pengiriman
+. 
+
+
+
+Customer 
+mengirimkan
+ 
+bukti
+ transfer DP; user 
+menginput
+ 
+jumlah
+ DP yang 
+masuk
+ dan 
+mengunggah
+ 
+bukti
+ 
+bayar
+. 
+
+
+
+
+Sistem
+ 
+mengubah
+ status 
+pesanan
+ 
+menjadi
+ DP 
+Diterima
+ / Dalam 
+Persiapan
+ dan 
+menghasilkan
+ Nota 
+Pembayaran
+ DP digital (
+mencantumkan
+ 
+rincian
+ DP, 
+sisa
+ 
+tagihan
+, dan 
+nomor
+ 
+rekening
+) 
+untuk
+ 
+dikirim
+ 
+ke
+ WA customer. 
+
+
+
+Bagian 
+gudang
+ 
+mempersiapkan
+ 
+barang
+. 
+
+
+
+Saat 
+barang
+ 
+siap
+ 
+dikirim
+, customer 
+melakukan
+ 
+pelunasan
+ 
+sisa
+ 
+tagihan
+. 
+
+
+
+User 
+mencatat
+ 
+pelunasan
+ di 
+sistem
+; status 
+berubah
+ 
+menjadi
+ Lunas. 
+
+
+
+
+Tombol
+ 
+Terbitkan
+ Surat Jalan 
+Pengiriman
+ 
+terbuka
+; 
+supir
+ 
+mengantar
+ 
+barang
+ 
+bersama
+ Surat Jalan 
+resmi
+ 
+Paletindo
+. 
+
+
+
+Input: Data Customer, Daftar Item, Harga Negosiasi, Nominal DP, Bukti Transfer, 
+Pilihan
+ Logistik (
+Kirim
+ Armada / Ambil 
+Sendiri
+). 
+
+
+
+Process: 
+Perhitungan
+ 
+syarat
+ DP (25%), 
+validasi
+ 
+sisa
+ 
+piutang
+, 
+validasi
+ 
+syarat
+ 
+pelunasan
+ 
+sebelum
+ 
+pembukaan
+ 
+akses
+ Surat Jalan 
+keluar
+. 
+
+
+
+Output: 
+Dokumen
+ 
+Pesanan
+ Penjualan, Nota DP, Nota Lunas, Surat Jalan 
+Pengiriman
+. 
+
+
+
+Business Rules:
+
+
+
+
+Pesanan
+ 
+tidak
+ 
+boleh
+ 
+diproses
+/
+disiapkan
+ 
+secara
+ 
+resmi
+ 
+tanpa
+ 
+adanya
+ DP minimal 25% 
+atau
+ 
+pembayaran
+ 
+langsung
+ 
+lunas
+. 
+
+
+
+Barang 
+secara
+ 
+mutlak
+ 
+tidak
+ 
+boleh
+ 
+dikeluarkan
+/
+dikirim
+ 
+dari
+ 
+gudang
+ 
+jika
+ status 
+pembayaran
+ 
+belum
+ 
+mencapai
+ 100% 
+lunas
+, 
+kecuali
+ 
+disetujui
+ 
+secara
+ 
+tertulis
+ 
+untuk
+ 
+metode
+ tempo. 
+
+
+
+Surat Jalan 
+pengiriman
+ 
+Paletindo
+ 
+hanya
+ 
+menampilkan
+ 
+nomor
+ PO customer, nama 
+produk
+, 
+kode
+ 
+barang
+, dan 
+kuantitas
+ (nominal 
+harga
+ 
+tidak
+ 
+wajib
+ 
+dicantumkan
+ pada 
+surat
+ 
+jalan
+ 
+fisik
+ 
+sopir
+). 
+
+
+
+Validation: Nilai DP yang 
+dimasukkan
+ 
+sistem
+ minimal 25% 
+dari
+ grand total 
+penjualan
+. 
+
+
+
+Status: Draft / 
+Penawaran
+ $\
+rightarrow
+$ 
+Menunggu
+ DP $\
+rightarrow
+$ DP 
+Diterima
+ (
+Diproses
+) $\
+rightarrow
+$ Lunas (
+Siap
+ 
+Kirim
+) $\
+rightarrow
+$ 
+Terkirim
+ (
+Selesai
+). 
+
+
+
+Approval: 
+Pembebasan
+ 
+syarat
+ 
+lunas
+ 
+sebelum
+ 
+kirim
+ (
+pemberian
+ 
+fasilitas
+ tempo 
+pembayaran
+) 
+wajib
+ 
+disetujui
+ 
+langsung
+ oleh Pak Yanto. 
+
+
+
+Notification: 
+Notifikasi
+ WhatsApp/
+sistem
+ 
+kepada
+ customer 
+saat
+ DP 
+diverifikasi
+ dan 
+saat
+ 
+pesanan
+ 
+siap
+ 
+dikirim
+. 
+
+
+
+Data Relationship: 
+Terhubung
+ 
+dengan
+ Master Customer, 
+Mutasi
+ Stok 
+Berkurang
+, Modul 
+Piutang
+ Tempo Bude. 
+
+
+
+Audit Trail: 
+Mencatat
+ user 
+pembuat
+ order, user 
+pengonfirmasi
+ DP, user 
+pengonfirmasi
+ 
+lunas
+, dan 
+waktu
+ 
+pencetakan
+ 
+surat
+ 
+jalan
+. 
+
+
+
+Exception / Edge Case: 
+Pesanan
+ 
+partai
+ 
+besar
+ 
+langsung
+ 
+dari
+ 
+pabrik
+ supplier 
+ke
+ customer (
+tanpa
+ 
+singgah
+ di 
+gudang
+): 
+sistem
+ 
+menyediakan
+ toggle checkbox "Direct Shipment" agar 
+stok
+ 
+gudang
+ 
+fisik
+ 
+Paletindo
+ 
+tidak
+ 
+terpengaruh
+, 
+melainkan
+ 
+mencatat
+ 
+aliran
+ margin 
+pembelian-penjualan
+ 
+secara
+ 
+langsung
+. 
+
+
+
+UI/UX Requirement:
+
+
+
+
+Tombol
+ "
+Cetak
+ Surat Jalan" 
+berstatus
+ 
+nonaktif
+ (disabled) 
+berwarna
+ 
+abu-abu
+ 
+dengan
+ label 
+gembok
+ 
+sebelum
+ status 
+transaksi
+ 
+menjadi
+ Lunas. 
+
+
+
+Template 
+cetak
+ nota 
+fleksibel
+: 
+terdapat
+ 
+keterangan
+ DP yang 
+masuk
+ dan 
+sisa
+ 
+kekurangan
+ nominal yang 
+wajib
+ 
+dilunasi
+. 
+
+
+
+Fitur 4: Kasir 
+Penjualan
+ 
+Langsung
+ di Gudang (Point of Sale - POS)
+
+Tujuan: 
+Mempermudah
+ Mas Heri 
+melayani
+ 
+pembeli
+ 
+eceran
+/
+langsung
+ yang 
+datang
+ 
+ke
+ 
+lokasi
+ 
+gudang
+ 
+dengan
+ 
+cepat
+ 
+tanpa
+ menu yang 
+rumit
+, 
+serta
+ 
+memastikan
+ 
+stok
+ 
+langsung
+ 
+terpotong
+ 
+seketika
+. 
+
+
+
+Aktor: Mas Heri. 
+
+
+
+
+Kondisi
+ Awal: 
+Pelanggan
+ 
+berada
+ di 
+gudang
+ 
+memilih
+ 
+barang
+. 
+
+
+
+Trigger: 
+Pelanggan
+ 
+membawa
+ 
+barang
+ 
+ke
+ 
+meja
+ 
+kasir
+ 
+gudang
+ 
+untuk
+ 
+membayar
+. 
+
+
+
+Alur Bisnis:
+
+
+
+Mas Heri 
+membuka
+ 
+halaman
+ 
+utama
+ 
+sistem
+ yang 
+langsung
+ 
+menampilkan
+ 
+antarmuka
+ 
+kasir
+ 
+ringkas
+ (POS). 
+
+
+
+Mas Heri 
+mengetik
+ Kode Barang (
+contoh
+: 
+ketik
+ 2808 
+atau
+ 64120). 
+
+
+
+
+Sistem
+ 
+langsung
+ 
+menampilkan
+ 
+deskripsi
+ 
+barang
+ dan 
+harga
+ 
+satuan
+ default. 
+
+
+
+Jika 
+pelanggan
+ 
+menawar
+ dan 
+disepakati
+ 
+harga
+ 
+khusus
+, Mas Heri 
+langsung
+ 
+mengklik
+ 
+angka
+ 
+harga
+ dan 
+mengubahnya
+ (inline edit). 
+
+
+
+Mas Heri 
+memasukkan
+ 
+kuantitas
+ 
+pembelian
+. 
+
+
+
+Mas Heri 
+memilih
+ 
+metode
+ 
+pembayaran
+: 
+Tunai
+ 
+atau
+ Transfer Bank. 
+
+
+
+Mas Heri 
+menekan
+ 
+tombol
+ 
+Selesaikan
+ &amp; 
+Cetak
+ Struk/Nota. 
+
+
+
+
+Sistem
+ 
+otomatis
+ 
+mengurangi
+ 
+stok
+ 
+barang
+ di 
+sistem
+ 
+saat
+ 
+itu
+ juga dan 
+mencetak
+ nota 
+transaksi
+ 
+untuk
+ 
+diserahkan
+ 
+ke
+ 
+pelanggan
+. 
+
+
+
+Input: Kode/SKU 
+Produk
+, Qty, Harga 
+Satuan
+ (Bisa di-override), Metode 
+Pembayaran
+. 
+
+
+
+Process: 
+Pengurangan
+ 
+stok
+ 
+otomatis
+ 
+secara
+ 
+realtime
+, 
+perhitungan
+ total 
+belanja
+ dan 
+kembalian
+, 
+pembentukan
+ 
+nomor
+ 
+struk
+ 
+penjualan
+. 
+
+
+
+Output: Nota 
+penjualan
+ 
+fisik
+/digital, 
+mutasi
+ 
+stok
+ 
+keluar
+ 
+realtime
+. 
+
+
+
+Business Rules:
+
+
+
+
+Transaksi
+ 
+kasir
+ 
+langsung
+ 
+harus
+ 
+berstatus
+ 
+lunas
+ 
+saat
+ 
+itu
+ juga. 
+
+
+
+Kolom 
+harga
+ per unit 
+bersifat
+ 
+bebas
+ 
+diubah
+ (editable) di 
+tempat
+ 
+untuk
+ 
+melayani
+ 
+kesepakatan
+ 
+harga
+ 
+diskon
+ 
+borongan
+ 
+langsung
+. 
+
+
+
+Validation: Qty 
+tidak
+ 
+boleh
+ 
+melebihi
+ 
+stok
+ 
+fisik
+ yang 
+tersedia
+ di 
+sistem
+ 
+saat
+ 
+itu
+; Nilai 
+pembayaran
+ 
+tidak
+ 
+boleh
+ 
+kurang
+ 
+dari
+ grand total 
+transaksi
+. 
+
+
+
+Status: Lunas (
+Selesai
+). 
+
+
+
+Approval: Tidak 
+memerlukan
+ 
+persetujuan
+ 
+berbelit
+ agar 
+operasional
+ di 
+depan
+ 
+meja
+ 
+kasir
+ 
+berjalan
+ 
+cepat
+. 
+
+
+
+Notification: Tanda 
+peringatan
+ pop-up audio/visual 
+jika
+ 
+stok
+ 
+tersisa
+ 
+mendekati
+ nol. 
+
+
+
+Data Relationship: 
+Terhubung
+ 
+langsung
+ 
+ke
+ Master 
+Produk
+, 
+Mutasi
+ Stok Gudang, dan 
+Rekap
+ Penjualan Harian. 
+
+
+
+Audit Trail: 
+Mencatat
+ ID 
+kasir
+ (Mas Heri), jam 
+transaksi
+, dan 
+riwayat
+ 
+perbedaan
+ 
+harga
+ modal 
+dengan
+ 
+harga
+ 
+jual
+ yang di-override. 
+
+
+
+Exception / Edge Case: Jika 
+listrik
+ 
+atau
+ internet 
+padam
+ 
+tiba-tiba
+, 
+nota
+ manual 
+darurat
+ 
+dapat
+ 
+diinput
+ 
+susulan
+ 
+menggunakan
+ 
+fitur
+ "Input Nota 
+Terlambat
+" 
+dengan
+ 
+penyesuaian
+ 
+tanggal
+ 
+mundur
+. 
+
+
+
+UI/UX Requirement:
+
+
+
+Desain 
+satu
+ 
+layar
+ 
+penuh
+ 
+tanpa
+ 
+navigasi
+ 
+bertingkat
+. 
+
+
+
+Kolom 
+pencarian
+ 
+kode
+ 
+barang
+ 
+wajib
+ 
+berukuran
+ 
+besar
+ 
+dengan
+ 
+fitur
+ autofill search. 
+
+
+
+
+Tombol
+ 
+pintas
+ keyboard (keyboard shortcut): 
+misal
+ 
+tombol
+ F2 
+untuk
+ 
+fokus
+ 
+pencarian
+, Enter 
+untuk
+ 
+tambah
+ item, dan F9 
+untuk
+ 
+cetak
+ nota. 
+
+
+
+Fitur 5: 
+Pengarsipan
+ &amp; 
+Rekonsiliasi
+ 
+Dokumen
+ 
+Finansial
+ Bude (Binder Digital)
+
+Tujuan: 
+Mengeliminasi
+ 
+risiko
+ 
+dokumen
+ 
+fisik
+ (
+surat
+ 
+jalan
+, nota, invoice, 
+faktur
+ 
+pajak
+) 
+hilang
+ 
+atau
+ 
+berceceran
+ di 
+meja
+ 
+sebelum
+ 
+direkap
+ 
+ke
+ 
+pembukuan
+. 
+
+
+
+Aktor: Bude, Mas Heri, Pak Yanto. 
+
+
+
+
+Kondisi
+ Awal: Mas Heri 
+telah
+ 
+mengunggah
+ 
+foto
+ 
+dokumen
+ pada proses 
+penerimaan
+ 
+barang
+ 
+atau
+ 
+pengeluaran
+ 
+barang
+. 
+
+
+
+Trigger: Bude 
+melakukan
+ 
+rekapitulasi
+ 
+pembukuan
+ dan 
+persiapan
+ 
+pembayaran
+ supplier 
+atau
+ 
+penagihan
+ tempo. 
+
+
+
+Alur Bisnis:
+
+
+
+Bude 
+membuka
+ 
+modul
+ 
+Arsip
+ 
+Dokumen
+ 
+Transaksi
+. 
+
+
+
+Bude 
+memfilter
+ daftar 
+transaksi
+ 
+berdasarkan
+ 
+Nomor
+ PO, Nama Supplier, 
+atau
+ 
+Rentang
+ 
+Tanggal
+. 
+
+
+
+
+Sistem
+ 
+menyajikan
+ 
+satu
+ 
+berkas
+ folder digital per PO yang 
+berisi
+ 
+seluruh
+ 
+histori
+ 
+dokumen
+ 
+terkait
+:
+
+
+
+Lembar 
+Dokumen
+ PO Asli. 
+
+
+
+Foto Surat Jalan 
+Penerimaan
+ 
+dari
+ 
+gudang
+. 
+
+
+
+Foto Nota 
+Pembelian
+. 
+
+
+
+File Invoice dan 
+Faktur
+ Pajak 
+dari
+ supplier. 
+
+
+
+Bude 
+dapat
+ 
+mengunggah
+ file Invoice dan 
+Faktur
+ Pajak 
+susulan
+ yang 
+baru
+ 
+dikirimkan
+ oleh supplier via 
+ekspedisi
+ 
+atau
+ email. 
+
+
+
+Bude 
+memverifikasi
+ 
+kecocokan
+ 
+antara
+ 
+tagihan
+ invoice supplier 
+dengan
+ 
+jumlah
+ 
+barang
+ yang 
+nyata
+ 
+diterima
+ pada Surat Jalan. 
+
+
+
+Jika 
+cocok
+, Bude 
+memberi
+ 
+centang
+ 
+verifikasi
+ "
+Dokumen
+ 
+Lengkap
+ &amp; 
+Siap
+ Bayar". 
+
+
+
+Input: 
+Nomor
+ 
+Referensi
+ PO, 
+Berkas
+ Invoice Supplier, 
+Nomor
+ 
+Faktur
+ Pajak, Nilai Pajak PPN, 
+Tanggal
+ 
+Jatuh
+ Tempo 
+Tagihan
+. 
+
+
+
+Process: 
+Pengelompokan
+ 
+seluruh
+ 
+dokumen
+ multimedia 
+ke
+ 
+dalam
+ 
+satu
+ 
+entitas
+ 
+transaksi
+ PO 
+terpadu
+ (3-Way Matching: PO vs SJ vs Invoice). 
+
+
+
+Output: Status 
+kelengkapan
+ 
+dokumen
+ PO, 
+arsip
+ digital 
+siap
+ 
+unduh
+, daftar 
+kewajiban
+ 
+bayar
+ supplier. 
+
+
+
+Business Rules:
+
+
+
+
+Dokumen
+ 
+fisik
+ 
+kertas
+ 
+tetap
+ 
+disimpan
+ di binder 
+fisik
+, 
+namun
+ 
+operasional
+ 
+harian
+ dan 
+pengecekan
+ 
+wajib
+ 
+mengacu
+ pada 
+arsip
+ digital 
+sistem
+. 
+
+
+
+
+Pembayaran
+ 
+tagihan
+ tempo supplier 
+hanya
+ 
+boleh
+ 
+diproses
+ 
+jika
+ 
+foto
+ Surat Jalan 
+asli
+ 
+telah
+ 
+terverifikasi
+ di 
+sistem
+. 
+
+
+
+Validation: File 
+unggahan
+ 
+wajib
+ 
+memiliki
+ 
+pratinjau
+ yang 
+terbaca
+ 
+jelas
+; 
+Nomor
+ 
+faktur
+ 
+pajak
+ 
+divalidasi
+ format 
+standarnya
+. 
+
+
+
+Status 
+Berkas
+: 
+Menunggu
+ Surat Jalan $\
+rightarrow
+$ 
+Menunggu
+ Invoice/
+Faktur
+ $\
+rightarrow
+$ 
+Lengkap
+ &amp; 
+Terverifikasi
+ $\
+rightarrow
+$ 
+Terbayar
+. 
+
+
+
+Approval: Bude 
+melakukan
+ 
+verifikasi
+ 
+kesesuaian
+ 
+dokumen
+. 
+
+
+
+Notification: 
+Peringatan
+ 
+berkala
+ 
+jika
+ 
+terdapat
+ PO yang 
+barangnya
+ 
+sudah
+ 
+diterima
+ 
+namun
+ invoice 
+belum
+ 
+diunggah
+ 
+lebih
+ 
+dari
+ 14 
+hari
+. 
+
+
+
+Data Relationship: 
+Terhubung
+ 
+dengan
+ Modul PO Supplier, Modul 
+Penerimaan
+ Gudang, dan 
+Buku
+ Besar Kas 
+Keluar
+. 
+
+
+
+Audit Trail: 
+Mencatat
+ 
+akun
+ 
+pengunggah
+ 
+berkas
+, 
+waktu
+ 
+unggah
+, dan 
+tanggal
+ 
+verifikasi
+ 
+dokumen
+. 
+
+
+
+Exception / Edge Case: Jika 
+dokumen
+ 
+fisik
+ 
+asli
+ 
+hilang
+ 
+sebelum
+ 
+sempat
+ 
+difoto
+, Bude 
+dapat
+ 
+menggunakan
+ 
+fitur
+ "Minta Salinan Dokumen" yang 
+mencantumkan
+ 
+histori
+ chat WA supplier 
+terkait
+. 
+
+
+
+UI/UX Requirement:
+
+
+
+
+Tampilan
+ 
+galeri
+ 
+kartu
+ (card grid) 
+atau
+ 
+tabel
+ 
+dengan
+ 
+kolom
+ 
+pratinjau
+ mini (thumbnail) 
+dokumen
+ yang 
+dapat
+ 
+diklik
+ 
+untuk
+ 
+memperbesar
+ 
+gambar
+. 
+
+
+
+Fitur 
+unduh
+ 
+seluruh
+ 
+dokumen
+ 
+dalam
+ 
+satu
+ 
+transaksi
+ 
+menjadi
+ 
+satu
+ file ZIP 
+arsip
+. 
+
+
+
+Fitur 6: Monitoring &amp; 
+Penagihan
+ 
+Piutang
+ 
+Penjualan
+ Tempo
+
+Tujuan: 
+Mencegah
+ 
+terjadinya
+ 
+piutang
+ customer 
+macet
+ 
+berbulan-bulan
+ 
+akibat
+ 
+ketiadaan
+ 
+catatan
+ 
+jatuh
+ tempo yang 
+terintegrasi
+. 
+
+
+
+Aktor: Bude, Pak Yanto. 
+
+
+
+
+Kondisi
+ Awal: 
+Terjadi
+ 
+transaksi
+ 
+pesanan
+ 
+partai
+ 
+besar
+ 
+dengan
+ 
+skema
+ 
+pembayaran
+ tempo yang 
+disetujui
+ Pak Yanto. 
+
+
+
+Trigger: Waktu 
+jatuh
+ tempo 
+pembayaran
+ 
+piutang
+ customer 
+mendekati
+ batas 
+akhir
+. 
+
+
+
+Alur Bisnis:
+
+
+
+Bude 
+membuka
+ menu Daftar 
+Piutang
+ &amp; 
+Tagihan
+ Tempo. 
+
+
+
+
+Sistem
+ 
+menampilkan
+ 
+tabel
+ daftar customer, 
+nomor
+ 
+pesanan
+, total 
+nilai
+ 
+transaksi
+, total 
+cicilan
+ yang 
+telah
+ 
+masuk
+, 
+sisa
+ 
+tagihan
+, dan 
+tanggal
+ 
+jatuh
+ tempo. 
+
+
+
+
+Sistem
+ 
+menandai
+ baris 
+transaksi
+ 
+dengan
+ 
+indikator
+ 
+warna
+: Hijau (
+belum
+ 
+jatuh
+ tempo), Kuning (H-7 
+jatuh
+ tempo), Merah (
+sudah
+ 
+lewat
+ 
+jatuh
+ tempo). 
+
+
+
+Bude 
+mengklik
+ 
+tombol
+ 
+Cetak
+ Invoice 
+Penagihan
+ Resmi. 
+
+
+
+Bude 
+mengklik
+ 
+tombol
+ 
+Kirim
+ 
+Pengingat
+ WhatsApp, 
+sistem
+ 
+otomatis
+ 
+membuka
+ chat WA customer 
+dengan
+ 
+teks
+ 
+penagihan
+ 
+sopan
+ 
+beserta
+ detail 
+rekening
+. 
+
+
+
+Saat customer 
+mencicil
+ 
+sebagian
+ dana (
+misal
+: 
+bayar
+ 
+cicilan
+ Rp2.000.000), Bude 
+membuka
+ detail 
+transaksi
+, 
+memasukkan
+ 
+jumlah
+ 
+pembayaran
+ 
+cicilan
+, dan 
+mengunggah
+ 
+bukti
+ 
+bayar
+. 
+
+
+
+
+Sistem
+ 
+mencatat
+ log 
+pembayaran
+ 
+parsial
+ dan 
+memperbarui
+ 
+sisa
+ 
+piutang
+ 
+secara
+ 
+realtime
+. 
+
+
+
+Input: ID 
+Pesanan
+ 
+Penjualan
+, Nominal 
+Pembayaran
+ Masuk, 
+Tanggal
+ 
+Pembayaran
+, Bukti Bayar Transfer. 
+
+
+
+Process: 
+Kalkulasi
+ 
+saldo
+ 
+sisa
+ 
+tagihan
+ ($Sisa = Total - \sum 
+Cicilan
+$), 
+pencatatan
+ log 
+historis
+ 
+pembayaran
+ 
+bertahap
+. 
+
+
+
+Output: 
+Laporan
+ status 
+piutang
+, 
+histori
+ log 
+pembayaran
+ customer, 
+dokumen
+ Invoice 
+penagihan
+ 
+resmi
+. 
+
+
+
+Business Rules:
+
+
+
+
+Penjualan
+ 
+dengan
+ tempo 
+hanya
+ 
+boleh
+ 
+diterbitkan
+ 
+jika
+ status 
+transaksi
+ 
+memiliki
+ 
+persetujuan
+ 
+khusus
+ 
+dari
+ Pak Yanto. 
+
+
+
+
+Setiap
+ 
+penerimaan
+ 
+pembayaran
+ 
+parsial
+ 
+wajib
+ 
+tercatat
+ di sub-log 
+riwayat
+ 
+pembayaran
+ 
+lengkap
+ 
+dengan
+ 
+stempel
+ 
+waktu
+. 
+
+
+
+Validation: 
+Jumlah
+ 
+pembayaran
+ 
+cicilan
+ 
+tidak
+ 
+boleh
+ 
+melebihi
+ 
+sisa
+ 
+kewajiban
+ 
+piutang
+. 
+
+
+
+Status: Belum Bayar $\
+rightarrow
+$ 
+Terbayar
+ Sebagian (
+Cicilan
+) $\
+rightarrow
+$ Lunas $\
+rightarrow
+$ 
+Jatuh
+ Tempo (Overdue). 
+
+
+
+Approval: 
+Konfirmasi
+ 
+pelunasan
+ 
+akhir
+ 
+divalidasi
+ oleh Bude. 
+
+
+
+Notification: 
+Sistem
+ 
+memunculkan
+ alert daftar 
+tagihan
+ 
+jatuh
+ tempo 
+minggu
+ 
+ini
+ pada dashboard 
+utama
+ Bude dan Pak Yanto. 
+
+
+
+Data Relationship: 
+Terhubung
+ 
+dengan
+ 
+Pesanan
+ 
+Penjualan
+ (SO), Master Customer, dan 
+Buku
+ Kas Masuk. 
+
+
+
+Audit Trail: 
+Mencatat
+ 
+setiap
+ nominal 
+pembayaran
+ yang 
+masuk
+, 
+tanggal
+ 
+pencatatan
+, dan user yang 
+menginput
+. 
+
+
+
+Exception / Edge Case: Customer 
+mangkir
+ 
+bayar
+ 
+melebihi
+ 
+toleransi
+: 
+sistem
+ 
+memberikan
+ 
+tanda
+ 
+blokir
+ 
+merah
+ pada nama customer agar admin 
+gudang
+ 
+tidak
+ 
+melayani
+ 
+pesanan
+ 
+baru
+ 
+sebelum
+ 
+tunggakan
+ lama 
+diselesaikan
+. 
+
+
+
+UI/UX Requirement:
+
+
+
+Tabel 
+ringkasan
+ 
+piutang
+ 
+dengan
+ 
+kartu
+ 
+metrik
+ 
+ringkas
+ di 
+bagian
+ 
+atas
+: "Total 
+Piutang
+ 
+Berjalan
+", "
+Piutang
+ 
+Jatuh
+ Tempo 
+Minggu
+ Ini", dan "Total 
+Piutang
+ 
+Macet
+". 
+
+
+
+
+Tombol
+ 
+aksi
+ 
+cepat
+: "
+Kirim
+ WA 
+Tagihan
+" 
+langsung
+ 
+dari
+ baris 
+tabel
+. 
+
+
+
+Fitur 7: 
+Rekonsiliasi
+ 
+Penjualan
+ Multi-Toko Marketplace via 
+Impor
+ Spreadsheet
+
+Tujuan: 
+Menyelaraskan
+ 
+stok
+ 
+gudang
+ 
+fisik
+ 
+dengan
+ 
+penjualan
+ yang 
+terjadi
+ di 7 
+toko
+ marketplace (Shopee, Tokopedia, Lazada, Blibli) 
+tanpa
+ 
+integrasi
+ API 
+langsung
+ yang 
+rumit
+. 
+
+
+
+Aktor: Mas Heri. 
+
+
+
+
+Kondisi
+ Awal: 
+Laporan
+ 
+penjualan
+ 
+berkala
+ 
+telah
+ 
+diunduh
+ 
+dari
+ Seller Center marketplace 
+dalam
+ format Excel/CSV. 
+
+
+
+Trigger: Mas Heri 
+melakukan
+ 
+rekapitulasi
+ 
+stok
+ 
+mingguan
+ 
+atau
+ 
+bulanan
+. 
+
+
+
+Alur Bisnis:
+
+
+
+Mas Heri 
+membuka
+ menu 
+Sinkronisasi
+ 
+Penjualan
+ Marketplace. 
+
+
+
+
+Memilih
+ channel marketplace (
+contoh
+: Shopee Toko 1, Shopee Toko 2, Tokopedia, Lazada, Blibli). 
+
+
+
+
+Memilih
+ 
+rentang
+ 
+tanggal
+ 
+penjualan
+ 
+sesuai
+ 
+berkas
+ 
+unduhan
+. 
+
+
+
+
+Mengunggah
+ file spreadsheet 
+laporan
+ 
+transaksi
+. 
+
+
+
+
+Sistem
+ 
+memetakan
+ 
+kolom
+ 
+kode
+ SKU 
+produk
+ dan 
+kuantitas
+ 
+barang
+ yang 
+terjual
+. 
+
+
+
+
+Sistem
+ 
+menampilkan
+ 
+ringkasan
+ data yang 
+terbaca
+ 
+untuk
+ 
+diverifikasi
+. 
+
+
+
+Mas Heri 
+menekan
+ 
+tombol
+ Proses &amp; 
+Potong
+ Stok Gudang. 
+
+
+
+
+Sistem
+ 
+memotong
+ 
+stok
+ 
+barang
+ 
+gudang
+ 
+secara
+ 
+otomatis
+ 
+berdasarkan
+ 
+akumulasi
+ 
+penjualan
+ yang 
+tercantum
+ pada file 
+laporan
+. 
+
+
+
+Input: 
+Pilihan
+ Akun Marketplace, 
+Berkas
+ Spreadsheet 
+Penjualan
+ (.xlsx / .csv). 
+
+
+
+Process: Parsing file Excel, 
+pemetaan
+ SKU marketplace 
+terhadap
+ SKU internal 
+Paletindo
+, 
+validasi
+ baris 
+transaksi
+ 
+berhasil
+, 
+eksekusi
+ 
+pemotongan
+ 
+stok
+ 
+massal
+. 
+
+
+
+Output: 
+Laporan
+ 
+ringkasan
+ 
+pemotongan
+ 
+stok
+ marketplace, 
+catatan
+ 
+histori
+ 
+impor
+ data. 
+
+
+
+Business Rules:
+
+
+
+
+Sistem
+ 
+hanya
+ 
+memotong
+ 
+stok
+ 
+untuk
+ 
+transaksi
+ 
+berstatus
+ "
+Pesanan
+ 
+Selesai
+ / 
+Terkirim
+" pada file marketplace. 
+
+
+
+
+Transaksi
+ yang 
+sudah
+ 
+pernah
+ 
+diimpor
+ 
+tidak
+ 
+boleh
+ 
+dipotong
+ 
+ganda
+ (duplicate import prevention) 
+berdasarkan
+ 
+nomor
+ 
+pesanan
+ marketplace. 
+
+
+
+Validation: 
+Validasi
+ 
+kecocokan
+ 
+kode
+ SKU; 
+jika
+ 
+terdapat
+ SKU di Excel yang 
+tidak
+ 
+dikenal
+ di 
+sistem
+, 
+sistem
+ 
+memunculkan
+ daftar 
+peringatan
+ 
+penyesuaian
+. 
+
+
+
+Status: File 
+Diunggah
+ $\
+rightarrow
+$ 
+Terverifikasi
+ $\
+rightarrow
+$ Stok 
+Berhasil
+ 
+Disesuaikan
+. 
+
+
+
+Approval: Mas Heri 
+memvalidasi
+ 
+sebelum
+ 
+tombol
+ final 
+pemotongan
+ 
+stok
+ 
+ditekan
+. 
+
+
+
+Notification: 
+Laporan
+ 
+jumlah
+ item yang 
+berhasil
+ 
+terpotong
+ dan item yang 
+gagal
+ 
+dipetakan
+. 
+
+
+
+Data Relationship: 
+Terhubung
+ 
+dengan
+ Master Data Barang dan 
+Mutasi
+ Log 
+Penjualan
+ Gudang. 
+
+
+
+Audit Trail: 
+Mencatat
+ 
+tanggal
+ 
+unggah
+, nama file, 
+jumlah
+ 
+kuantitas
+ 
+barang
+ 
+terpotong
+, dan user yang 
+mengunggah
+. 
+
+
+
+Exception / Edge Case: Ada 
+pesanan
+ 
+partai
+ 
+besar
+ (1.000 pcs) yang 
+masuk
+ 
+lewat
+ Shopee 
+namun
+ 
+dibatalkan
+ 
+untuk
+ 
+dialihkan
+ 
+ke
+ 
+transaksi
+ 
+langsung
+ (
+menghindari
+ 
+biaya
+ 
+komisi
+ platform): Mas Heri 
+dapat
+ 
+membatalkan
+ baris 
+tersebut
+ pada 
+pratinjau
+ 
+sebelum
+ 
+stok
+ 
+dieksekusi
+. 
+
+
+
+UI/UX Requirement:
+
+
+
+Area drag-and-drop 
+berkas
+ spreadsheet yang 
+jelas
+. 
+
+
+
+Tabel 
+pratinjau
+ 
+hasil
+ 
+pembacaan
+ 
+berkas
+ 
+sebelum
+ 
+eksekusi
+ 
+mutasi
+ 
+stok
+ 
+dijalankan
+. 
+
+
+
+5. Modul ERP
+
+                                  +---------------------------------------+
+
+                                  |         MASTER DATA MANAGEMENT        |
+
+                                  |
+   (
+
+Produk
+/SKU, Supplier, 
+Customer)   
+ |
+
+                                  +-------------------+-------------------+
+
+                                                      |
+
+                         +----------------------------+----------------------------+
+
+                         |                                                         |
+
+                         v                                                         
+v
+
+
+          +------------------------------+                          +------------------------------+
+
+          |         PROCUREMENT          |                          |        SALES &amp; POS           |
+
+          
+|  (
+PO Supplier, Order 
+Keluar
+) |                          | (POS Gudang, SO 
+Pesanan
+ 
+Bsr
+) |
+
+          +--------------+---------------+                          +--------------+---------------+
+
+                         |                                                         |
+
+                         | (Barang Masuk / 
+Inbound)   
+                             | (Barang 
+Keluar
+ / Outbound)
+
+                         v                                                         
+v
+
+
+          +----------------------------------------------------------------------------------------+
+
+          |                                  INVENTORY &amp; WAREHOUSE                                 |
+
+          |    
+   (
+
+Kontrol
+ Stok Realtime, Surat Jalan 
+Penerimaan
+, Import 
+Rekap
+ 
+Marketplace)   
+     |
+
+          +-------------------------------------------+--------------------------------------------+
+
+                                                      |
+
+                                                      v
+
+                                  +---------------------------------------+
+
+                                  |          FINANCE &amp; DOCUMENTS          |
+
+                                  
+|  (
+Binder Digital, 
+Piutang
+ 
+Tempo,   
+   |
+
+                                  |   Invoice, 
+Faktur
+, Audit 
+Trail)   
+    |
+
+                                  +---------------------------------------+
+
+1. Modul Master Data
+
+Tujuan: 
+Menjaga
+ 
+standarisasi
+ 
+identitas
+ 
+produk
+, 
+mitra
+ 
+pemasok
+, dan 
+pelanggan
+. 
+
+
+
+Fitur di 
+Dalamnya
+: 
+Katalog
+ 
+Produk
+ &amp; SKU, Master Supplier, Master Customer. 
+
+
+
+Role 
+Pengguna
+: Mas Heri, Pak Yanto, Bude. 
+
+
+
+Data Utama: Kode SKU 
+unik
+, nama 
+barang
+, 
+dimensi
+/
+karakteristik
+ (
+misal
+: solid, 
+lubang
+, plat 
+besi
+), 
+varian
+ 
+warna
+, 
+harga
+ modal 
+acuan
+, 
+harga
+ 
+jual
+ 
+acuan
+. 
+
+
+
+
+Hubungan
+ Antarmodul: 
+Menjadi
+ 
+referensi
+ 
+dasar
+ 
+bagi
+ Modul Procurement, Inventory, dan Sales. 
+
+
+
+2. Modul Procurement (
+Pengadaan
+)
+
+Tujuan: 
+Mengelola
+ proses 
+pemesanan
+ 
+barang
+ 
+dagang
+ 
+ke
+ supplier dan 
+pabrik
+ 
+jasa
+ 
+cetak
+ 
+secara
+ 
+akurat
+. 
+
+
+
+Fitur di 
+Dalamnya
+: Form 
+Pembuatan
+ PO, Template 
+Pesan
+ WA/Email PO, Daftar 
+Pantauan
+ Status PO. 
+
+
+
+Role 
+Pengguna
+: Pak Yanto, Mas Heri. 
+
+
+
+Data Utama: 
+Nomor
+ PO, 
+tanggal
+ 
+pesan
+, ID Supplier, 
+rincian
+ 
+barang
+, 
+harga
+ 
+beli
+ 
+kesepakatan
+, 
+catatan
+ direct shipment. 
+
+
+
+
+Hubungan
+ Antarmodul: 
+Menjadi
+ 
+dasar
+ 
+penerimaan
+ 
+barang
+ di Modul Inventory dan 
+dasar
+ 
+verifikasi
+ 
+tagihan
+ di Modul Finance. 
+
+
+
+3. Modul Inventory &amp; Gudang (Warehouse)
+
+Tujuan: 
+Mengontrol
+ 
+arus
+ 
+fisik
+ 
+barang
+ 
+masuk
+, 
+mutasi
+ 
+stok
+ 
+keluar
+, dan 
+mencocokkan
+ 
+stok
+ 
+buku
+ 
+dengan
+ 
+fisik
+. 
+
+
+
+Fitur di 
+Dalamnya
+: 
+Penerimaan
+ Barang (Goods Receipt) &amp; 
+Unggah
+ Surat Jalan, Kartu 
+Mutasi
+ Stok Realtime, 
+Unggah
+ 
+Sinkronisasi
+ Marketplace, 
+Catatan
+ Stock 
+Opname
+ Rutin. 
+
+
+
+Role 
+Pengguna
+: Mas Heri, Pak Yanto. 
+
+
+
+Data Utama: 
+Jumlah
+ 
+stok
+ on-hand, 
+riwayat
+ 
+mutasi
+ 
+masuk
+/
+keluar
+, 
+berkas
+ 
+foto
+ 
+surat
+ 
+jalan
+ supplier, log 
+barang
+ 
+rusak
+/
+cacat
+. 
+
+
+
+
+Hubungan
+ Antarmodul: 
+Menerima
+ data 
+dari
+ Procurement (
+barang
+ 
+masuk
+), 
+menerima
+ data 
+dari
+ Sales &amp; Marketplace (
+barang
+ 
+keluar
+), 
+mengirimkan
+ data 
+fisik
+ 
+ke
+ Modul Finance. 
+
+
+
+4. Modul Sales &amp; Kasir (
+Penjualan
+)
+
+Tujuan: 
+Memfasilitasi
+ 
+transaksi
+ 
+penjualan
+ 
+langsung
+ di 
+meja
+ 
+gudang
+ (POS) dan 
+pesanan
+ 
+partai
+ 
+besar
+ 
+dengan
+ 
+pengawasan
+ uang 
+muka
+ (DP). 
+
+
+
+Fitur di 
+Dalamnya
+: Kasir 
+Cepat
+ (POS), 
+Pesanan
+ 
+Penjualan
+ 
+Partai
+ (SO), 
+Cetak
+ Nota DP &amp; Nota Lunas, 
+Penerbitan
+ Surat Jalan 
+Keluar
+. 
+
+
+
+Role 
+Pengguna
+: Mas Heri (POS &amp; SO), Pak Yanto (Approval 
+Diskon
+/SO Besar). 
+
+
+
+Data Utama: 
+Nomor
+ Nota/SO, 
+tanggal
+ 
+transaksi
+, ID Customer, 
+rincian
+ 
+barang
+, 
+harga
+ deal, 
+nilai
+ DP, status 
+lunas
+, 
+nomor
+ 
+surat
+ 
+jalan
+ 
+keluar
+. 
+
+
+
+
+Hubungan
+ Antarmodul: 
+Memotong
+ 
+kuantitas
+ 
+stok
+ di Modul Inventory dan 
+membentuk
+ data 
+piutang
+/
+pemasukan
+ di Modul Finance. 
+
+
+
+5. Modul Finance &amp; 
+Manajemen
+ 
+Dokumen
+ (Binder Digital)
+
+Tujuan: 
+Mengamankan
+ 
+arsip
+ 
+bukti
+ 
+transaksi
+ legal 
+serta
+ 
+mengawasi
+ 
+penagihan
+ 
+piutang
+ 
+berjangka
+ (tempo). 
+
+
+
+Fitur di 
+Dalamnya
+: Lemari 
+Arsip
+ Digital per PO, 
+Pengawasan
+ 
+Tagihan
+ 
+Jatuh
+ Tempo Customer, 
+Pencatatan
+ 
+Cicilan
+ Pembayaran, 
+Rekap
+ 
+Faktur
+ &amp; Pajak. 
+
+
+
+Role 
+Pengguna
+: Bude, Pak Yanto. 
+
+
+
+Data Utama: File 
+foto
+ 
+surat
+ 
+jalan
+, file invoice &amp; 
+faktur
+ 
+pajak
+, 
+jadwal
+ 
+jatuh
+ tempo, 
+saldo
+ 
+piutang
+ customer, 
+riwayat
+ 
+cicilan
+ kas. 
+
+
+
+
+Hubungan
+ Antarmodul: 
+Menarik
+ 
+referensi
+ data 
+transaksi
+ 
+dari
+ Modul Procurement dan Sales 
+untuk
+ 
+dicocokkan
+ 
+dengan
+ 
+dokumen
+ kas. 
+
+
+
+6. End-to-End User Flow
+
+
+Skenario
+ A: 
+Pengadaan
+ Barang Masuk (Inbound Procurement)
+
+[Mulai] 
+
+  │
+
+  ▼
+
+[Pak Yanto / Mas Heri 
+menginput
+ PO Supplier di 
+Sistem
+]
+
+  │
+
+  ├─► 
+Sistem
+ 
+kalkulasi
+ 
+otomatis
+ (
+Cegah
+ salah 
+hitung
+ 
+harga
+ modal &amp; total)
+
+  │
+
+  ▼
+
+[PO 
+Diterbitkan
+] ──► 
+Kirim
+ 
+dokumen
+ via WA / Email 
+ke
+ Supplier
+
+  │
+
+  ▼
+
+[
+Supir
+ 
+Paletindo
+ 
+berangkat
+ 
+mengambil
+ 
+barang
+ 
+ke
+ 
+pabrik
+]
+
+  │
+
+  ▼
+
+[Barang 
+tiba
+ di Gudang 
+bersama
+ Surat Jalan Supplier]
+
+  │
+
+  ▼
+
+[Mas Heri 
+memeriksa
+ 
+fisik
+ &amp; 
+hitung
+ 
+kuantitas
+ di 
+bak
+ 
+truk
+]
+
+  │
+
+  ├─► 
+Apakah
+ 
+kondisi
+ 
+fisik
+ 
+barang
+ 
+sesuai
+ &amp; 
+utuh
+?
+
+  │     ├── Ya: Masukkan Qty 
+Diterima
+ 
+penuh
+
+
+  │     └── Ada Cacat/Kurang: Masukkan Qty 
+Diterima
+ Baik &amp; Qty Rusak (Catat 
+Retur
+)
+
+  │
+
+  ▼
+
+[Mas Heri 
+memfoto
+ Surat Jalan 
+kertas
+ 
+menggunakan
+ Kamera HP / Web]
+
+  │
+
+  ▼
+
+[
+Klik
+ "
+Konfirmasi
+ 
+Penerimaan
+ Barang" di 
+Sistem
+]
+
+  │
+
+  ├─► 
+Sistem
+ 
+menambahkan
+ Qty 
+ke
+ Stok Gudang 
+secara
+ 
+realtime
+
+
+  ├─► File 
+foto
+ 
+tersimpan
+ di folder digital 
+nomor
+ PO 
+terkait
+
+
+  │
+
+  ▼
+
+[
+Apakah
+ 
+seluruh
+ Qty pada PO 
+sudah
+ 
+diterima
+?]
+
+  ├── Belum (
+Muatan
+ Mobil 
+Penuh
+): Status PO = "
+Diproses
+ Sebagian" (
+Menunggu
+ Surat Jalan 
+susulan
+)
+
+  └── 
+Sudah
+ 
+Penuh
+: Status PO = "
+Selesai
+"
+
+        │
+
+        ▼
+
+[Bude 
+membuka
+ 
+sistem
+ ──► 
+Verifikasi
+ Surat Jalan vs Invoice 
+Tagihan
+ Supplier ──► 
+Arsip
+ 
+Selesai
+]
+
+  │
+
+  ▼
+
+[
+Selesai
+]
+
+
+Skenario
+ B: 
+Pesanan
+ 
+Penjualan
+ 
+Partai
+ Besar &amp; 
+Kontrol
+ 
+Pembayaran
+ (Sales Order)
+
+[Mulai]
+
+  │
+
+  ▼
+
+[Customer 
+menghubungi
+ WA/
+Telepon
+ 
+memesan
+ 
+barang
+ 
+jumlah
+ 
+besar
+]
+
+  │
+
+  ▼
+
+[
+Staf
+ 
+mengecek
+ 
+ketersediaan
+ 
+stok
+ 
+fisik
+ di Dashboard 
+Sistem
+]
+
+  │
+
+  ├─► 
+Apakah
+ 
+stok
+ di 
+gudang
+ 
+mencukupi
+?
+
+  │     ├── Ya: 
+Lanjutkan
+ proses 
+pesanan
+ 
+dari
+ 
+stok
+ 
+gudang
+
+
+  │     └── Tidak: Cek 
+opsi
+ 
+pesan
+ 
+langsung
+ 
+ke
+ Supplier (Direct Ship 
+dari
+ 
+pabrik
+)
+
+  │
+
+  ▼
+
+[
+Staf
+ 
+membuat
+ 
+Pesanan
+ Customer (SO) di 
+Sistem
+]
+
+  │
+
+  ├─► Masukkan 
+harga
+ 
+hasil
+ 
+kesepakatan
+ (Bisa di-override 
+jika
+ 
+ada
+ 
+diskon
+)
+
+  ├─► 
+Sistem
+ 
+menghitung
+ 
+syarat
+ DP minimal 25%
+
+  │
+
+  ▼
+
+[Status 
+Pesanan
+: "
+Menunggu
+ DP" (Akses Surat Jalan Terkunci)]
+
+  │
+
+  ▼
+
+[Customer transfer DP &amp; 
+kirim
+ 
+bukti
+ 
+pembayaran
+]
+
+  │
+
+  ▼
+
+[
+Staf
+ 
+menginput
+ 
+nilai
+ DP &amp; 
+unggah
+ 
+bukti
+ transfer 
+ke
+ 
+Sistem
+]
+
+  │
+
+  ├─► Status 
+Pesanan
+ = "DP 
+Diterima
+ / Dalam 
+Persiapan
+"
+
+  ├─► 
+Sistem
+ 
+cetak
+ "Nota DP" (
+mencantumkan
+ 
+sisa
+ 
+kekurangan
+ nominal)
+
+  │
+
+  ▼
+
+[Gudang 
+mempersiapkan
+ packing &amp; 
+muatan
+ 
+barang
+]
+
+  │
+
+  ▼
+
+[
+Apakah
+ 
+Pembeli
+ 
+mendapatkan
+ 
+fasilitas
+ tempo 
+pembayaran
+ yang 
+disetujui
+ Pak Yanto?]
+
+  ├── Ya: 
+Sistem
+ 
+membuka
+ 
+opsi
+ 
+terbitkan
+ Surat Jalan 
+dengan
+ status "Tempo / 
+Piutang
+ 
+Berjalan
+"
+
+  └── Tidak: 
+Pembeli
+ 
+wajib
+ 
+melunasi
+ 
+sisa
+ 
+tagihan
+ 100%
+
+        │
+
+        ▼
+
+  [Customer 
+mentransfer
+ 
+sisa
+ 
+pelunasan
+]
+
+        │
+
+        ▼
+
+  [
+Staf
+ 
+memvalidasi
+ 
+pelunasan
+ di 
+Sistem
+ ──► Status 
+Pesanan
+ = "Lunas"]
+
+        │
+
+        ▼
+
+[
+Tombol
+ "
+Cetak
+ Surat Jalan" Terbuka]
+
+  │
+
+  ▼
+
+[Surat Jalan 
+dicetak
+ ──► 
+Supir
+ 
+berangkat
+ 
+membawa
+ 
+barang
+ ──► Stok 
+gudang
+ 
+resmi
+ 
+terpotong
+]
+
+  │
+
+  ▼
+
+[
+Selesai
+]
+
+7. Feature Detail &amp; User Story
+
+1. User Story: 
+Pembuatan
+ PO Supplier
+
+Format: 
+Sebagai
+ Pak Yanto (Owner), 
+saya
+ 
+ingin
+ 
+membuat
+ Purchase Order 
+dengan
+ 
+memilih
+ 
+kode
+ 
+barang
+ yang 
+langsung
+ 
+memunculkan
+ 
+harga
+ modal 
+acuan
+ 
+serta
+ 
+mengkalkulasi
+ total 
+biaya
+ 
+otomatis
+, 
+sehingga
+ 
+saya
+ 
+tidak
+ 
+lagi
+ 
+melakukan
+ 
+kesalahan
+ 
+perhitungan
+ manual 
+atau
+ salah 
+memesan
+ 
+spesifikasi
+ 
+barang
+ 
+ke
+ 
+pabrik
+ supplier. 
+
+
+
+Acceptance Criteria:
+
+
+
+Given: Pak Yanto 
+berada
+ di 
+halaman
+ Form PO Baru dan data supplier 
+serta
+ master SKU 
+telah
+ 
+terdaftar
+ di database. 
+
+
+
+When: Pak Yanto 
+mengetik
+ 
+kode
+ 
+barang
+ (
+misal
+: 64120), 
+memilih
+ 
+kuantitas
+ 100, dan 
+mengubah
+ 
+harga
+ modal baris 
+menjadi
+ Rp80.000. 
+
+
+
+Then: 
+Sistem
+ 
+secara
+ 
+realtime
+ 
+menampilkan
+ subtotal Rp8.000.000 dan 
+mengalkulasi
+ grand total 
+keseluruhan
+ 
+tanpa
+ 
+perlu
+ me-refresh 
+halaman
+. 
+
+
+
+When: Pak Yanto 
+menekan
+ 
+tombol
+ "
+Terbitkan
+ PO". 
+
+
+
+Then: 
+Dokumen
+ PO 
+resmi
+ 
+tersimpan
+ 
+dengan
+ 
+nomor
+ 
+unik
+ 
+otomatis
+, status 
+berubah
+ 
+menjadi
+ 
+Diterbitkan
+, dan 
+tombol
+ "
+Kirim
+ WhatsApp" 
+siap
+ 
+digunakan
+ 
+dengan
+ 
+pesan
+ template yang 
+rapi
+. 
+
+
+
+2. User Story: 
+Penerimaan
+ Barang &amp; 
+Digitalisasi
+ Surat Jalan
+
+Format: 
+Sebagai
+ Mas Heri (Admin Gudang), 
+saya
+ 
+ingin
+ 
+mengonfirmasi
+ 
+barang
+ yang 
+tiba
+ di 
+gudang
+ dan 
+mengunggah
+ 
+foto
+ 
+surat
+ 
+jalan
+ supplier 
+langsung
+ 
+dari
+ 
+ponsel
+/
+komputer
+, 
+sehingga
+ 
+stok
+ 
+gudang
+ 
+bertambah
+ 
+otomatis
+ dan 
+dokumen
+ 
+fisik
+ 
+tidak
+ 
+hilang
+ 
+jika
+ 
+terselip
+ di 
+keranjang
+ 
+meja
+. 
+
+
+
+Acceptance Criteria:
+
+
+
+Given: 
+Terdapat
+ PO 
+berstatus
+ 
+Diterbitkan
+ 
+dengan
+ 
+kuantitas
+ 
+pesanan
+ 
+2.000 unit
+ 
+botol
+. 
+
+
+
+When: 
+Supir
+ 
+tiba
+ 
+membawa
+ 1.000 unit (
+karena
+ 
+kapasitas
+ 
+mobil
+ 
+tidak
+ 
+muat
+), Mas Heri 
+menginput
+ 
+nomor
+ Surat Jalan supplier, 
+mengisi
+ Qty 
+diterima
+ 1000, 
+mengunggah
+ 
+foto
+ 
+fisik
+ 
+surat
+ 
+jalan
+, 
+lalu
+ 
+menekan
+ "
+Konfirmasi
+ 
+Terima
+". 
+
+
+
+Then: Saldo 
+stok
+ 
+gudang
+ 
+untuk
+ 
+barang
+ 
+tersebut
+ 
+langsung
+ 
+bertambah
+ 1.000 unit di 
+sistem
+, 
+berkas
+ 
+foto
+ 
+tersimpan
+ 
+aman
+ di database 
+arsip
+, dan status PO 
+menjadi
+ 
+Diproses
+ Sebagian (1000/2000). 
+
+
+
+3. User Story: 
+Transaksi
+ 
+Cepat
+ Kasir Gudang (POS)
+
+Format: 
+Sebagai
+ Mas Heri (Kasir Gudang), 
+saya
+ 
+ingin
+ 
+menginput
+ 
+pembelian
+ 
+pelanggan
+ 
+langsung
+ 
+hanya
+ 
+dengan
+ 
+mengetik
+ 
+kode
+ 
+barang
+ dan 
+bebas
+ 
+menyesuaikan
+ 
+harga
+ 
+tawar-menawar
+ di 
+layar
+ yang 
+sama
+, 
+sehingga
+ 
+pelayanan
+ 
+kasir
+ 
+selesai
+ 
+dalam
+ 
+beberapa
+ 
+detik
+ dan 
+stok
+ 
+barang
+ 
+langsung
+ 
+terpotong
+ 
+akurat
+. 
+
+
+
+Acceptance Criteria:
+
+
+
+Given: 
+Pelanggan
+ 
+berdiri
+ di 
+depan
+ 
+kasir
+ 
+membeli
+ 
+5 unit
+ 
+keranjang
+ 
+kode
+ 2808. 
+
+
+
+When: Mas Heri 
+mengetik
+ 
+kode
+ 2808, 
+sistem
+ 
+menampilkan
+ 
+harga
+ default Rp50.000. Mas Heri 
+mengklik
+ 
+kolom
+ 
+harga
+, 
+mengubahnya
+ 
+menjadi
+ Rp47.500 
+sesuai
+ 
+diskon
+ 
+kesepakatan
+, 
+memasukkan
+ 
+kuantitas
+ 5, 
+lalu
+ 
+memilih
+ 
+pembayaran
+ "
+Tunai
+ Lunas" dan 
+klik
+ "
+Cetak
+ Nota". 
+
+
+
+Then: Nota 
+tercetak
+ 
+dengan
+ total Rp237.500, data 
+stok
+ 
+fisik
+ 
+berkurang
+ 
+5 unit
+ 
+seketika
+, dan 
+seluruh
+ proses 
+selesai
+ 
+dalam
+ 
+satu
+ 
+alur
+ 
+layar
+ 
+tanpa
+ 
+navigasi
+ 
+bertingkat
+. 
+
+
+
+4. User Story: 
+Pelacakan
+ 
+Tagihan
+ 
+Penjualan
+ Tempo
+
+Format: 
+Sebagai
+ Bude (Finance), 
+saya
+ 
+ingin
+ 
+melihat
+ daftar 
+seluruh
+ 
+penjualan
+ yang 
+pembayarannya
+ 
+bertempo
+ 
+beserta
+ 
+riwayat
+ 
+cicilannya
+, 
+sehingga
+ 
+Paletindo
+ 
+tidak
+ 
+kehilangan
+ 
+hak
+ 
+tagih
+ 
+atau
+ 
+lupa
+ 
+menagih
+ 
+kewajiban
+ customer yang 
+sudah
+ 
+jatuh
+ tempo 
+berbulan-bulan
+. 
+
+
+
+Acceptance Criteria:
+
+
+
+Given: 
+Terdapat
+ 
+pesanan
+ 
+partai
+ 
+besar
+ 
+senilai
+ Rp45.000.000 
+dengan
+ 
+jatuh
+ tempo 
+tanggal
+ 30 
+bulan
+ 
+berjalan
+. 
+
+
+
+When: Bude 
+membuka
+ 
+modul
+ 
+Piutang
+ Tempo, 
+sistem
+ 
+menandai
+ baris 
+transaksi
+ 
+dengan
+ status 
+jatuh
+ tempo dan 
+menampilkan
+ 
+sisa
+ 
+kewajiban
+ yang 
+belum
+ 
+dibayar
+. 
+
+
+
+When: Customer 
+mencicil
+ 
+sebesar
+ Rp2.000.000 via transfer bank, Bude 
+menginput
+ nominal 
+tersebut
+ 
+ke
+ log 
+pembayaran
+ 
+pesanan
+. 
+
+
+
+Then: Sisa 
+tagihan
+ 
+otomatis
+ 
+terpotong
+ 
+menjadi
+ Rp43.000.000, 
+riwayat
+ 
+cicilan
+ 
+tersimpan
+ 
+dengan
+ 
+stempel
+ 
+waktu
+, dan Bude 
+dapat
+ 
+langsung
+ 
+mengklik
+ 
+opsi
+ "
+Kirim
+ 
+Pengingat
+ 
+Tagihan
+ WA". 
+
+
+
+8. Data yang 
+Dibutuhkan
+
+
+
+Entitas
+ Utama &amp; 
+Struktur
+ Data 
+Rujukan
+
+
++--------------------+        +--------------------+        +--------------------+
+
+|    
+m_suppliers
+     |        |     
+m_products
+     |        |    
+m_customers
+     |
+
++--------------------+        +--------------------+        +--------------------+
+
+| id (
+PK)   
+         |        | id (
+PK)   
+         |        | id (
+PK)   
+         |
+
+| 
+supplier_code
+      |        | 
+sku_code
+ (
+Unique)  |
+        | 
+customer_name
+      |
+
+| name               |        | name               |        | 
+phone_whatsapp
+     |
+
+| 
+phone_whatsapp
+     |        | dimensions         |        | address            |
+
+| email              |        | characteristics    |        | 
+is_tempo_allowed
+   |
+
++---------+----------+        | 
+color_variant
+      |        +---------+----------+
+
+          |                   | 
+base_cost_price
+    |                  |
+
+          |                   | 
+default_sell_price
+ |                  |
+
+          |                   +---+------------+---+                  |
+
+          |                       |            |                      |
+
+          v                       
+v
+            
+v
+                      
+v
+
+
++--------------------+  +---------+----+  +----+---------+  +--------------------+
+
+|   
+t_purchase_orders
+
+|  |
+
+t_po_items
+    
+|  |
+
+t_so_items
+    
+|  |
+ 
+t_sales_orders
+     |
+
++--------------------+  +--------------+  +--------------+  +--------------------+
+
+| id (
+PK)   
+         
+|  |
+ id (
+PK)   
+   
+|  |
+ id (
+PK)   
+   
+|  |
+ id (
+PK)   
+         |
+
+| 
+po_number
+ (Unique) 
+|  |
+ 
+po_id
+ (
+FK)   |  |
+ 
+so_id
+ (
+FK)   |  |
+ 
+so_number
+ (Unique) |
+
+| 
+supplier_id
+ (
+FK)   |  |
+ 
+product_id
+   
+|  |
+ 
+product_id
+   
+|  |
+ 
+customer_id
+ (
+FK)   
+|
+
+| 
+po_date
+            
+|  |
+ 
+qty_
+ordered
+  |
+  | 
+qty_
+ordered
+  |
+  | 
+order_type
+         |
+
+| status             
+|  |
+ 
+unit_cost
+    
+|  |
+ 
+unit_price
+   
+|  |
+ 
+total_amount
+       |
+
+| 
+is_direct_ship
+     
+|  +
+--------------
++  +
+--------------
++  |
+ 
+dp_amount
+          |
+
++---------+----------+                                      | 
+payment_status
+     |
+
+          |                                                 +---------+----------+
+
+          v                                                           |
+
++--------------------+                                                v
+
+
+|  
+t
+_goods_
+receipts
+  |
+                                      +--------------------+
+
++--------------------+                                      
+|  
+t
+_delivery_orders
+ |
+
+| id (
+PK)   
+         |                                      +--------------------+
+
+| 
+po_id
+ (
+FK)   
+      |                                      | id (
+PK)   
+         |
+
+| 
+sj_supplier_number
+ |                                      | 
+so_id
+ (
+FK)   
+      |
+
+| 
+receipt_date
+       |                                      | 
+do_number
+ (Unique) |
+
+| 
+photo_sj_url
+       |                                      | 
+delivery_date
+      |
+
+| 
+received_by
+ (
+FK)   
+|                                      | 
+driver_name
+        |
+
++--------------------+                                      +--------------------+
+
+
+Rincian
+ Kamus Data
+
+
+m_products
+ (Master 
+Produk
+ &amp; SKU)
+
+
+
+
+Fungsi
+: 
+Menyimpan
+ data 
+katalog
+ 
+referensi
+ 
+barang
+ yang 
+dijual
+ dan 
+disimpan
+. 
+
+
+
+Field Utama: id, 
+sku_code
+ (Unique, 
+misal
+: 2808, 64120), 
+product_name
+, dimensions (
+Ukuran
+ 
+fisik
+), characteristics (
+Tipe
+: Solid, Lubang, Plat 
+Besi
+), 
+color_variant
+, 
+base_cost_price
+ (Harga Modal 
+Acuan
+), 
+default_sell_price
+ (Harga Jual 
+Acuan
+). 
+
+
+
+
+Pengelola
+: Mas Heri (Create/Edit), Pak Yanto (View/Edit Harga 
+Acuan
+). 
+
+
+
+
+t_purchase_orders
+ &amp; 
+t_po_items
+ (PO 
+Pengadaan
+ Supplier)
+
+
+
+
+Fungsi
+: 
+Mencatat
+ 
+instruksi
+ 
+pemesanan
+ 
+barang
+ 
+dagang
+ 
+ke
+ 
+pemasok
+. 
+
+
+
+Field Utama: id, 
+po_number
+ (Format: PO-PLT-YYYYMMDD-XXXX), 
+supplier_id
+, 
+po_date
+, status (Draft, Issued, Partial, Completed, Cancelled), 
+is_direct_ship
+ (Boolean), items [(
+product_id
+, 
+qty_ordered
+, 
+unit_cost_negotiated
+, subtotal)]. 
+
+
+
+
+Pengelola
+: Pak Yanto / Mas Heri (Create/Edit), Bude (View). 
+
+
+
+
+t_goods_receipts
+ &amp; 
+t_gr_items
+ (
+Penerimaan
+ Barang Masuk)
+
+
+
+
+Fungsi
+: 
+Mencatat
+ 
+kedatangan
+ 
+fisik
+ 
+barang
+ di 
+gudang
+ 
+beserta
+ 
+lampiran
+ 
+surat
+ 
+jalan
+. 
+
+
+
+Field Utama: id, 
+po_id
+, 
+sj_supplier_number
+, 
+receipt_date
+, 
+photo_sj_url
+, notes, items [(
+product_id
+, 
+qty_good
+, 
+qty_defect
+)]. 
+
+
+
+
+Pengelola
+: Mas Heri (Create/Upload), Bude &amp; Pak Yanto (View). 
+
+
+
+
+t_sales_orders
+ &amp; 
+t_so_items
+ (
+Pesanan
+ 
+Penjualan
+ &amp; POS)
+
+
+
+
+Fungsi
+: 
+Mencatat
+ 
+seluruh
+ 
+penjualan
+ 
+baik
+ 
+langsung
+ di 
+kasir
+ (POS) 
+maupun
+ 
+pesanan
+ 
+partai
+ 
+besar
+. 
+
+
+
+Field Utama: id, 
+order_number
+, 
+order_type
+ (POS_CASH, SALES_ORDER_BULK), 
+customer_id
+, 
+order_date
+, 
+total_amount
+, 
+dp_amount_paid
+, 
+payment_status
+ (
+Waiting_DP
+, 
+Partial_DP
+, 
+Paid_Full
+, Tempo), items [(
+product_id
+, qty, 
+actual_sell_price
+, subtotal)]. 
+
+
+
+
+Pengelola
+: Mas Heri (Create/Edit POS), Pak Yanto (Approval SO Tempo), Bude (Update 
+Pembayaran
+). 
+
+
+
+
+t_documents_vault
+ (
+Berkas
+ Digital 
+Transaksi
+)
+
+
+
+
+Fungsi
+: 
+Mengelompokkan
+ 
+seluruh
+ file 
+foto
+/
+dokumen
+ per 
+transaksi
+ 
+dalam
+ 
+satu
+ 
+wadah
+ digital. 
+
+
+
+Field Utama: id, 
+reference_type
+ (PO_SUPPLIER, SO_CUSTOMER), 
+reference_id
+, 
+document_type
+ (SURAT_JALAN, INVOICE_SUPPLIER, FAKTUR_PAJAK, BUKTI_TRANSFER, NOTA), 
+file_path_url
+, 
+uploaded_by
+, 
+created_at
+. 
+
+
+
+
+Pengelola
+: Mas Heri (Upload Surat Jalan), Bude (Upload Invoice/
+Faktur
+/Bukti Transfer), Pak Yanto (View/Download). 
+
+
+
+9. Dashboard &amp; Reporting
+
+1. Dashboard 
+Operasional
+ Gudang (Akses: Mas Heri)
+
+
+Informasi
+ yang 
+Ditampilkan
+:
+
+
+
+Widget 
+Cepat
+ Kasir POS (
+Pencarian
+ Kode SKU 
+langsung
+). 
+
+
+
+Daftar PO 
+Menunggu
+ Barang Datang (
+Menampilkan
+ Nama Supplier, 
+Nomor
+ PO, Qty 
+Menunggu
+). 
+
+
+
+
+Indikator
+ Stok 
+Kritis
+ (Barang 
+dengan
+ 
+kuantitas
+ 
+fisik
+ di 
+bawah
+ batas minimum). 
+
+
+
+Filter &amp; 
+Periode
+: Realtime 
+hari
+ 
+ini
+. 
+
+
+
+Tujuan 
+Penggunaan
+: 
+Memastikan
+ 
+operasional
+ 
+penerimaan
+ 
+barang
+ dan 
+pelayanan
+ 
+pembeli
+ 
+langsung
+ di 
+gudang
+ 
+berjalan
+ 
+cepat
+ 
+tanpa
+ 
+hambatan
+ 
+antarmuka
+. 
+
+
+
+2. Dashboard 
+Keuangan
+ &amp; 
+Piutang
+ (Akses: Bude)
+
+
+Informasi
+ yang 
+Ditampilkan
+:
+
+
+
+Kartu 
+Metrik
+: "Total 
+Piutang
+ 
+Berjalan
+", "
+Piutang
+ 
+Jatuh
+ Tempo 
+Minggu
+ Ini", "
+Dokumen
+ PO Belum 
+Lengkap
+". 
+
+
+
+Tabel Daftar 
+Tagihan
+ Tempo 
+Pelanggan
+ (
+dengan
+ 
+tombol
+ 
+aksi
+ 
+langsung
+ 
+Kirim
+ WA 
+Tagihan
+). 
+
+
+
+Daftar 
+Verifikasi
+ Invoice Supplier yang 
+siap
+ 
+dicocokkan
+ 
+dengan
+ Surat Jalan. 
+
+
+
+Filter &amp; 
+Periode
+: Filter per Customer, per Status Tempo, 
+Rentang
+ 
+Tanggal
+ Bulanan. 
+
+
+
+Tujuan 
+Penggunaan
+: 
+Mengawasi
+ 
+perputaran
+ kas 
+masuk
+, 
+mencegah
+ 
+piutang
+ 
+tak
+ 
+tertagih
+, dan 
+merapikan
+ 
+arsip
+ 
+pembukuan
+ 
+pajak
+. 
+
+
+
+3. Dashboard 
+Eksekutif
+ &amp; 
+Manajemen
+ (Akses: Pak Yanto)
+
+
+Informasi
+ yang 
+Ditampilkan
+:
+
+
+
+
+Ringkasan
+ Total Nilai 
+Penjualan
+ (Harian, 
+Mingguan
+, 
+Bulanan
+). 
+
+
+
+Nilai 
+Valuasi
+ Total Stok Gudang 
+Aktif
+. 
+
+
+
+Status 
+Pengadaan
+ Barang Pabrik (PO 
+Diterbitkan
+ vs Tiba). 
+
+
+
+Alert Anomali: Daftar 
+barang
+ 
+rusak
+/defect yang 
+dilaporkan
+ 
+dari
+ 
+gudang
+. 
+
+
+
+Filter &amp; 
+Periode
+: Filter 
+Tahunan
+, 
+Bulanan
+, dan 
+Perbandingan
+ Antar-Bulan. 
+
+
+
+Tujuan 
+Penggunaan
+: 
+Pengambilan
+ 
+keputusan
+ 
+pembelian
+ 
+stok
+ volume 
+besar
+, 
+penentuan
+ 
+kebijakan
+ 
+harga
+/
+diskon
+, dan 
+pengawasan
+ 
+aset
+ 
+usaha
+. 
+
+
+
+10. Notification &amp; Approval Workflow
+
+
+Matriks
+ 
+Notifikasi
+
+
+Event 
+Pemicu
+
+
+
+Penerima
+ 
+Notifikasi
+
+
+Channel 
+Notifikasi
+
+
+
+Pesan
+ yang 
+Disampaikan
+
+
+PO Supplier Baru 
+Diterbitkan
+
+
+Pak Yanto &amp; Mas Heri
+
+
+Sistem
+ Web &amp; Template WA
+
+"PO [
+Nomor
+ PO] 
+ke
+ Supplier [Nama] 
+telah
+ 
+diterbitkan
+. 
+Siap
+ 
+dikirim
+ 
+ke
+ 
+pemasok
+." 
+
+
+
+
+Penerimaan
+ Barang Masuk (
+Parsial
+/
+Penuh
+)
+
+Pak Yanto &amp; Bude
+
+
+Sistem
+ Web Dashboard
+
+"Barang PO [
+Nomor
+ PO] 
+tiba
+ di 
+gudang
+. Surat Jalan 
+telah
+ 
+diunggah
+ oleh Mas Heri." 
+
+
+
+DP 
+Pesanan
+ Customer Masuk
+
+Mas Heri (Gudang)
+
+Pop-up 
+Sistem
+ Gudang
+
+"DP 
+Pesanan
+ [
+Nomor
+ SO] an. [Nama Customer] 
+telah
+ 
+diterima
+. Barang 
+siap
+ 
+disiapkan
+." 
+
+
+
+
+Pelunasan
+ 
+Pesanan
+ Customer Lunas
+
+Mas Heri (Gudang)
+
+Pop-up 
+Sistem
+ Gudang
+
+"
+Pesanan
+ [
+Nomor
+ SO] 
+telah
+ LUNAS. Akses Surat Jalan 
+Pengiriman
+ 
+telah
+ 
+dibuka
+." 
+
+
+
+H-7 &amp; Hari-H Jatuh Tempo 
+Piutang
+
+
+Bude &amp; Pak Yanto
+
+
+Sistem
+ Dashboard &amp; 
+Pengingat
+ WA
+
+"
+Tagihan
+ an. [Nama Customer] 
+senilai
+ [
+Nomor
+ Nominal] 
+jatuh
+ tempo pada [
+Tanggal
+]." 
+
+
+
+
+Matriks
+ Workflow Approval
+
+Alur Proses 
+Bisnis
+
+
+Approver
+
+Hal yang Diperiksa &amp; 
+Divalidasi
+
+
+
+Kondisi
+ Setuju (Approve)
+
+
+Kondisi
+ Tolak (Reject)
+
+
+Konsekuensi
+ Jika Ditolak
+
+
+Pemberian
+ 
+Fasilitas
+ 
+Pembayaran
+ Tempo
+
+Pak Yanto
+
+
+Profil
+ customer, 
+nilai
+ 
+transaksi
+, 
+riwayat
+ 
+kedisiplinan
+ 
+bayar
+ masa 
+lalu
+. 
+
+
+
+Customer 
+terpercaya
+; Surat Jalan 
+keluar
+ 
+boleh
+ 
+diterbitkan
+ 
+sebelum
+ 
+lunas
+. 
+
+
+
+Customer 
+baru
+ / 
+risiko
+ 
+tinggi
+. 
+
+
+
+
+Sistem
+ 
+tetap
+ 
+mengunci
+ Surat Jalan 
+sampai
+ 
+pembayaran
+ 100% 
+lunas
+. 
+
+
+
+Direct Shipment (Supplier 
+Langsung
+ 
+ke
+ Customer)
+
+Pak Yanto
+
+
+Kesepakatan
+ 
+harga
+ 
+jual
+ vs 
+harga
+ 
+beli
+ supplier dan 
+kelayakan
+ armada. 
+
+
+
+
+Selisih
+ margin 
+disetujui
+; PO supplier 
+otomatis
+ 
+ditandai
+ direct delivery. 
+
+
+
+Margin 
+tidak
+ 
+sesuai
+ 
+atau
+ supplier 
+menolak
+ 
+kirim
+ 
+langsung
+. 
+
+
+
+Barang 
+wajib
+ 
+ditarik
+ 
+ke
+ 
+gudang
+ 
+Paletindo
+ 
+terlebih
+ 
+dahulu
+. 
+
+
+
+
+Verifikasi
+ 
+Dokumen
+ 
+Siap
+ Bayar Supplier
+
+Bude
+
+
+Kesesuaian
+ 
+antara
+ Qty di PO, Qty Surat Jalan 
+fisik
+, dan nominal Invoice 
+tagihan
+. 
+
+
+
+Qty dan nominal 
+klop
+ (match); status 
+berkas
+ 
+menjadi
+ 
+Terverifikasi
+. 
+
+
+
+Nominal di invoice 
+lebih
+ 
+tinggi
+ 
+dari
+ 
+kesepakatan
+ PO 
+atau
+ Qty 
+tidak
+ 
+sesuai
+ 
+fisik
+. 
+
+
+
+Ditahan; Bude 
+melakukan
+ 
+konfirmasi
+ 
+ulang
+ 
+ke
+ 
+pihak
+ supplier. 
+
+
+
+11. Permission &amp; Access Control
+
+Modul / Fitur / Data
+
+Pak Yanto (Owner)
+
+Mas Heri (Gudang/Kasir)
+
+Bude (Finance/Tax)
+
+
+Catatan
+ 
+Khusus
+
+
+Master Data 
+Produk
+ &amp; SKU
+
+Full (C/R/U/D)
+
+C / R / U
+
+R
+
+Mas Heri 
+menambah
+ 
+barang
+ 
+baru
+ &amp; 
+kode
+. 
+
+
+
+
+Lihat
+ Harga Modal 
+Standar
+
+
+R
+
+R [
+Perlu
+ Konfirmasi]
+
+R
+
+Hak 
+akses
+ 
+harga
+ modal 
+gudang
+ 
+perlu
+ 
+disepakati
+. 
+
+
+
+
+Buat
+ &amp; Edit PO Supplier
+
+Full (C/R/U)
+
+C / R [
+Perlu
+ Konfirmasi]
+
+R
+
+Pak Yanto 
+penentu
+ 
+utama
+ 
+pemesanan
+ supplier. 
+
+
+
+
+Penerimaan
+ Barang &amp; Upload SJ
+
+R
+
+Full (C/R/U)
+
+R
+
+
+Tugas
+ 
+mutlak
+ Mas Heri di 
+gudang
+. 
+
+
+
+Kasir 
+Cepat
+ POS (
+Penjualan
+ 
+Langsung
+)
+
+R
+
+Full (C/R/U)
+
+R
+
+Mas Heri 
+dapat
+ meng-override 
+harga
+ 
+satuan
+. 
+
+
+
+Sales Order 
+Partai
+ &amp; 
+Validasi
+ DP
+
+Full (C/R/U/Approve)
+
+C / R
+
+R / U (Update DP)
+
+
+Validasi
+ uang DP 
+masuk
+ 
+dicatat
+ Bude/Mas Heri. 
+
+
+
+Buka 
+Kunci
+ 
+Pengiriman
+ Tempo
+
+Full (Approve)
+
+-
+
+-
+
+
+Kewenangan
+ 
+eksklusif
+ Pak Yanto. 
+
+
+
+
+Manajemen
+ 
+Dokumen
+ &amp; 
+Faktur
+ Pajak
+
+R / Download
+
+R (Upload Foto SJ)
+
+Full (C/R/U/
+Verifikasi
+)
+
+Bude 
+mengelola
+ 
+faktur
+, invoice, dan 
+pajak
+. 
+
+
+
+
+Laporan
+ &amp; 
+Penagihan
+ 
+Piutang
+
+
+Full (R/Approve)
+
+-
+
+Full (C/R/U)
+
+
+Pengawasan
+ 
+penagihan
+ oleh Bude &amp; Pak Yanto. 
+
+
+
+Audit Activity Log
+
+Full (R)
+
+-
+
+-
+
+Hanya Owner yang 
+memantau
+ audit log. 
+
+
+
+
+Keterangan
+: C = Create, R = Read, U = Update, D = Delete.
+
+
+
+12. Business Rules
+
+1. 
+Aturan
+ Proses (Process Rules)
+
+Satu 
+pesanan
+ 
+pembelian
+ (PO) 
+dapat
+ 
+menerima
+ 
+pengiriman
+ 
+secara
+ 
+bertahap
+ yang 
+menghasilkan
+ 
+lebih
+ 
+dari
+ 
+satu
+ Surat Jalan (SJ), 
+namun
+ 
+satu
+ 
+berkas
+ Surat Jalan 
+tidak
+ 
+boleh
+ 
+mencantumkan
+ 
+gabungan
+ 
+dari
+ dua 
+nomor
+ PO yang 
+berbeda
+. 
+
+
+
+Barang yang 
+diproduksi
+ di 
+pabrik
+ 
+jasa
+ 
+cetak
+ (
+maklon
+) 
+tetap
+ 
+berstatus
+ 
+stok
+ supplier 
+sampai
+ 
+barang
+ 
+tersebut
+ 
+fisik
+ 
+nyata
+ 
+diangkut
+ 
+tiba
+ di 
+gudang
+ 
+Paletindo
+ 
+dengan
+ Surat Jalan 
+resmi
+. 
+
+
+
+
+Pesanan
+ 
+pelanggan
+ 
+partai
+ 
+besar
+ 
+tidak
+ 
+dapat
+ 
+dimasukkan
+ 
+ke
+ 
+antrean
+ 
+penyiapan
+ 
+barang
+ 
+gudang
+ 
+tanpa
+ 
+adanya
+ 
+pembayaran
+ DP minimal 25% 
+atau
+ 
+pelunasan
+ 
+langsung
+. 
+
+
+
+Akses 
+penerbitan
+ 
+cetak
+ 
+dokumen
+ Surat Jalan 
+Pengiriman
+ 
+terkunci
+ 
+otomatis
+ oleh 
+sistem
+ 
+hingga
+ status 
+pembayaran
+ 
+tercatat
+ Lunas 100%, 
+kecuali
+ 
+ada
+ bypass approval tempo 
+dari
+ Pak Yanto. 
+
+
+
+2. 
+Aturan
+ Approval &amp; Akses
+
+
+Penjualan
+ 
+dengan
+ 
+skema
+ 
+pembayaran
+ 
+bertempo
+ 
+wajib
+ 
+mendapatkan
+ 
+persetujuan
+ digital 
+dari
+ 
+akun
+ Pak Yanto. 
+
+
+
+
+Setiap
+ 
+perubahan
+ data 
+transaksi
+ masa 
+lalu
+, 
+pembatalan
+ 
+nomor
+ nota, 
+atau
+ 
+penghapusan
+ 
+arsip
+ 
+wajib
+ 
+terekam
+ 
+dalam
+ audit trail 
+sistem
+ dan 
+tidak
+ 
+boleh
+ 
+dihapus
+ 
+secara
+ 
+permanen
+ 
+dari
+ database (soft delete only). 
+
+
+
+3. 
+Aturan
+ Data &amp; 
+Identitas
+ Barang
+
+
+Setiap
+ 
+jenis
+ 
+produk
+ 
+wajib
+ 
+memiliki
+ 
+kode
+/SKU 
+unik
+ yang 
+merepresentasikan
+ 
+dimensi
+ dan 
+karakteristik
+ 
+fisik
+ (
+misal
+: 
+kode
+ 
+berbeda
+ 
+antara
+ 
+produk
+ solid dan 
+produk
+ 
+berlubang
+, 
+meskipun
+ 
+dimensinya
+ 
+sama
+ 
+persis
+). 
+
+
+
+
+Perbedaan
+ 
+varian
+ 
+warna
+ pada 
+dimensi
+ dan 
+bentuk
+ yang 
+sama
+ 
+tidak
+ 
+mengubah
+ 
+nomor
+ 
+kode
+/SKU 
+barang
+ 
+utama
+. 
+
+
+
+4. 
+Aturan
+ 
+Perhitungan
+ &amp; 
+Finansial
+
+
+Harga 
+jual
+ 
+standar
+ pada 
+katalog
+ 
+memiliki
+ 
+acuan
+ margin 
+sekitar
+ 30% di 
+atas
+ 
+harga
+ modal. 
+
+
+
+Harga 
+satuan
+ 
+barang
+ pada nota 
+kasir
+ POS dan 
+Pesanan
+ 
+Penjualan
+ (SO) 
+bersifat
+ 
+fleksibel
+ (
+overrideable
+) 
+untuk
+ 
+memfasilitasi
+ 
+kesepakatan
+ 
+tawar-menawar
+ 
+langsung
+. 
+
+
+
+Formula 
+perhitungan
+ 
+persentase
+ DP:
+
+
+
+$$\
+text{
+
+Persentase
+ DP} = \
+left(
+\
+frac{
+\
+text{
+Nominal DP Masuk
+}}{
+\
+text{
+Grand Total 
+Tagihan
+
+}}\
+right) \times 100\% \
+ge
+ 25\%$$
+
+
+
+13. Edge Cases
+
+
+Kondisi
+ Khusus / 
+Anomali
+ 
+Lapangan
+
+
+
+Deskripsi
+ 
+Permasalahan
+
+
+Solusi 
+Penanganan
+ 
+Sistem
+ ERP
+
+
+Kapasitas
+ Armada 
+Truk
+ Kurang
+
+
+Supir
+ 
+hanya
+ 
+mampu
+ 
+membawa
+ 1.000 
+dari
+ 2.500 pcs 
+pesanan
+ PO. 
+
+
+
+
+Sistem
+ 
+mendukung
+ Partial Goods Receipt. Status PO 
+tetap
+ 
+Diproses
+ Sebagian. 
+Sistem
+ 
+mengizinkan
+ Mas Heri 
+membuat
+ Surat Jalan 
+Penerimaan
+ ke-2 dan ke-3 pada 
+nomor
+ PO yang 
+sama
+ di 
+kemudian
+ 
+hari
+. 
+
+
+
+Barang Cacat/
+Pecah
+ Saat Tiba
+
+Dari 100 pcs 
+barang
+ yang 
+diantar
+ supplier, 
+ditemukan
+ 2 pcs 
+pecah
+ di 
+bak
+ 
+truk
+. 
+
+
+
+Mas Heri 
+menginput
+ 98 pcs pada 
+kolom
+ "
+Diterima
+ Baik" dan 2 pcs pada 
+kolom
+ "Barang Cacat". Hanya 98 pcs yang 
+masuk
+ 
+ke
+ 
+saldo
+ 
+stok
+ 
+aktif
+ 
+gudang
+. 
+Sistem
+ 
+membuat
+ 
+nomor
+ 
+tiket
+ 
+retur
+ 
+untuk
+ 
+klaim
+ 
+penggantian
+ supplier. 
+
+
+
+Surat Jalan 
+Fisik
+ 
+Kertas
+ Hilang
+
+Surat 
+jalan
+ 
+kertas
+ 
+terselip
+/
+hilang
+ di 
+meja
+ 
+sebelum
+ 
+sempat
+ 
+dicatat
+ Bude. 
+
+
+
+Bude 
+cukup
+ 
+membuka
+ 
+histori
+ PO 
+terkait
+ di 
+sistem
+ dan 
+mengunduh
+ 
+ulang
+ 
+foto
+ 
+surat
+ 
+jalan
+ yang 
+sebelumnya
+ 
+telah
+ 
+difoto
+ dan 
+diunggah
+ oleh Mas Heri 
+saat
+ 
+barang
+ 
+pertama
+ kali 
+tiba
+. 
+
+
+
+Customer Borongan 
+Lewat
+ Marketplace
+
+Customer 
+memesan
+ 1.000 pcs via Shopee, 
+lalu
+ 
+diarahkan
+ 
+transaksi
+ 
+langsung
+ 
+untuk
+ 
+menghindari
+ 
+potongan
+ 
+komisi
+. 
+
+
+
+Mas Heri 
+membatalkan
+ 
+pesanan
+ di 
+sistem
+ marketplace, 
+lalu
+ 
+membuat
+ 
+Pesanan
+ 
+Penjualan
+ (SO) 
+Langsung
+ di ERP 
+dengan
+ 
+mencatat
+ DP 25% 
+secara
+ offline. 
+
+
+
+
+Fluktuasi
+ Harga Modal Supplier
+
+Supplier 
+menaikkan
+ 
+harga
+ modal 
+saat
+ 
+barang
+ 
+hendak
+ 
+diambil
+ 
+tanpa
+ 
+pemberitahuan
+ 
+katalog
+ 
+baru
+. 
+
+
+
+User 
+dapat
+ 
+langsung
+ 
+mengedit
+ 
+nilai
+ nominal 
+harga
+ modal pada baris PO yang 
+bersangkutan
+ 
+tanpa
+ 
+merusak
+ 
+histori
+ master data 
+produk
+ lama. 
+
+
+
+
+Pencurian
+ / 
+Selisih
+ Stok 
+Fisik
+
+
+Stok di 
+sistem
+ 
+mencatat
+ 20 unit, 
+namun
+ 
+fisik
+ di 
+rak
+ 
+gudang
+ 
+hanya
+ 
+ada
+ 5 unit (
+akibat
+ 
+kehilangan
+/
+tidak
+ 
+tercatat
+). 
+
+
+
+
+Dilakukan
+ 
+penyesuaian
+ 
+melalui
+ 
+modul
+ Stock Adjustment / Stock 
+Opname
+ 
+dengan
+ 
+menyertakan
+ 
+alasan
+ 
+selisih
+ (
+misal
+: "
+Selisih
+ 
+Hilang
+ / 
+Kerusakan
+ 
+Fisik
+") yang 
+langsung
+ 
+terekam
+ pada audit log Pak Yanto. 
+
+
+
+14. Non-Functional Requirements
+
+User Interface &amp; 
+Kemudahan
+ 
+Penggunaan
+ (Usability): 
+Antarmuka
+ 
+wajib
+ 
+meminimalkan
+ 
+jumlah
+ 
+klik
+; 
+alur
+ 
+kerja
+ 
+kasir
+ dan 
+penerimaan
+ 
+barang
+ 
+harus
+ 
+dapat
+ 
+diselesaikan
+ 
+dalam
+ 
+satu
+ 
+alur
+ 
+layar
+ 
+tanpa
+ 
+navigasi
+ 
+bertingkat
+ yang 
+membingungkan
+ 
+bagi
+ 
+staf
+ non-IT. 
+
+
+
+Akses Lintas 
+Perangkat
+ (Cross-Platform &amp; Responsive Design): 
+Sistem
+ 
+berbasis
+ Web Responsive yang 
+dapat
+ 
+diakses
+ optimal 
+melalui
+ 
+layar
+ monitor 
+komputer
+ 
+gudang
+ (Mas Heri), laptop 
+kantor
+ (Pak Yanto &amp; Bude), 
+serta
+ smartphone Android (
+untuk
+ 
+memfoto
+ 
+surat
+ 
+jalan
+ 
+secara
+ 
+langsung
+ di 
+bak
+ 
+mobil
+). 
+
+
+
+
+Keamanan
+ &amp; 
+Autentikasi
+ (Authentication &amp; Authorization): 
+Sistem
+ 
+menerapkan
+ Role-Based Access Control (RBAC) yang 
+ketat
+; 
+sesi
+ login 
+terlindungi
+ kata 
+sandi
+ 
+unik
+ 
+untuk
+ masing-masing user. 
+
+
+
+
+Penyimpanan
+ 
+Berkas
+ Digital (File Storage): 
+Mendukung
+ 
+penyimpanan
+ 
+kompresi
+ 
+otomatis
+ 
+untuk
+ 
+foto
+ 
+surat
+ 
+jalan
+ dan 
+dokumen
+ 
+berformat
+ JPG, PNG, dan PDF guna 
+menghemat
+ 
+ruang
+ 
+penyimpanan
+ cloud 
+tanpa
+ 
+mengurangi
+ 
+keterbacaan
+ 
+teks
+ 
+dokumen
+. 
+
+
+
+Audit Trail &amp; 
+Keamanan
+ Data (Security &amp; Auditability): 
+Seluruh
+ 
+aksi
+ 
+pembuatan
+, 
+perubahan
+ data 
+harga
+, 
+pengeditan
+ 
+stok
+, dan 
+penghapusan
+ 
+transaksi
+ 
+wajib
+ 
+mencatat
+ 
+identitas
+ user (user ID), 
+alamat
+ IP, dan 
+stempel
+ 
+waktu
+ (timestamp) 
+secara
+ 
+permanen
+. 
+
+
+
+Performa 
+Sistem
+ (Performance): Waktu 
+respon
+ 
+pencarian
+ 
+kode
+ 
+barang
+ (SKU) pada 
+kasir
+ POS 
+tidak
+ 
+boleh
+ 
+melebihi
+ 1 
+detik
+ 
+untuk
+ 
+menjaga
+ 
+kecepatan
+ 
+transaksi
+ di 
+meja
+ 
+kasir
+. 
+
+
+
+15. MVP Scope
+
+Must Have (
+Prioritas
+ Utama - 
+Rilis
+ 
+Tahap
+ 1)
+
+Master Data 
+Produk
+ 
+berbasis
+ Kode SKU 
+unik
+ 
+dengan
+ 
+harga
+ modal dan 
+harga
+ 
+jual
+ 
+fleksibel
+. 
+
+
+
+Modul 
+Pembuatan
+ PO Supplier 
+lengkap
+ 
+dengan
+ 
+kalkulasi
+ 
+otomatis
+ dan 
+tombol
+ 
+ekspor
+/
+kirim
+ WhatsApp. 
+
+
+
+Modul 
+Penerimaan
+ Barang Gudang 
+dengan
+ 
+fitur
+ 
+wajib
+ 
+unggah
+ 
+foto
+ Surat Jalan supplier. 
+
+
+
+Kasir 
+Cepat
+ Gudang (POS) 
+dengan
+ 
+fitur
+ edit 
+harga
+ 
+satuan
+ 
+langsung
+ dan 
+pemotongan
+ 
+stok
+ 
+otomatis
+. 
+
+
+
+Fitur 
+Pesanan
+ 
+Penjualan
+ 
+Partai
+ Besar (SO) 
+dengan
+ 
+kunci
+ 
+validasi
+ DP 25% dan 
+pelunasan
+ 
+sebelum
+ 
+cetak
+ Surat Jalan. 
+
+
+
+
+Arsip
+ Folder Digital 
+Dokumen
+ per 
+transaksi
+ PO. 
+
+
+
+Should Have (
+Prioritas
+ 
+Lanjutan
+ - 
+Rilis
+ 
+Tahap
+ 2)
+
+Modul 
+Pengawasan
+ 
+Piutang
+ 
+Penjualan
+ Tempo 
+dengan
+ 
+pengingat
+ 
+jatuh
+ tempo H-7 via WhatsApp. 
+
+
+
+Fitur 
+Impor
+ 
+Rekonsiliasi
+ 
+Penjualan
+ Marketplace 
+berkala
+ (Shopee, Tokopedia, Lazada, Blibli) 
+berbasis
+ 
+unggah
+ 
+berkas
+ spreadsheet. 
+
+
+
+Fitur Stock 
+Opname
+ 
+berkala
+ 
+mingguan
+/
+bulanan
+ 
+dengan
+ 
+kartu
+ 
+selisih
+ 
+fisik
+ vs 
+sistem
+. 
+
+
+
+Log Audit Trail 
+terperinci
+ 
+untuk
+ 
+aktivitas
+ 
+seluruh
+ role 
+pengguna
+. 
+
+
+
+Could Have (Fitur Masa 
+Depan
+ - 
+Rilis
+ 
+Tahap
+ 3)
+
+Integrasi 
+otomatis
+ API Webhook Marketplace 
+untuk
+ 
+sinkronisasi
+ 
+pesanan
+ 
+secara
+ 
+realtime
+. 
+
+
+
+Fitur 
+pembuatan
+ 
+otomatis
+ 
+draf
+ 
+Faktur
+ Pajak yang 
+kompatibel
+ 
+dengan
+ 
+aplikasi
+ 
+perpajakan
+ 
+resmi
+ (
+Coretax
+). 
+
+
+
+Integrasi 
+pelacak
+ GPS armada 
+pengiriman
+ 
+supir
+ 
+Paletindo
+. 
+
+
+
+16. Requirement yang Masih Belum Jelas (Open Questions / 
+Perlu
+ 
+Konfirmasi
+)
+
+
+Struktur
+ 
+Pembagian
+ Peran 
+Finansial
+ Bude:
+
+
+
+
+Pertanyaan
+: 
+Dokumen
+ 
+apa
+ 
+saja
+ yang 
+secara
+ 
+riil
+ 
+dihasilkan
+ oleh Bude 
+saat
+ 
+mengambil
+ 
+arsip
+ di 
+meja
+ 
+keranjang
+ (
+apakah
+ Bude 
+membuat
+ 
+buku
+ kas 
+besar
+, 
+laporan
+ 
+neraca
+ 
+laba-rugi
+, 
+atau
+ 
+sebatas
+ 
+faktur
+ 
+pajak
+ di 
+aplikasi
+ 
+eksternal
+)? 
+
+
+
+
+Dampak
+: 
+Memengaruhi
+ 
+kedalaman
+ 
+fitur
+ 
+pembukuan
+ pada Modul Finance. 
+
+
+
+
+Keterbukaan
+ Data Harga Modal 
+untuk
+ Admin Gudang:
+
+
+
+
+Pertanyaan
+: 
+Apakah
+ Mas Heri 
+diizinkan
+ 
+melihat
+ nominal 
+harga
+ modal 
+barang
+ 
+dari
+ supplier pada 
+sistem
+ 
+gudang
+, 
+ataukah
+ 
+kolom
+ 
+harga
+ modal 
+harus
+ 
+disembunyikan
+ (hidden) 
+khusus
+ 
+untuk
+ 
+akun
+ Mas Heri? 
+
+
+
+
+Dampak
+: Desain permission field data 
+produk
+ dan 
+tampilan
+ 
+tabel
+ 
+kasir
+. 
+
+
+
+Format 
+Standar
+ 
+Penomoran
+ 
+Dokumen
+ Internal:
+
+
+
+
+Pertanyaan
+: 
+Apakah
+ 
+saat
+ 
+ini
+ 
+Paletindo
+ 
+telah
+ 
+memiliki
+ format 
+penomoran
+ 
+resmi
+ 
+untuk
+ PO, Surat Jalan 
+Pengiriman
+, dan Nota 
+Penjualan
+, 
+atau
+ 
+sistem
+ 
+bebas
+ 
+merancang
+ 
+struktur
+ 
+penomoran
+ 
+otomatis
+ 
+baru
+? 
+
+
+
+
+Dampak
+: Logika generator 
+penomoran
+ 
+otomatis
+ 
+dokumen
+ pada basis data. 
+
+
+
+SOP 
+Penanganan
+ Barang 
+Retur
+ / Rusak 
+ke
+ Supplier:
+
+
+
+
+Pertanyaan
+: Jika 
+terdapat
+ 
+barang
+ 
+rusak
+ 
+saat
+ 
+penerimaan
+ 
+dari
+ supplier, 
+apakah
+ supplier 
+langsung
+ 
+menukar
+ 
+barang
+ 
+fisik
+ 
+baru
+ di 
+tempat
+, 
+atau
+ 
+diterbitkan
+ nota 
+kredit
+ 
+pemotong
+ 
+tagihan
+ invoice? 
+
+
+
+
+Dampak
+: Desain 
+entitas
+ database 
+retur
+ 
+pembelian
+ dan 
+alur
+ 
+rekonsiliasi
+ invoice Bude. 
+
+
+
+17. Kesimpulan 
+Sistem
+
+
+
+Sistem
+ ERP 
+Pergudangan
+ &amp; 
+Operasional
+ PT 
+Paletindo
+ Prakarsa 
+Unggul
+ 
+dirancang
+ 
+untuk
+ 
+memecahkan
+ 
+tiga
+ 
+persoalan
+ 
+utama
+ di 
+lapangan
+: 
+kesalahan
+ input manual pada PO, 
+ketidakakuratan
+ 
+stok
+ 
+antara
+ 
+catatan
+ dan 
+fisik
+ 
+rak
+, 
+serta
+ 
+sering
+ 
+hilangnya
+ 
+berkas
+ 
+dokumen
+ 
+fisik
+ 
+transaksi
+. 
+
+
+
+
+Prinsip
+ 
+dasar
+ 
+sistem
+ 
+ini
+ 
+adalah
+ 
+mendigitalisasi
+ 
+alur
+ 
+kerja
+ 
+nyata
+ 
+tanpa
+ 
+merusak
+ 
+kebiasaan
+ 
+lapangan
+:
+
+
+
+
+Antarmuka
+ Mas Heri 
+dibuat
+ 
+ringkas
+ 
+berbasis
+ 
+pencarian
+ 
+kode
+ SKU 
+cepat
+ dan 
+alur
+ 
+kasir
+ 
+satu
+ 
+halaman
+ 
+dengan
+ 
+fleksibilitas
+ edit 
+harga
+. 
+
+
+
+Alur 
+pengadaan
+ 
+dikunci
+ 
+dengan
+ 
+aturan
+ 
+disiplin
+: 
+stok
+ 
+hanya
+ 
+bertambah
+ 
+saat
+ 
+barang
+ 
+fisik
+ 
+tiba
+ 
+bersama
+ 
+foto
+ Surat Jalan, dan 
+barang
+ 
+pesanan
+ 
+partai
+ 
+hanya
+ 
+keluar
+ 
+jika
+ 
+kewajiban
+ 
+pembayaran
+ 
+telah
+ 
+lunas
+ (
+atau
+ 
+berstatus
+ tempo 
+resmi
+). 
+
+
+
+
+Dokumen
+ 
+fisik
+ yang 
+selama
+ 
+ini
+ 
+menumpuk
+ di 
+keranjang
+ 
+meja
+ 
+ditransformasikan
+ 
+menjadi
+ 
+berkas
+ 
+arsip
+ digital per 
+nomor
+ PO yang 
+dapat
+ 
+diakses
+ oleh Bude dan Pak Yanto 
+kapan
+ 
+saja
+. 
+
+
+
+
+Dengan
+ 
+implementasi
+ 
+bertahap
+ 
+dari
+ MVP 
+Tahap
+ 1, 
+sistem
+ 
+akan
+ 
+memberikan
+ 
+fondasi
+ 
+operasional
+ yang 
+kokoh
+, 
+transparan
+, dan 
+mudah
+ 
+digunakan
+ oleh 
+seluruh
+ 
+staf
+ 
+tanpa
+ 
+menimbulkan
+ 
+penolakan
+ 
+sistem
+ 
+seperti
+ 
+pengalaman
+ masa 
+lalu
+. 
+
+
+
