@@ -13,11 +13,16 @@ echo [2/2] Menghubungkan domain palora.paletindo.id ke Cloudflare...
 echo.
 echo ============================================================
 echo   PALORA SUDAH AKTIF ONLINE!
-echo   Buka di browser: https://palora.paletindo.id
+echo   Akses Publik:    https://palora.paletindo.id
+echo   Akses Lokal LAN: http://localhost:8090
 echo   Dashboard Admin: https://palora.paletindo.id/_/
 echo.
-echo   Tekan Ctrl+C atau tutup jendela ini untuk menghentikan.
+echo   Jangan tutup jendela ini selama aplikasi ingin diakses.
 echo ============================================================
 echo.
 
-cloudflared.exe tunnel run palora
+if exist "config.yml" (
+    cloudflared.exe --config config.yml tunnel run
+) else (
+    cloudflared.exe tunnel run palora
+)

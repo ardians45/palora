@@ -38,6 +38,9 @@ backend/pocketbase.exe
 backend/cloudflared*
 backend/CHANGELOG.md
 backend/LICENSE.md
+backend/tunnel.json
+backend/cert.pem
+backend/config.yml
 backend/pb_data/
 backend/pb_public/
 backend/.env
