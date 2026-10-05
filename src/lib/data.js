@@ -56,6 +56,10 @@ export function useRecords(collection, { filter = '', sort = '-created', enabled
 /** Satu record berdasarkan id atau filter, dengan realtime. */
 export function useRecord(collection, idOrFilter, { byFilter = false } = {}) {
   const [state, setState] = useState({ item: null, loading: true, error: null });
+  // pindah dokumen dengan cepat: jawaban dokumen sebelumnya yang datang terlambat diabaikan
+  const key = `${collection}|${idOrFilter}|${byFilter}`;
+  const ref = useRef(key);
+  ref.current = key;
   const load = useCallback(async () => {
     if (!idOrFilter) {
       setState({ item: null, loading: false, error: null });
@@ -65,11 +69,11 @@ export function useRecord(collection, idOrFilter, { byFilter = false } = {}) {
       const item = byFilter
         ? await pb.collection(collection).getFirstListItem(idOrFilter)
         : await pb.collection(collection).getOne(idOrFilter);
-      setState({ item, loading: false, error: null });
+      if (ref.current === key) setState({ item, loading: false, error: null });
     } catch (error) {
-      setState({ item: null, loading: false, error });
+      if (ref.current === key) setState({ item: null, loading: false, error });
     }
-  }, [collection, idOrFilter, byFilter]);
+  }, [collection, idOrFilter, byFilter, key]);
 
   useEffect(() => {
     load();

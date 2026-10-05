@@ -5,11 +5,11 @@ import { Check, Minus, Upload } from 'lucide-react';
 import { pb } from '../../lib/pb';
 import { fileUrl, useRecords } from '../../lib/data';
 import { navigate, replaceQuery, useRoute } from '../../lib/router';
-import { useSession } from '../../lib/session';
-import { date, today } from '../../lib/format';
-import { PO_STATUS } from '../../lib/status';
-import { Button, Empty, Field, FilePick, Input, PageHeader, Select, StatusBadge, Tabs } from '../../ui/core';
+import { date, daysFromToday, num, today } from '../../lib/format';
+import { PO_STATUS, dueTone } from '../../lib/status';
+import { Badge, Button, Empty, Field, FilePick, Input, PageHeader, Select, StatusBadge, Tabs } from '../../ui/core';
 import DataTable, { matchText } from '../../ui/DataTable';
+import DateRange from '../../ui/DateRange';
 import { Dialog, useToast } from '../../ui/feedback';
 
 export const DOC_CATEGORIES = ['Surat Jalan', 'Invoice', 'Faktur Pajak', 'Bukti Transfer', 'Purchase Order', 'Lainnya'];
@@ -22,14 +22,12 @@ const Tick = ({ on, label }) => (
 
 export default function Arsip() {
   const { query } = useRoute();
-  const { can } = useSession();
   const tab = query.tab || 'po';
   const search = query.q || '';
   const [upload, setUpload] = useState(false);
   const pos = useRecords('purchase_orders', { filter: 'deleted = false', sort: '-date,-created' });
   const docs = useRecords('documents', { filter: 'deleted = false', sort: '-created' });
-  const finance = can('owner', 'finance');
-  const invoices = useRecords('supplier_invoices', { filter: 'deleted = false', enabled: finance });
+  const invoices = useRecords('supplier_invoices', { filter: 'deleted = false' });
 
   const folders = useMemo(
     () =>
@@ -43,14 +41,33 @@ export default function Arsip() {
           invoice: inv.length > 0 || related.some((d) => d.category === 'Invoice'),
           faktur: inv.some((i) => i.tax_file || i.tax_invoice_no) || related.some((d) => d.category === 'Faktur Pajak'),
           lunas: inv.length > 0 && inv.every((i) => i.paid_amount >= i.total_amount),
+          invoiceNos: inv.map((i) => i.invoice_no).join(', '),
+          remaining: inv.reduce((sum, i) => sum + i.total_amount - i.paid_amount, 0),
+          nextDue: inv.filter((i) => i.total_amount - i.paid_amount > 0 && i.due_date).map((i) => i.due_date).sort()[0] || '',
+          lastSj: (po.receipts || []).length ? po.receipts[po.receipts.length - 1].date : '',
           files: related.length + inv.filter((i) => i.file).length + inv.filter((i) => i.tax_file).length,
         };
       }),
     [pos.items, docs.items, invoices.items]
   );
 
-  const folderRows = folders.filter((f) => matchText(f, search, ['po_no', 'supplier']));
-  const docRows = docs.items.filter((d) => matchText(d, search, ['title', 'ref_no', 'partner', 'category', 'file_name']));
+  const FOLDER_TABS = {
+    semua: () => true,
+    invoice: (f) => f.sj && !f.invoice && f.state !== 'batal',
+    hutang: (f) => f.invoice && !f.lunas,
+    lengkap: (f) => f.sj && f.invoice && f.faktur && f.lunas,
+  };
+  const ftab = query.f || 'semua';
+  // tanggal: PO dibuat atau ada surat jalan masuk di rentang itu
+  const from = query.from || '';
+  const to = query.to || '';
+  const inRange = (d) => !!d && (!from || d >= from) && (!to || d <= to);
+  const anyDate = !from && !to;
+  const folderBase = folders.filter(
+    (f) => (anyDate || inRange(f.date) || (f.receipts || []).some((r) => inRange(r.date))) && matchText(f, search, ['po_no', 'supplier', 'invoiceNos'])
+  );
+  const folderRows = folderBase.filter(FOLDER_TABS[ftab] || FOLDER_TABS.semua);
+  const docRows = docs.items.filter((d) => (anyDate || inRange(d.date || String(d.created).slice(0, 10))) && matchText(d, search, ['title', 'ref_no', 'partner', 'category', 'file_name']));
 
   return (
     <>
@@ -65,6 +82,7 @@ export default function Arsip() {
       />
       <div className="table-tools">
         <Input className="search" type="search" placeholder="Cari no. PO, supplier, berkas..." value={search} onChange={(e) => replaceQuery({ ...query, q: e.target.value })} aria-label="Cari arsip" />
+        <DateRange query={query} />
       </div>
       <Tabs
         tabs={[
@@ -74,6 +92,16 @@ export default function Arsip() {
         value={tab}
         onChange={(k) => replaceQuery({ ...query, tab: k })}
       />
+      {tab === 'po' && (
+        <div className="table-tools">
+          <Select className="w-md" value={ftab} onChange={(e) => replaceQuery({ ...query, f: e.target.value })} aria-label="Filter map">
+            <option value="semua">Semua map ({folderBase.length})</option>
+            <option value="invoice">Barang sudah datang, invoice belum ({folderBase.filter(FOLDER_TABS.invoice).length})</option>
+            <option value="hutang">Invoice belum lunas ({folderBase.filter(FOLDER_TABS.hutang).length})</option>
+            <option value="lengkap">Lengkap & lunas ({folderBase.filter(FOLDER_TABS.lengkap).length})</option>
+          </Select>
+        </div>
+      )}
       {tab === 'po' ? (
         <DataTable
           rows={folderRows}
@@ -88,13 +116,31 @@ export default function Arsip() {
             { key: 'state', label: 'Status PO', render: (f) => <StatusBadge map={PO_STATUS} value={f.state} /> },
             { key: 'po', label: 'PO', align: 'center', sortable: false, render: () => <Tick on label="PO" /> },
             { key: 'sj', label: 'Surat Jalan', align: 'center', value: (f) => (f.sj ? 1 : 0), render: (f) => <Tick on={f.sj} label="Surat jalan" /> },
-            ...(finance
-              ? [
-                  { key: 'invoice', label: 'Invoice', align: 'center', value: (f) => (f.invoice ? 1 : 0), render: (f) => <Tick on={f.invoice} label="Invoice" /> },
-                  { key: 'faktur', label: 'Faktur', align: 'center', value: (f) => (f.faktur ? 1 : 0), render: (f) => <Tick on={f.faktur} label="Faktur" /> },
-                  { key: 'lunas', label: 'Lunas', align: 'center', value: (f) => (f.lunas ? 1 : 0), render: (f) => <Tick on={f.lunas} label="Lunas" /> },
-                ]
-              : []),
+            { key: 'invoice', label: 'Invoice', align: 'center', value: (f) => (f.invoice ? 1 : 0), render: (f) => <Tick on={f.invoice} label="Invoice" /> },
+            { key: 'faktur', label: 'Faktur', align: 'center', value: (f) => (f.faktur ? 1 : 0), render: (f) => <Tick on={f.faktur} label="Faktur" /> },
+            { key: 'lunas', label: 'Lunas', align: 'center', value: (f) => (f.lunas ? 1 : 0), render: (f) => <Tick on={f.lunas} label="Lunas" /> },
+            { key: 'invoiceNos', label: 'No. Invoice', render: (f) => <span className="mono small">{f.invoiceNos}</span> },
+            {
+              key: 'remaining',
+              label: 'Sisa Hutang',
+              align: 'right',
+              render: (f) => (f.invoice ? <span className={f.remaining > 0 ? 'strong' : 'muted'}>{num(f.remaining)}</span> : ''),
+              total: true,
+            },
+            {
+              key: 'nextDue',
+              label: 'Catatan',
+              sortable: false,
+              render: (f) => {
+                if (f.nextDue) {
+                  const t = dueTone(f.nextDue, f.remaining);
+                  return <Badge tone={t.tone}>jatuh tempo {date(f.nextDue)}</Badge>;
+                }
+                const d = daysFromToday(f.lastSj);
+                if (f.sj && !f.invoice && d !== null && f.state !== 'batal') return <Badge tone={-d > 14 ? 'warn' : 'neutral'}>invoice belum datang · {-d} hari</Badge>;
+                return '';
+              },
+            },
             { key: 'files', label: 'Berkas', align: 'right' },
           ]}
         />

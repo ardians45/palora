@@ -4,7 +4,7 @@ import { useRecords } from '../../lib/data';
 import { useRoute, navigate, replaceQuery } from '../../lib/router';
 import { useSession } from '../../lib/session';
 import { date, num } from '../../lib/format';
-import { ORDER_STATUS, CHANNEL_LABEL, dueTone } from '../../lib/status';
+import { ORDER_STATUS, CHANNEL_LABEL, dueTone, shipProgress } from '../../lib/status';
 import { Badge, Empty, Input, LinkButton, PageHeader, Select, StatusBadge, Tabs } from '../../ui/core';
 import DataTable, { matchText } from '../../ui/DataTable';
 
@@ -67,6 +67,7 @@ export default function PesananList() {
         <span className="row">
           <StatusBadge map={ORDER_STATUS} value={o.status} />
           {o.release_approved && ['baru', 'dp'].includes(o.status) && <Badge tone="warn">Izin Owner</Badge>}
+          {o.status !== 'batal' && shipProgress(o).partial && <Badge tone="info">Keluar sebagian</Badge>}
         </span>
       ),
     },

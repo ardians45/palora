@@ -72,6 +72,21 @@ function toIsoDate(v) {
   return today();
 }
 
+/**
+ * Angka uang dari laporan marketplace: "Rp 125.000", "125000.00", "125,000.50", "125.000,50".
+ * Pemisah terakhir yang diikuti 1-2 digit di akhir = desimal; selain itu pemisah ribuan.
+ */
+export function parseMoney(v) {
+  if (typeof v === 'number') return v;
+  const s = String(v ?? '').replace(/[^\d.,-]/g, '');
+  if (!s) return 0;
+  const last = Math.max(s.lastIndexOf('.'), s.lastIndexOf(','));
+  const decimal = last !== -1 && /^\d{1,2}$/.test(s.slice(last + 1));
+  const intPart = decimal ? s.slice(0, last) : s;
+  const n = Number(intPart.replace(/[.,]/g, '') + (decimal ? `.${s.slice(last + 1)}` : ''));
+  return Number.isFinite(n) ? n : 0;
+}
+
 /** Baca baris laporan marketplace menjadi { order_no, date, sku, name, qty, price }. Diekspor untuk test. */
 export function parseReport(sheetRows) {
   if (sheetRows.length === 0) return { rows: [], skipped: 0, missing: Object.keys(COLS) };
@@ -95,7 +110,7 @@ export function parseReport(sheetRows) {
     const qty = Number(String(r[col.qty]).replace(/[^\d.-]/g, '')) || 0;
     if (qty <= 0) continue;
     const priceRaw = col.price ? r[col.price] : 0;
-    const price = typeof priceRaw === 'number' ? priceRaw : Number(String(priceRaw || '').replace(/[^\d]/g, '')) || 0;
+    const price = parseMoney(priceRaw);
     rows.push({
       order_no: orderNo,
       date: col.date ? toIsoDate(r[col.date]) : today(),

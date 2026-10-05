@@ -202,6 +202,9 @@ describe('Pesanan customer', () => {
     });
     expect(order.order_no).toMatch(/^INV\/PPU\/202610\/\d{4}$/);
     expect(order).toMatchObject({ total_amount: 380000, remaining_amount: 380000, status: 'baru', channel: 'pesanan' });
+    expect(order.due_date).toBe('2026-10-19'); // Tempo 14 Hari
+    const t30 = await S.gudang.collection('sales_orders').create({ date: '2026-10-05', customer: 'X', payment_type: 'Tempo 30 Hari', items: [line(p, 1)] });
+    expect(t30.due_date).toBe('2026-11-04');
   });
 
   it('status & nilai uang tidak bisa diubah langsung', async () => {
@@ -351,16 +354,58 @@ describe('Kasir', () => {
 
 // ---------------------------------------------------------------------------
 describe('Hutang supplier', () => {
-  it('invoice supplier + cicilan; tidak boleh lebih dari sisa; gudang tidak bisa', async () => {
+  it('invoice supplier + cicilan; tidak boleh lebih dari sisa; gudang bisa lihat tapi tidak bisa bayar', async () => {
     const inv = await S.finance.collection('supplier_invoices').create({
       invoice_no: 'INV-LH-01', supplier: 'PT LINHUI', total_amount: 3465000, date: today(), due_date: '2026-11-05',
     });
-    await errorOf(S.gudang.collection('supplier_invoices').getOne(inv.id));
+    expect((await S.gudang.collection('supplier_invoices').getOne(inv.id)).invoice_no).toBe('INV-LH-01');
     await errorOf(post(S.gudang, '/api/palora/payment', { kind: 'supplier', invoice_id: inv.id, amount: 1 }));
     await post(S.finance, '/api/palora/payment', { kind: 'supplier', invoice_id: inv.id, amount: 1465000 });
     const err = await errorOf(post(S.finance, '/api/palora/payment', { kind: 'supplier', invoice_id: inv.id, amount: 2000001 }));
     expect(err.message).toMatch(/sisa hutang Rp 2\.000\.000/);
     await errorOf(S.finance.collection('supplier_invoices').update(inv.id, { paid_amount: 0 }));
+  });
+});
+
+
+describe('Map PO: 1 PO, beberapa surat jalan, invoice & faktur', () => {
+  let po;
+  beforeAll(async () => {
+    const p = await freshProduct('T-MAP', 0);
+    po = await S.gudang.collection('purchase_orders').create({
+      supplier: 'PT LINHUI', items: [{ productCode: p.code, name: p.name, qty: 20, price: 10000 }],
+    });
+    await post(S.gudang, '/api/palora/po/state', { po_id: po.id, state: 'dikirim' });
+    await post(S.gudang, '/api/palora/po/receive', { po_id: po.id, sj_no: 'LH-SJ-1', lines: [{ index: 0, good: 12 }] });
+    await post(S.gudang, '/api/palora/po/receive', { po_id: po.id, sj_no: 'LH-SJ-2', lines: [{ index: 0, good: 8 }] });
+  });
+
+  it('Mas Heri mencatat invoice yang datang; supplier & no. PO diambil dari PO', async () => {
+    const inv = await S.gudang.collection('supplier_invoices').create({
+      invoice_no: 'LH-INV-77', po_id: po.id, supplier: 'NAMA SALAH', total_amount: 200000, sj_nos: ['LH-SJ-1', 'LH-SJ-2'], tax_invoice_no: '040026001',
+    });
+    expect(inv).toMatchObject({ supplier: 'PT LINHUI', po_no: po.po_no, received_by: 'Mas Heri', paid_amount: 0 });
+    expect(inv.sj_nos).toEqual(['LH-SJ-1', 'LH-SJ-2']);
+  });
+
+  it('surat jalan dari PO lain ditolak', async () => {
+    const err = await errorOf(
+      S.gudang.collection('supplier_invoices').create({ invoice_no: 'LH-INV-78', po_id: po.id, total_amount: 1, sj_nos: ['SJ-PO-LAIN'] })
+    );
+    expect(err.message).toMatch(/SJ-PO-LAIN bukan milik/);
+  });
+
+  it('no. invoice yang sama dari supplier yang sama ditolak (anti dobel)', async () => {
+    const err = await errorOf(S.finance.collection('supplier_invoices').create({ invoice_no: 'LH-INV-77', po_id: po.id, total_amount: 5 }));
+    expect(err.message).toMatch(/sudah pernah dicatat/);
+  });
+
+  it('gudang tidak bisa mengubah total tagihan atau membayar; keuangan bisa', async () => {
+    const inv = await S.owner.collection('supplier_invoices').getFirstListItem('invoice_no = "LH-INV-77"');
+    await errorOf(S.gudang.collection('supplier_invoices').update(inv.id, { total_amount: 1 }));
+    await errorOf(post(S.gudang, '/api/palora/payment', { kind: 'supplier', invoice_id: inv.id, amount: 1000 }));
+    await post(S.finance, '/api/palora/payment', { kind: 'supplier', invoice_id: inv.id, amount: 200000 });
+    expect((await S.owner.collection('supplier_invoices').getOne(inv.id)).paid_amount).toBe(200000);
   });
 });
 
@@ -473,5 +518,201 @@ describe('Audit trail & hak akses', () => {
   it('nama di log diambil dari akun login', async () => {
     const rec = await S.gudang.collection('system_logs').create({ uid: 'LOG-T', user: 'Pak Yanto (Owner)', module: 'x', action: 'x' });
     expect(rec.user).toBe('Mas Heri (Admin Gudang & Kasir)');
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('Celah API biasa tertutup (kolom milik server)', () => {
+  it('pesanan: sisa, nilai uang & data marketplace tidak bisa diubah lewat REST', async () => {
+    const p = await freshProduct('T-SEC1', 50, { sell_price: 10000 });
+    const o = await S.gudang.collection('sales_orders').create({ customer: 'Sec', payment_type: 'Tempo 14 Hari', items: [line(p, 5)] });
+    const upd = await S.gudang.collection('sales_orders').update(o.id, {
+      remaining_amount: 0, dp_amount: 50000, subtotal: 1, tax_amount: 1, marketplace_order_no: 'X1', store: 'Shopee', notes: 'boleh',
+    });
+    expect(upd).toMatchObject({ remaining_amount: 50000, dp_amount: 0, subtotal: 50000, tax_amount: 0, marketplace_order_no: '', store: '', notes: 'boleh' });
+    const plus = await S.owner.send(`/api/collections/sales_orders/records/${o.id}`, { method: 'PATCH', body: { 'paid_amount+': 50000 } }).catch((e) => e);
+    expect((await S.owner.collection('sales_orders').getOne(o.id)).paid_amount).toBe(0);
+    expect(plus).toBeDefined();
+  });
+
+  it('barang: stok (termasuk modifier stock+) & kode tidak bisa diubah; arsip ditolak bila masih dipakai', async () => {
+    const p = await freshProduct('T-SEC2', 10);
+    await S.gudang.send(`/api/collections/products/records/${p.id}`, { method: 'PATCH', body: { 'stock+': 100 } }).catch(() => {});
+    expect(await stockOf('T-SEC2')).toBe(10);
+    const err = await errorOf(S.gudang.collection('products').update(p.id, { code: 'T-SEC2-BARU' }));
+    expect(err.message).toMatch(/Kode barang tidak bisa diganti/);
+    await S.gudang.collection('sales_orders').create({ customer: 'Pakai', items: [line(p, 1)] });
+    const busy = await errorOf(S.gudang.collection('products').update(p.id, { deleted: true }));
+    expect(busy.message).toMatch(/masih dipakai di INV\//);
+  });
+
+  it('qty pecahan ditolak dengan pesan jelas', async () => {
+    const p = await product(S.owner, 'T-SEC2');
+    const err = await errorOf(S.gudang.collection('sales_orders').create({ customer: 'Koma', items: [line(p, 1.5)] }));
+    expect(err.message).toMatch(/bilangan bulat/);
+  });
+
+  it('invoice supplier: gudang tidak bisa mengarsipkan; total tidak boleh di bawah yang sudah dibayar', async () => {
+    const inv = await S.gudang.collection('supplier_invoices').create({ invoice_no: 'INV-SEC-1', supplier: 'PT SEC', total_amount: 1000000, date: today() });
+    await errorOf(S.gudang.collection('supplier_invoices').update(inv.id, { deleted: true }));
+    await post(S.finance, '/api/palora/payment', { kind: 'supplier', invoice_id: inv.id, amount: 600000 });
+    const err = await errorOf(S.owner.collection('supplier_invoices').update(inv.id, { total_amount: 500000 }));
+    expect(err.message).toMatch(/lebih kecil dari yang sudah dibayar/);
+    await errorOf(S.owner.collection('supplier_invoices').update(inv.id, { deleted: true }));
+    await S.finance.collection('supplier_invoices').create({ invoice_no: 'INV-SEC-2', supplier: 'PT SEC', total_amount: 1, date: today() });
+    const dup = await errorOf(S.finance.collection('supplier_invoices').update(inv.id, { invoice_no: 'INV-SEC-2' }));
+    expect(dup.message).toMatch(/sudah pernah dicatat/);
+    expect((await S.owner.collection('supplier_invoices').getOne(inv.id)).deleted).toBe(false);
+  });
+
+  it('PO: total & status tidak bisa diubah langsung', async () => {
+    const p = await product(S.owner, 'T-SEC2');
+    const po = await S.gudang.collection('purchase_orders').create({ supplier: 'PT SEC', items: [line(p, 10, 5000)] });
+    const upd = await S.gudang.collection('purchase_orders').update(po.id, { total_amount: 1, status: 'Selesai', notes: 'ok' });
+    expect(upd).toMatchObject({ total_amount: 50000, state: 'draft', notes: 'ok' });
+  });
+
+  it('surat jalan: status diterima hanya lewat konfirmasi', async () => {
+    const p = await freshProduct('T-SEC3', 10);
+    const o = await S.gudang.collection('sales_orders').create({ customer: 'SJ', destination: 'Jl. X', items: [line(p, 2)] });
+    await post(S.finance, '/api/palora/payment', { kind: 'customer', order_id: o.id, amount: o.total_amount });
+    const { delivery } = await post(S.gudang, '/api/palora/orders/dispatch', { order_id: o.id, mode: 'kirim' });
+    await S.gudang.collection('deliveries').update(delivery.id, { status: 'diterima' }).catch(() => {});
+    expect((await S.owner.collection('deliveries').getOne(delivery.id)).status).toBe('dikirim');
+  });
+});
+
+describe('Pesanan tempo: barang diterima dulu, lunas belakangan', () => {
+  it('pelunasan setelah surat jalan diterima -> status selesai', async () => {
+    const p = await freshProduct('T-TMP', 10, { sell_price: 10000 });
+    const o = await S.gudang.collection('sales_orders').create({ customer: 'Tempo', destination: 'Jl. Y', payment_type: 'Tempo 30 Hari', items: [line(p, 4)] });
+    await post(S.owner, '/api/palora/orders/release', { order_id: o.id });
+    const { delivery } = await post(S.gudang, '/api/palora/orders/dispatch', { order_id: o.id, mode: 'kirim' });
+    await post(S.gudang, '/api/palora/deliveries/received', { delivery_id: delivery.id, received_by: 'Pak Andi' });
+    expect((await S.owner.collection('sales_orders').getOne(o.id)).status).toBe('dikirim');
+    const r = await post(S.finance, '/api/palora/payment', { kind: 'customer', order_id: o.id, amount: o.total_amount });
+    expect(r.order).toMatchObject({ status: 'selesai', remaining_amount: 0 });
+  });
+});
+
+describe('Opname dengan transaksi di tengah', () => {
+  it('penjualan antara menghitung & menyimpan tidak ikut dikembalikan', async () => {
+    const p = await freshProduct('T-OPS', 100);
+    // 09:00 dihitung: fisik 100, sistem 100. 10:00 terjual 10. 11:00 opname disimpan.
+    await post(S.gudang, '/api/palora/kasir/checkout', { items: [line(p, 10)], received_amount: 9999999 });
+    const sess = await post(S.gudang, '/api/palora/opname/apply', { lines: [{ product_id: p.id, counted: 100, system_at_count: 100 }] });
+    expect(sess.adjusted_count).toBe(0);
+    expect(await stockOf('T-OPS')).toBe(90);
+    // fisik kurang 2 dari saat dihitung -> stok terkini ikut dikurangi 2
+    await post(S.gudang, '/api/palora/opname/apply', { lines: [{ product_id: p.id, counted: 88, system_at_count: 90 }] });
+    expect(await stockOf('T-OPS')).toBe(88);
+  });
+});
+
+describe('PO: kurang, lebih & harga modal', () => {
+  it('terima lebih dari PO hanya dengan alasan; harga modal ikut harga PO', async () => {
+    const p = await freshProduct('T-POX', 0, { buy_price: 10000 });
+    const po = await S.gudang.collection('purchase_orders').create({ supplier: 'PT X', items: [line(p, 10, 12500)] });
+    await post(S.gudang, '/api/palora/po/state', { po_id: po.id, state: 'dikirim' });
+    const err = await errorOf(post(S.gudang, '/api/palora/po/receive', { po_id: po.id, sj_no: 'SJ-X1', lines: [{ index: 0, good: 12 }] }));
+    expect(err.message).toMatch(/isi alasan kelebihan/);
+    const r = await post(S.gudang, '/api/palora/po/receive', { po_id: po.id, sj_no: 'SJ-X1', lines: [{ index: 0, good: 12 }], over_reason: 'bonus supplier' });
+    expect(r.state).toBe('selesai');
+    expect(r.receipts[0].note).toMatch(/Kelebihan .* \+2: bonus supplier/);
+    expect(await stockOf('T-POX')).toBe(12);
+    expect((await product(S.owner, 'T-POX')).buy_price).toBe(12500);
+  });
+
+  it('PO yang sisanya tidak datang bisa ditutup dengan alasan', async () => {
+    const p = await product(S.owner, 'T-POX');
+    const po = await S.gudang.collection('purchase_orders').create({ supplier: 'PT X', items: [line(p, 10, 12500)] });
+    await post(S.gudang, '/api/palora/po/state', { po_id: po.id, state: 'dikirim' });
+    await errorOf(post(S.gudang, '/api/palora/po/state', { po_id: po.id, state: 'selesai', reason: 'x' })); // belum ada penerimaan
+    await post(S.gudang, '/api/palora/po/receive', { po_id: po.id, sj_no: 'SJ-X2', lines: [{ index: 0, good: 6 }] });
+    await errorOf(post(S.gudang, '/api/palora/po/state', { po_id: po.id, state: 'selesai' }));
+    const r = await post(S.gudang, '/api/palora/po/state', { po_id: po.id, state: 'selesai', reason: 'pabrik stop produksi' });
+    expect(r).toMatchObject({ state: 'selesai', status: 'Selesai (ditutup kurang)' });
+    expect(r.notes).toMatch(/Ditutup kurang: pabrik stop produksi \(.* kurang 4\)/);
+    await errorOf(post(S.gudang, '/api/palora/po/receive', { po_id: po.id, sj_no: 'SJ-X3', lines: [{ index: 0, good: 1 }] }));
+  });
+});
+
+describe('Kirim bertahap: 1 pesanan, beberapa surat jalan', () => {
+  it('mobil tidak muat: kirim 60 dulu, sisa 40 di surat jalan kedua', async () => {
+    const p = await freshProduct('T-BTH', 100, { sell_price: 10000 });
+    const o = await S.gudang.collection('sales_orders').create({ customer: 'Bertahap', destination: 'Jl. Z', items: [line(p, 100)] });
+    await post(S.finance, '/api/palora/payment', { kind: 'customer', order_id: o.id, amount: o.total_amount });
+    const r1 = await post(S.gudang, '/api/palora/orders/dispatch', { order_id: o.id, mode: 'kirim', lines: [{ index: 0, qty: 60 }] });
+    expect(r1).toMatchObject({ complete: false, order: { status: 'lunas' } });
+    expect(r1.delivery.items[0].qty).toBe(60);
+    expect(await stockOf('T-BTH')).toBe(40);
+    await errorOf(post(S.owner, '/api/palora/orders/cancel', { order_id: o.id, reason: 'x' }));
+    await errorOf(S.gudang.collection('sales_orders').update(o.id, { items: [line(p, 50)] }));
+    const over = await errorOf(post(S.gudang, '/api/palora/orders/dispatch', { order_id: o.id, mode: 'kirim', lines: [{ index: 0, qty: 41 }] }));
+    expect(over.message).toMatch(/melebihi sisa pesanan 40/);
+    const r2 = await post(S.gudang, '/api/palora/orders/dispatch', { order_id: o.id, mode: 'kirim' });
+    expect(r2).toMatchObject({ complete: true, order: { status: 'dikirim' } });
+    expect(r2.delivery.items[0].qty).toBe(40);
+    await post(S.gudang, '/api/palora/deliveries/received', { delivery_id: r1.delivery.id, received_by: 'A' });
+    expect((await S.owner.collection('sales_orders').getOne(o.id)).status).toBe('dikirim'); // SJ kedua belum diterima
+    await post(S.gudang, '/api/palora/deliveries/received', { delivery_id: r2.delivery.id, received_by: 'A' });
+    expect((await S.owner.collection('sales_orders').getOne(o.id)).status).toBe('selesai');
+  });
+});
+
+describe('Retur dari customer', () => {
+  let p;
+  let o;
+  beforeAll(async () => {
+    p = await freshProduct('T-RTR', 50, { sell_price: 10000 });
+    o = await S.gudang.collection('sales_orders').create({ customer: 'Retur', destination: 'Jl. R', items: [line(p, 10)] });
+    await post(S.finance, '/api/palora/payment', { kind: 'customer', order_id: o.id, amount: 100000 });
+    const r = await post(S.gudang, '/api/palora/orders/dispatch', { order_id: o.id, mode: 'kirim' });
+    await post(S.gudang, '/api/palora/deliveries/received', { delivery_id: r.delivery.id, received_by: 'B' });
+  });
+
+  it('retur rusak + uang kembali: gudang ditolak, Owner bisa; tagihan & kas menyesuaikan', async () => {
+    const body = { order_id: o.id, mode: 'refund', reason: 'retak', lines: [{ index: 0, qty: 2, condition: 'rusak' }] };
+    const err = await errorOf(post(S.gudang, '/api/palora/orders/return', body));
+    expect(err.message).toMatch(/pengembalian dana Rp 20\.000/);
+    const r = await post(S.owner, '/api/palora/orders/return', body);
+    expect(r.refund).toBe(20000);
+    expect(r.order).toMatchObject({ total_amount: 80000, paid_amount: 80000, remaining_amount: 0, status: 'selesai' });
+    expect(await stockOf('T-RTR')).toBe(40); // rusak tidak kembali ke stok
+    const refund = await S.owner.collection('payments').getFirstListItem(`order_id = "${o.id}" && kind = "refund"`);
+    expect(refund.amount).toBe(20000);
+    await errorOf(post(S.owner, '/api/palora/orders/return', { ...body, lines: [{ index: 0, qty: 9 }] })); // tinggal 8
+  });
+
+  it('ganti barang: barang baik masuk stok, baris dibuka lagi lalu dikirim ulang', async () => {
+    const r = await post(S.gudang, '/api/palora/orders/return', {
+      order_id: o.id, mode: 'ganti', reason: 'salah warna', lines: [{ index: 0, qty: 3, condition: 'baik' }],
+    });
+    expect(r.order).toMatchObject({ total_amount: 80000, status: 'lunas' });
+    expect(await stockOf('T-RTR')).toBe(43);
+    expect((await movementsOf('T-RTR')).at(-1)).toMatchObject({ type: 'RETUR', qty: 3 });
+    const d = await post(S.gudang, '/api/palora/orders/dispatch', { order_id: o.id, mode: 'kirim' });
+    expect(d.delivery.items[0].qty).toBe(3);
+    expect(await stockOf('T-RTR')).toBe(40);
+  });
+});
+
+describe('PO untuk pesanan customer & riwayat cetak', () => {
+  it('PO menyimpan pesanan tujuan dari data asli', async () => {
+    const p = await freshProduct('T-DRP', 0);
+    const o = await S.gudang.collection('sales_orders').create({ customer: 'Toko Langsung', items: [line(p, 5)] });
+    const po = await S.gudang.collection('purchase_orders').create({ supplier: 'PT D', items: [line(p, 5, 1000)], for_orders: [{ id: o.id, customer: 'palsu' }] });
+    expect(po.for_orders).toEqual([{ id: o.id, order_no: o.order_no, customer: 'Toko Langsung' }]);
+    await errorOf(S.gudang.collection('purchase_orders').update(po.id, { for_orders: [{ id: 'tidakada123456' }] }));
+    const found = await S.gudang.collection('purchase_orders').getList(1, 5, { filter: `for_orders ~ '"${o.id}"'` });
+    expect(found.totalItems).toBe(1);
+  });
+
+  it('cetak tercatat di riwayat dokumen', async () => {
+    const o = (await S.owner.collection('sales_orders').getList(1, 1)).items[0];
+    await post(S.finance, '/api/palora/printed', { collection: 'sales_orders', id: o.id, doc: 'Nota' });
+    const a = await S.owner.collection('audit_trail').getFirstListItem(`record_id = "${o.id}" && action = "print"`);
+    expect(a.actor_name).toMatch(/Keuangan/);
+    await errorOf(post(S.finance, '/api/palora/printed', { collection: 'users', id: o.id }));
   });
 });

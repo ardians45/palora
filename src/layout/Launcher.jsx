@@ -5,6 +5,7 @@ import { href } from '../lib/router';
 import { useSession } from '../lib/session';
 import { today } from '../lib/format';
 import { MODULES } from '../modules/registry';
+import { RECEIVABLE_FILTER } from '../lib/status';
 import { Input } from '../ui/core';
 import { Topbar } from './Shell';
 
@@ -20,7 +21,7 @@ function useCounts(role) {
       sjJalan: ['deliveries', 'status = "dikirim"'],
     };
     if (role === 'owner' || role === 'finance') {
-      queries.piutangLewat = ['sales_orders', `remaining_amount > 0 && status != "batal" && due_date != "" && due_date < "${t}"`];
+      queries.piutangLewat = ['sales_orders', `${RECEIVABLE_FILTER} && due_date != "" && due_date < "${t}"`];
       queries.hutangLewat = ['supplier_invoices', `deleted = false && paid_amount < total_amount && due_date != "" && due_date < "${t}"`];
     }
     const run = () =>

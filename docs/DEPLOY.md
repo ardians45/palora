@@ -42,32 +42,87 @@ Foto barang bisa dipasang ulang kapan saja ke server mana pun: `npm run photos -
 
 Yang dibutuhkan di PC gudang: **tidak perlu install Node.js**, cukup folder `backend/`.
 
-**Di laptop developer** (sekali):
-```bash
-npm install
-npm run setup
-npm run build:server
-```
+**Di laptop developer** (sekali): siapkan database produksi yang bersih (tanpa data uji coba).
+1. Matikan `npm run backend` / `npm run dev` bila sedang jalan.
+2. Ganti nama folder `backend\pb_data` → `backend\pb_data-dev` (database uji coba disimpan, tidak ikut ke gudang).
+3. Salin `backend\.env.example` → `backend\.env`, ganti **semua password** dengan yang kuat.
+4. Jalankan:
+   ```bash
+   npm install
+   npm run setup
+   npm run build:server
+   ```
 Hasilnya folder `backend/` berisi `pocketbase.exe`, `pb_data` (database + akun), `pb_public` (aplikasi),
-`pb_migrations`, `pb_hooks`, dan `windows/`.
+`pb_migrations`, `pb_hooks`, dan `windows/`. (`pb_data-dev`, `seed/`, `.env` tidak perlu dicopy.)
 
 **Di PC gudang:**
-1. Copy seluruh folder `backend/` ke misalnya `C:\PALORA\`.
-2. Klik dua kali `C:\PALORA\windows\jalankan-palora.bat`. Kalau Windows Firewall bertanya, pilih **Allow** (Private network).
+1. Copy folder `backend/` (lewat flashdisk) ke `C:\PALORA\`.
+2. Klik kanan `C:\PALORA\windows\pasang-autostart.bat` → **Run as administrator**.
+   Server langsung menyala, menyala otomatis setiap PC dihidupkan (walau belum login, tanpa jendela),
+   restart sendiri bila berhenti, dan port 8090 dibuka di firewall untuk jaringan Private.
+   (`jalankan-palora.bat` hanya untuk percobaan manual; jangan dijalankan bersamaan.)
 3. Cari IP PC gudang (`ipconfig` → IPv4, misal `192.168.1.10`). Sebaiknya di-set IP statis di router.
+   Pastikan jaringan WiFi/LAN gudang di Windows bertipe **Private**.
 4. Dari komputer/HP lain di WiFi gudang buka `http://192.168.1.10:8090`.
 
-**Supaya otomatis nyala saat PC dihidupkan:** Task Scheduler → *Create Basic Task* →
-Trigger *When the computer starts* → Action *Start a program* → pilih `jalankan-palora.bat`.
+### Memindahkan tunnel dari laptop ke PC gudang
 
-**Akses dari luar gudang (HP Pak De):** pilih salah satu
-- **Cloudflare Tunnel** (gratis, perlu domain): install `cloudflared` di PC gudang, buat tunnel ke `http://localhost:8090`.
-- **Tailscale** (gratis, tanpa domain): install Tailscale di PC gudang & HP Pak De, buka `http://<nama-pc>:8090`.
+Satu tunnel boleh punya beberapa "connector". Kalau laptop dan PC gudang **sama-sama** menyala dengan
+token yang sama, pengunjung dibagi acak ke dua database berbeda. Jadi urutannya:
+
+1. Pastikan PALORA di PC gudang sudah jalan (`http://localhost:8090` terbuka di PC gudang).
+2. Di PC gudang: `C:\PALORA\windows\pasang-tunnel.bat <TOKEN>` (token yang sama, ambil lagi di
+   Zero Trust → Networks → Tunnels → tunnel Anda → *Configure*).
+3. Cek di dashboard tunnel → tab **Connectors**: sekarang ada 2 (laptop & PC gudang).
+4. **Di laptop**, matikan connector-nya:
+   - bila dipasang sebagai service (Command Prompt *Run as administrator*): `cloudflared service uninstall`
+   - bila dijalankan di terminal (`cloudflared tunnel run ...`): tutup terminalnya.
+5. Dashboard **Connectors** tinggal 1 (nama PC gudang). Buka `https://palora.paletindo.id` dari HP pakai data seluler.
+
+Public Hostname (`palora.paletindo.id` → `localhost:8090`) tidak perlu diubah karena `localhost` dibaca
+dari sisi komputer yang menjalankan connector.
+
+### Akses dari internet dengan subdomain `palora.paletindo.id` (Cloudflare Tunnel, gratis)
+
+Tidak perlu IP publik, tidak perlu buka port router, HTTPS otomatis.
+
+**1. Pindahkan pengelolaan DNS paletindo.id ke Cloudflare** (sekali, gratis)
+1. Daftar di [dash.cloudflare.com](https://dash.cloudflare.com) → **Add a domain** → `paletindo.id` → paket **Free**.
+2. Cloudflare memindai record DNS lama (website, email/MX). **Cocokkan dengan record di registrar lama** —
+   pastikan record website & email ikut, supaya website paletindo.id dan email tidak mati.
+3. Di panel registrar tempat paletindo.id dibeli, ganti **nameserver** ke 2 nameserver dari Cloudflare.
+   Aktif dalam beberapa menit sampai 24 jam. (Butuh akses dari pengelola website paletindo.id.)
+
+**2. Buat tunnel**
+1. Cloudflare → **Zero Trust** → **Networks → Tunnels** → **Create a tunnel** → tipe *Cloudflared* → nama `palora-gudang`.
+2. Pilih Windows, salin **token** (teks panjang setelah `service install`).
+3. Di PC gudang, klik kanan `C:\PALORA\windows\pasang-tunnel.bat` → *Run as administrator* lewat Command Prompt:
+   ```bash
+   C:\PALORA\windows\pasang-tunnel.bat <TOKEN>
+   ```
+4. Kembali ke dashboard tunnel → **Public Hostname → Add**:
+   Subdomain `palora` · Domain `paletindo.id` · Service **HTTP** · URL `localhost:8090` → Save.
+5. Buka `https://palora.paletindo.id` dari HP (pakai data seluler, bukan WiFi gudang).
+
+**3. Amankan dashboard admin** (disarankan)
+Zero Trust → **Access → Applications → Add** → Self-hosted → domain `palora.paletindo.id`, path `_/` →
+policy *Emails*: email Owner. Dashboard database (`/_/`) jadi hanya bisa dibuka Owner (kode OTP lewat email).
+Aplikasi PALORA biasa tetap dibuka dengan login akun masing-masing.
+
+**Agar selalu online**
+- Power Options: *Sleep = Never*, matikan "Turn off hard disk".
+- BIOS: aktifkan *Restore on AC Power Loss = Power On* (PC menyala sendiri setelah listrik padam). UPS sangat disarankan.
+- Server otomatis lewat `pasang-autostart.bat`, tunnel otomatis lewat `pasang-tunnel.bat` (Windows Service).
+  Cek: Task Scheduler → *PALORA Server* (Running) dan `services.msc` → *Cloudflared agent* (Running).
+- Bila internet gudang mati: dari dalam gudang tetap bisa dibuka lewat `http://<IP-PC-gudang>:8090`.
+
+**Alternatif tanpa domain:** Tailscale (gratis): install di PC gudang & HP Pak De, buka `http://<nama-pc>:8090`.
 
 **Backup:**
 - Otomatis: buka `http://localhost:8090/_/` → *Settings → Backups* → aktifkan jadwal harian.
   Bisa juga diarahkan ke penyimpanan S3/Cloudflare R2.
-- Manual: matikan server, lalu jalankan `windows\backup-palora.bat` (zip ke folder `backups\`).
+- Manual: matikan server (`schtasks /end /tn "PALORA Server"` sebagai administrator), jalankan
+  `windows\backup-palora.bat` (zip ke folder `backups\`), lalu `schtasks /run /tn "PALORA Server"`.
 
 ## Pindah dari cloud ke server gudang (atau sebaliknya)
 
@@ -80,4 +135,5 @@ Selesai. Semua akun, data, dan file ikut pindah.
 
 - **Cloud:** push ke GitHub, Railway otomatis build ulang. Migrasi skema jalan otomatis saat start.
 - **Server gudang:** `npm run build:server` di laptop, lalu copy ulang folder `pb_public`, `pb_migrations`,
-  `pb_hooks` ke PC gudang (**jangan** timpa `pb_data`). Restart `jalankan-palora.bat`.
+  `pb_hooks` ke PC gudang (**jangan** timpa `pb_data`). Restart server sebagai administrator:
+  `schtasks /end /tn "PALORA Server"` lalu `schtasks /run /tn "PALORA Server"`.

@@ -49,6 +49,7 @@ export const MOVEMENT_TYPE = {
   OUT: { label: 'Keluar', tone: 'info' },
   OPNAME: { label: 'Opname', tone: 'warn' },
   ADJUSTMENT: { label: 'Koreksi', tone: 'neutral' },
+  RETUR: { label: 'Retur', tone: 'warn' },
 };
 
 /** Status tagihan berdasarkan jatuh tempo */
@@ -71,3 +72,22 @@ export function payableStatus(inv) {
 }
 
 export const ROLE_LABEL = { owner: 'Owner', gudang: 'Admin Gudang & Kasir', finance: 'Keuangan' };
+
+// Pesanan yang belum dibayar sama sekali: nota/invoice belum terbit (alur lama: dokumen resmi muncul setelah DP),
+// yang dicetak/dikirim hanya "Konfirmasi Pesanan".
+export const isOrderConfirmation = (o) => o.channel === 'pesanan' && o.status === 'baru' && !(o.paid_amount > 0);
+
+// Pesanan yang sudah "jadi" (ada DP, diizinkan keluar, atau barang sudah keluar). Pesanan baru tanpa DP
+// belum dihitung sebagai omzet maupun piutang (masih konfirmasi pesanan).
+export const ORDER_COMMITTED = '(status != "baru" || paid_amount > 0 || release_approved = true)';
+export const RECEIVABLE_FILTER = `remaining_amount > 0 && status != "batal" && ${ORDER_COMMITTED}`;
+
+// Qty barang yang sudah keluar per baris pesanan (data lama tanpa sentQty: semua keluar bila status sudah keluar)
+export const sentOf = (o, it) =>
+  it.sentQty !== undefined && it.sentQty !== null ? Number(it.sentQty) || 0 : ['dikirim', 'diambil', 'selesai'].includes(o.status) ? Number(it.qty) || 0 : 0;
+export const shipProgress = (o) => {
+  const items = o.items || [];
+  const any = items.some((it) => sentOf(o, it) > 0);
+  const all = items.length > 0 && items.every((it) => sentOf(o, it) >= Number(it.qty));
+  return { any, all, partial: any && !all };
+};

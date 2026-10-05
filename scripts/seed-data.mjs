@@ -25,7 +25,9 @@ export const productRecord = (p) => ({
   factory: p.factory || '',
   stock: Math.max(0, Math.round(Number(p.stock) || 0)),
   unit: p.unit || 'pcs',
-  min_stock: Number(p.minStock) || 0,
+  // Excel klien tidak punya stok minimum (angka 5 di data lama hanya isian otomatis untuk semua barang),
+  // jadi dikosongkan: Owner mengisi sendiri untuk barang yang laku, supaya peringatan "menipis" berarti.
+  min_stock: 0,
   buy_price: Number(p.buyPrice) || 0,
   sell_price: Number(p.sellPrice) || 0,
   location: p.location || '',

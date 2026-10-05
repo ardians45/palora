@@ -174,6 +174,7 @@ function cleanItems(items, opts) {
     const price = Number(it.price);
     const label = it.name || it.productCode || "baris " + (i + 1);
     if (!isFinite(qty) || qty <= 0) throw new BadRequestError("Qty " + label + " harus lebih dari 0.");
+    if (Math.floor(qty) !== qty) throw new BadRequestError("Qty " + label + " harus bilangan bulat (tanpa koma).");
     if (!isFinite(price) || price < 0) throw new BadRequestError("Harga " + label + " tidak valid.");
     if (opts.requireCode && !it.productCode) throw new BadRequestError("Kode barang " + label + " belum dipilih.");
     const out = {
@@ -269,7 +270,56 @@ function statusAfterPayment(order, minDpPercent) {
   return "baru";
 }
 
+/** Qty barang yang sudah keluar untuk satu baris pesanan (data lama tanpa sentQty: semua keluar bila status sudah keluar). */
+function sentQty(status, it) {
+  if (it.sentQty !== undefined && it.sentQty !== null) return Number(it.sentQty) || 0;
+  return ["dikirim", "diambil", "selesai"].indexOf(status) !== -1 ? Number(it.qty) || 0 : 0;
+}
+
+function allSent(status, items) {
+  return items.every((it) => sentQty(status, it) >= Number(it.qty));
+}
+
+/**
+ * Status pesanan setelah barang keluar / surat jalan diterima / pembayaran, untuk pesanan yang semua barangnya sudah keluar:
+ * - masih ada surat jalan belum diterima -> dikirim
+ * - semua diterima/diambil & lunas -> selesai
+ * - belum lunas -> dikirim (ada surat jalan) atau diambil (semua diambil sendiri)
+ */
+function statusAfterOut(txApp, order) {
+  const deliveries = txApp.findRecordsByFilter("deliveries", "order_id = {:o}", "", 0, 0, { o: order.id });
+  const pending = deliveries.some((d) => d.getString("status") !== "diterima");
+  const paid = order.getFloat("paid_amount") >= order.getFloat("total_amount");
+  if (pending) return "dikirim";
+  if (paid) return "selesai";
+  return deliveries.length > 0 ? "dikirim" : "diambil";
+}
+
+/** PO untuk pesanan customer: [{id}] -> [{id, order_no, customer}] dari data pesanan asli. */
+function normalizeForOrders(app, record) {
+  const list = getJSON(record, "for_orders") || [];
+  const seen = {};
+  const out = [];
+  list.forEach((x) => {
+    const id = String((x && x.id) || x || "");
+    if (!id || seen[id]) return;
+    seen[id] = true;
+    let o;
+    try {
+      o = app.findRecordById("sales_orders", id);
+    } catch (_) {
+      throw new BadRequestError("Pesanan customer yang dipilih tidak ditemukan.");
+    }
+    out.push({ id: o.id, order_no: o.getString("order_no"), customer: o.getString("customer") });
+  });
+  record.set("for_orders", out);
+}
+
 module.exports = {
+  normalizeForOrders,
+  sentQty,
+  allSent,
+  statusAfterOut,
   ROLE_LABEL,
   actorLabel,
   actorName,

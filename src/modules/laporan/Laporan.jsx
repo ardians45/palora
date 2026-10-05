@@ -6,7 +6,7 @@ import { useRecords } from '../../lib/data';
 import { replaceQuery, useRoute } from '../../lib/router';
 import { useSession } from '../../lib/session';
 import { date, num, rp, today } from '../../lib/format';
-import { CHANNEL_LABEL } from '../../lib/status';
+import { CHANNEL_LABEL, ORDER_COMMITTED, RECEIVABLE_FILTER } from '../../lib/status';
 import { Button, Field, Input, Kpi, PageHeader, Panel, Select } from '../../ui/core';
 import DataTable from '../../ui/DataTable';
 
@@ -28,9 +28,9 @@ export default function Laporan() {
   const [from, to] = preset === 'custom' ? [query.from || today(-30), query.to || today()] : presetRange(preset);
   const range = `date >= "${from}" && date <= "${to}"`;
 
-  const orders = useRecords('sales_orders', { filter: `${range} && status != "batal"`, sort: 'date' });
+  const orders = useRecords('sales_orders', { filter: `${range} && status != "batal" && ${ORDER_COMMITTED}`, sort: 'date' });
   const payments = useRecords('payments', { filter: range, sort: 'date' });
-  const openOrders = useRecords('sales_orders', { filter: 'remaining_amount > 0 && status != "batal"' });
+  const openOrders = useRecords('sales_orders', { filter: RECEIVABLE_FILTER });
   const invoices = useRecords('supplier_invoices', { filter: 'deleted = false' });
 
   const stats = useMemo(() => {
@@ -53,7 +53,10 @@ export default function Laporan() {
         byProduct.set(k, p);
       }
     }
-    const cashIn = payments.items.filter((p) => p.kind === 'customer').reduce((s, p) => s + p.amount, 0);
+    // kas masuk bersih: pembayaran customer dikurangi dana retur yang dikembalikan
+    const cashIn =
+      payments.items.filter((p) => p.kind === 'customer').reduce((s, p) => s + p.amount, 0) -
+      payments.items.filter((p) => p.kind === 'refund').reduce((s, p) => s + p.amount, 0);
     const cashOut = payments.items.filter((p) => p.kind === 'supplier').reduce((s, p) => s + p.amount, 0);
     const omzet = orders.items.reduce((s, o) => s + o.total_amount, 0);
     const receivable = openOrders.items.reduce((s, o) => s + o.remaining_amount, 0);

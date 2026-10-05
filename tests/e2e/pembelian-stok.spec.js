@@ -130,3 +130,70 @@ test('Marketplace: laporan Shopee -> cocokkan SKU -> potong stok; upload ulang d
   await expect(page.getByText('SKU marketplace belum dikenal')).toHaveCount(0);
   await expect(page.getByRole('button', { name: /^Import 0 pesanan/ })).toBeDisabled();
 });
+
+test('Map PO: 2 surat jalan -> Mas Heri catat invoice+faktur yang datang -> Bude bayar -> map lengkap', async ({ page }) => {
+  // PO dengan 2 kali pengambilan (mobil tidak muat), disiapkan lewat API
+  const g = await api('gudang');
+  const p = await g.collection('products').getFirstListItem('code = "PLT-0011"');
+  const po = await g.collection('purchase_orders').create({
+    supplier: 'PT FUTARI PLASTIK INDONESIA', up_person: 'Pak Hendra',
+    items: [{ productCode: p.code, name: p.name, qty: 2000, price: 26000 }],
+  });
+  await g.send('/api/palora/po/state', { method: 'POST', body: { po_id: po.id, state: 'dikirim' } });
+  for (const [sj, qty] of [['FTR-SJ-A', 1000], ['FTR-SJ-B', 1000]]) {
+    await g.send('/api/palora/po/receive', { method: 'POST', body: { po_id: po.id, sj_no: sj, lines: [{ index: 0, good: qty }] } });
+  }
+
+  // Mas Heri menerima invoice + faktur yang diantar orang supplier, difoto, simpan ke PO-nya
+  await login(page, 'gudang');
+  await page.goto(`/#/pembelian/${po.id}`);
+  await expect(page.locator('.check-item.on', { hasText: 'Surat jalan (2)' })).toBeVisible();
+  await expect(page.locator('.check-item', { hasText: 'Invoice (0)' })).not.toHaveClass(/on/);
+  await page.getByRole('button', { name: 'Catat Invoice / Faktur Datang' }).click();
+  const dlg = page.getByRole('dialog');
+  await dlg.getByLabel('No. invoice').fill('FTR-INV-501');
+  await dlg.getByLabel('Total tagihan').fill('52000000');
+  await dlg.getByLabel('No. faktur pajak').fill('04002600191092999');
+  const files = dlg.locator('input[type=file]');
+  await files.nth(0).setInputFiles({ name: 'invoice.pdf', mimeType: 'application/pdf', buffer: PDF });
+  await files.nth(1).setInputFiles({ name: 'faktur.pdf', mimeType: 'application/pdf', buffer: PDF });
+  await expect(dlg.getByLabel('FTR-SJ-A', { exact: false })).toBeChecked();
+  await dlg.getByRole('button', { name: 'Simpan' }).click();
+  await expect(toast(page)).toContainText(`map ${po.po_no}`);
+
+  // timeline map berurutan: PO -> SJ 1 -> SJ 2 -> invoice -> faktur
+  const tl = page.locator('.timeline li b');
+  await expect(tl).toHaveText([
+    `${po.po_no} dibuat`,
+    'Surat jalan 1: FTR-SJ-A',
+    'Surat jalan 2: FTR-SJ-B',
+    'Invoice FTR-INV-501',
+    'Faktur pajak 04002600191092999',
+  ]);
+  await expect(page.locator('.check-item.on', { hasText: 'Invoice (1)' })).toBeVisible();
+  await expect(page.locator('.check-item.on', { hasText: 'Faktur pajak' })).toBeVisible();
+  await expect(page.locator('.check-item', { hasText: 'Lunas' })).toContainText('sisa Rp 52.000.000');
+  // kontak supplier + tombol minta kirim ulang dokumen
+  await expect(page.getByRole('link', { name: 'Minta invoice/faktur' })).toHaveAttribute('href', /wa\.me\/.*text=.*FTR-SJ-A/);
+
+  // Bude membayar lunas dari menu Hutang
+  await page.getByRole('button', { name: 'Keluar', exact: true }).click();
+  await login(page, 'finance');
+  await page.goto('/#/hutang');
+  await page.getByRole('cell', { name: 'FTR-INV-501' }).click();
+  await page.getByRole('button', { name: 'Catat Pembayaran' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Simpan Pembayaran' }).click();
+  await expect(page.getByText('Lunas').first()).toBeVisible();
+
+  // map PO sekarang lengkap & muncul di filter Arsip "Lengkap & lunas"
+  await page.goto(`/#/pembelian/${po.id}`);
+  await expect(page.locator('.check-item.on', { hasText: 'Lunas' })).toBeVisible();
+  await expect(page.locator('.timeline li b').last()).toHaveText('Bayar Rp 52.000.000');
+  await page.goto('/#/arsip?f=lengkap');
+  await expect(page.getByRole('cell', { name: po.po_no })).toBeVisible();
+
+  // lembar sampul map untuk dicetak & ditempel di map kertas
+  await page.goto(`/#/cetak/map-po/${po.id}?preview=1`);
+  const sheet = page.locator('.paper');
+  for (const t of ['MAP DOKUMEN', 'FTR-SJ-A', 'FTR-SJ-B', 'FTR-INV-501', '04002600191092999', 'Sisa hutang']) await expect(sheet).toContainText(t);
+});

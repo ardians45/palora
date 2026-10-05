@@ -1,19 +1,22 @@
 // PO ke supplier: meniru "PO 37.xlsx" (No · Tipe · Ukuran · Warna · Harga · Qty · Jumlah),
 // penerimaan barang bertahap (1 PO bisa beberapa surat jalan), foto SJ supplier.
 import React, { useMemo, useState } from 'react';
-import { Ban, Mail, MessageCircle, PackageCheck, Pencil, Plus, Printer, Save, Send } from 'lucide-react';
+import { Ban, CircleSlash, FileText, FolderOpen, Mail, MessageCircle, PackageCheck, Pencil, Plus, Printer, Save, Send } from 'lucide-react';
 import { pb } from '../../lib/pb';
-import { action, fileUrl, useRecord, useRecords, q } from '../../lib/data';
+import { action, fileUrl, useRecord, useRecords } from '../../lib/data';
 import { href, navigate, replaceQuery, useRoute } from '../../lib/router';
 import { useSession } from '../../lib/session';
 import { date, num, rp, today, waLink } from '../../lib/format';
 import { PO_STATUS, PO_STEPS } from '../../lib/status';
-import { Button, DescList, Empty, ErrorBox, Field, FilePick, Input, LinkButton, Loading, PageHeader, Panel, StatusBadge, Steps, Tabs, Textarea } from '../../ui/core';
+import { Button, DescList, Empty, ErrorBox, Field, FilePick, Input, LinkButton, Loading, PageHeader, Panel, Select, StatusBadge, Steps, Tabs, Textarea } from '../../ui/core';
 import DataTable, { matchText } from '../../ui/DataTable';
+import DateRange from '../../ui/DateRange';
 import LineItems, { lineTotal, validateLines } from '../../ui/LineItems';
 import Activity from '../../ui/Activity';
 import { ReasonDialog } from '../../ui/PaymentDialog';
 import { Dialog, useConfirm, useToast } from '../../ui/feedback';
+import { InvoiceDialog } from '../keuangan/Hutang';
+import { PayableSummary, PoChecklist, PoTimeline, SupplierContact, usePoFolder } from './POFolder';
 
 const progress = (po) => {
   const items = po.items || [];
@@ -29,8 +32,10 @@ export function POList() {
   const { can } = useSession();
   const tab = query.tab || 'semua';
   const search = query.q || '';
+  const from = query.from || '';
+  const to = query.to || '';
   const { items, loading, error, reload } = useRecords('purchase_orders', { filter: 'deleted = false', sort: '-date,-created' });
-  const base = items.filter((po) => matchText(po, search, ['po_no', 'supplier', 'notes', (po) => (po.items || []).map((i) => `${i.productCode} ${i.name}`).join(' ')]));
+  const base = items.filter((po) => (!from || po.date >= from) && (!to || po.date <= to) && matchText(po, search, ['po_no', 'supplier', 'notes', (po) => (po.items || []).map((i) => `${i.productCode} ${i.name}`).join(' ')]));
   const tests = {
     semua: () => true,
     draft: (po) => poState(po) === 'draft',
@@ -55,6 +60,7 @@ export function POList() {
       />
       <div className="table-tools">
         <Input className="search" type="search" placeholder="Cari no. PO, supplier, barang..." value={search} onChange={(e) => replaceQuery({ ...query, q: e.target.value })} aria-label="Cari PO" />
+        <DateRange query={query} />
       </div>
       <Tabs
         tabs={[
@@ -121,7 +127,10 @@ function POFormInner({ existing }) {
     expected_date: existing?.expected_date || '',
     notes: existing?.notes || '',
     items: existing?.items || [],
+    for_orders: existing?.for_orders || [],
   }));
+  // pesanan customer yang masih menunggu barang (untuk barang yang langsung dikirim dari supplier ke customer)
+  const openOrders = useRecords('sales_orders', { filter: 'channel = "pesanan" && (status = "baru" || status = "dp" || status = "lunas")', sort: '-created' });
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const set = (patch) => setF((x) => ({ ...x, ...patch }));
@@ -139,7 +148,7 @@ function POFormInner({ existing }) {
     if (!f.supplier.trim()) return setErr('Supplier wajib diisi. 1 PO = 1 supplier.');
     const lineErr = validateLines(f.items);
     if (lineErr) return setErr(lineErr);
-    const body = { ...f, items: f.items.map((it) => ({ ...it, qty: Number(it.qty), price: Number(it.price) })) };
+    const body = { ...f, for_orders: f.for_orders.map((o) => ({ id: o.id })), items: f.items.map((it) => ({ ...it, qty: Number(it.qty), price: Number(it.price) })) };
     setBusy(true);
     try {
       const rec = existing ? await pb.collection('purchase_orders').update(existing.id, body) : await pb.collection('purchase_orders').create(body);
@@ -198,6 +207,37 @@ function POFormInner({ existing }) {
           <span className="grand right">{rp(lineTotal(f.items))}</span>
         </div>
       </Panel>
+      <Panel title="Untuk pesanan customer (opsional)">
+        <p className="small muted mb-2">Isi bila barang PO ini langsung dikirim ke customer tanpa disimpan di gudang. Setelah barang diterima, keluarkan dari halaman pesanannya.</p>
+        <div className="chips">
+          {f.for_orders.map((o) => (
+            <span key={o.id} className="chip">
+              {o.order_no} · {o.customer}
+              <button type="button" aria-label={`Hapus ${o.order_no}`} onClick={() => set({ for_orders: f.for_orders.filter((x) => x.id !== o.id) })}>
+                ×
+              </button>
+            </span>
+          ))}
+          <Select
+            className="w-md"
+            value=""
+            onChange={(e) => {
+              const o = openOrders.items.find((x) => x.id === e.target.value);
+              if (o) set({ for_orders: [...f.for_orders, { id: o.id, order_no: o.order_no, customer: o.customer }] });
+            }}
+            aria-label="Tambah pesanan customer"
+          >
+            <option value="">+ Pilih pesanan customer...</option>
+            {openOrders.items
+              .filter((o) => !f.for_orders.some((x) => x.id === o.id))
+              .map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.order_no} · {o.customer}
+                </option>
+              ))}
+          </Select>
+        </div>
+      </Panel>
       <Panel title="Lainnya">
         <div className="form-grid">
           <Field label="Perkiraan barang siap">
@@ -214,13 +254,14 @@ function POFormInner({ existing }) {
 
 export function PODoc({ id }) {
   const { item: po, loading, error, reload } = useRecord('purchase_orders', id);
-  const docs = useRecords('documents', { filter: po ? `ref_no = ${q(po.po_no)} && deleted = false` : '', enabled: !!po });
+  const folder = usePoFolder(po);
   const { settings, can } = useSession();
   const toast = useToast();
   const confirm = useConfirm();
   const [dlg, setDlg] = useState(null);
   if (loading && !po) return <Loading />;
   if (error || !po) return <ErrorBox error={error} onRetry={reload} />;
+  if (!folder) return <Loading />;
 
   const st = poState(po);
   const editable = can('owner', 'gudang');
@@ -292,8 +333,16 @@ export function PODoc({ id }) {
               Terima Barang
             </Button>
           )}
+          {st !== 'draft' && st !== 'batal' && (
+            <Button variant={st === 'selesai' && folder.invoices.length === 0 ? 'primary' : undefined} icon={FileText} onClick={() => setDlg('invoice')}>
+              Catat Invoice / Faktur Datang
+            </Button>
+          )}
           <Button icon={Printer} onClick={() => window.open(href(['cetak', 'po', po.id]), '_blank')}>
             Cetak PO
+          </Button>
+          <Button icon={FolderOpen} onClick={() => window.open(href(['cetak', 'map-po', po.id]), '_blank')}>
+            Cetak Lembar Map
           </Button>
           {editable && st !== 'batal' && (
             <>
@@ -315,6 +364,11 @@ export function PODoc({ id }) {
               Ubah
             </LinkButton>
           )}
+          {editable && st === 'sebagian' && (
+            <Button icon={CircleSlash} onClick={() => setDlg('close')}>
+              Tutup PO (sisa tidak datang)
+            </Button>
+          )}
           {editable && ['draft', 'dikirim'].includes(st) && (
             <Button variant="danger" icon={Ban} onClick={() => setDlg('cancel')}>
               Batalkan
@@ -323,6 +377,7 @@ export function PODoc({ id }) {
         </div>
         <Steps steps={PO_STEPS} current={st} exception={st === 'batal' ? 'Dibatalkan' : null} />
       </div>
+      {st !== 'batal' && <PoChecklist po={po} folder={folder} />}
       <div className="doc-layout">
         <div className="stack">
           <div className="sheet">
@@ -376,7 +431,11 @@ export function PODoc({ id }) {
             {po.notes && <p className="mt-3 small muted">Catatan: {po.notes}</p>}
           </div>
 
-          <Panel title={`Penerimaan barang (${(po.receipts || []).length} surat jalan)`} bodyClass="">
+          <Panel title="Isi map PO (urut tanggal)" bodyClass="">
+            <PoTimeline po={po} folder={folder} />
+          </Panel>
+
+          <Panel title={`Surat jalan & barang diterima (${(po.receipts || []).length} surat jalan)`} bodyClass="">
             {(po.receipts || []).length === 0 ? (
               <div className="empty">Belum ada barang diterima.</div>
             ) : (
@@ -392,7 +451,7 @@ export function PODoc({ id }) {
                 </thead>
                 <tbody>
                   {po.receipts.map((r, i) => {
-                    const doc = docs.items.find((d) => d.id === r.docId);
+                    const doc = folder.docs.find((d) => d.id === r.docId);
                     return (
                       <tr key={i}>
                         <td className="mono">{r.sjNo}</td>
@@ -410,11 +469,49 @@ export function PODoc({ id }) {
             )}
           </Panel>
         </div>
-        <Panel title="Riwayat" bodyClass="">
-          <Activity recordIds={po.id} />
-        </Panel>
+        <div className="stack">
+          {(po.for_orders || []).length > 0 && (
+            <Panel title="Untuk pesanan customer" bodyClass="">
+              <table className="dt">
+                <tbody>
+                  {po.for_orders.map((o) => (
+                    <tr key={o.id} className="clickable" onClick={() => navigate(['penjualan', o.id])}>
+                      <td className="mono">{o.order_no}</td>
+                      <td>{o.customer}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {(po.receipts || []).length > 0 && (
+                <p className="small muted panel-note">Barang sudah diterima: buka pesanannya lalu "Keluarkan Barang" untuk kirim ke customer.</p>
+              )}
+            </Panel>
+          )}
+          <Panel title="Kontak supplier">
+            <SupplierContact po={po} folder={folder} />
+          </Panel>
+          <Panel title="Hutang PO ini">
+            <PayableSummary folder={folder} />
+          </Panel>
+          <Panel title="Riwayat" bodyClass="">
+            <Activity recordIds={[po.id, ...folder.invoices.map((i) => i.id)]} />
+          </Panel>
+        </div>
       </div>
       {dlg === 'receive' && <ReceiveDialog po={po} onClose={() => setDlg(null)} />}
+      {dlg === 'invoice' && <InvoiceDialog presetPo={po} stay onClose={() => setDlg(null)} />}
+      {dlg === 'close' && (
+        <ReasonDialog
+          title={`Tutup ${po.po_no}?`}
+          label="Alasan (sisa barang tidak dikirim supplier)"
+          confirmLabel="Tutup PO"
+          onClose={() => setDlg(null)}
+          onSubmit={async (reason) => {
+            await action('po/state', { po_id: po.id, state: 'selesai', reason });
+            toast.ok(`${po.po_no} ditutup. Barang yang kurang tercatat di catatan PO.`);
+          }}
+        />
+      )}
       {dlg === 'cancel' && (
         <ReasonDialog
           title={`Batalkan ${po.po_no}?`}
@@ -440,8 +537,10 @@ function ReceiveDialog({ po, onClose }) {
   const [driver, setDriver] = useState('');
   const [file, setFile] = useState(null);
   const [lines, setLines] = useState(() => items.map((it) => ({ good: Math.max(0, it.qty - (Number(it.receivedQty) || 0)), bad: 0 })));
+  const [overReason, setOverReason] = useState('');
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
+  const overLines = items.filter((it, i) => Number(lines[i].good) > Math.max(0, it.qty - (Number(it.receivedQty) || 0)));
 
   const setLine = (i, patch) => setLines((ls) => ls.map((l, j) => (j === i ? { ...l, ...patch } : l)));
 
@@ -449,10 +548,7 @@ function ReceiveDialog({ po, onClose }) {
     e.preventDefault();
     setErr('');
     if (!sj.trim()) return setErr('No. surat jalan dari supplier wajib diisi.');
-    for (const [i, it] of items.entries()) {
-      const remaining = it.qty - (Number(it.receivedQty) || 0);
-      if (Number(lines[i].good) > remaining) return setErr(`${it.name}: diterima ${lines[i].good} melebihi sisa PO ${remaining}.`);
-    }
+    if (overLines.length && !overReason.trim()) return setErr('Ada barang yang diterima melebihi sisa PO. Isi alasan kelebihan dulu.');
     if (!lines.some((l) => Number(l.good) > 0 || Number(l.bad) > 0)) return setErr('Isi qty yang diterima.');
     setBusy(true);
     try {
@@ -462,6 +558,7 @@ function ReceiveDialog({ po, onClose }) {
         date: day,
         driver,
         lines: lines.map((l, index) => ({ index, good: Number(l.good) || 0, bad: Number(l.bad) || 0 })),
+        over_reason: overLines.length ? overReason : '',
         photo: file || undefined,
       });
       toast.ok(res.state === 'selesai' ? `Barang ${po.po_no} lengkap diterima, stok bertambah` : `Penerimaan ${sj} tersimpan, stok bertambah`);
@@ -520,14 +617,19 @@ function ReceiveDialog({ po, onClose }) {
                       <td className="right">
                         <input className="cell num w-xs" inputMode="numeric" value={lines[i].bad} onChange={(e) => setLine(i, { bad: e.target.value.replace(/\D/g, '') })} aria-label={`Rusak ${it.name}`} />
                       </td>
-                      <td className={`right ${rem < 0 ? 'text-bad strong' : ''}`}>{num(rem)}</td>
+                      <td className={`right ${rem < 0 ? 'text-warn strong' : ''}`}>{rem < 0 ? `lebih ${num(-rem)}` : num(rem)}</td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
           </div>
-          <p className="small muted">Barang rusak dicatat tapi tidak masuk stok. Sisa bisa diterima di surat jalan berikutnya.</p>
+          <p className="small muted">Barang rusak dicatat tapi tidak masuk stok. Sisa bisa diterima di surat jalan berikutnya. Harga modal barang mengikuti harga di PO ini.</p>
+          {overLines.length > 0 && (
+            <Field label={`Alasan kelebihan (${overLines.map((it) => it.name).join(', ')})`} required>
+              <Input value={overReason} onChange={(e) => setOverReason(e.target.value)} placeholder="mis. supplier kirim lebih, sudah disetujui Pak Yanto" />
+            </Field>
+          )}
           {err && <div className="alert error">{err}</div>}
         </div>
         <div className="dialog-foot">

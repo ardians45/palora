@@ -97,7 +97,7 @@ export function HutangList() {
   );
 }
 
-export function InvoiceDialog({ onClose, presetPo }) {
+export function InvoiceDialog({ onClose, presetPo, stay = false }) {
   const toast = useToast();
   const pos = useRecords('purchase_orders', { filter: 'deleted = false && state != "batal"', sort: '-date' });
   const suppliers = useRecords('suppliers', { filter: 'deleted = false', sort: 'name' });
@@ -110,13 +110,20 @@ export function InvoiceDialog({ onClose, presetPo }) {
     total_amount: presetPo?.total_amount || '',
     tax_invoice_no: '',
     notes: '',
+    received_date: today(),
   });
+  // surat jalan PO yang ditagih invoice ini (default: semua)
+  const receipts = presetPo?.receipts || [];
+  const [sjNos, setSjNos] = useState(() => receipts.map((r) => r.sjNo));
   const [file, setFile] = useState(null);
   const [taxFile, setTaxFile] = useState(null);
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const set = (patch) => setF((x) => ({ ...x, ...patch }));
-  const poOptions = useMemo(() => pos.items.filter((p) => !f.supplier || p.supplier.toLowerCase() === f.supplier.toLowerCase()), [pos.items, f.supplier]);
+  const poOptions = useMemo(() => {
+    const list = pos.items.filter((p) => !f.supplier || p.supplier.toLowerCase() === f.supplier.toLowerCase());
+    return presetPo && !list.some((p) => p.id === presetPo.id) ? [presetPo, ...list] : list;
+  }, [pos.items, f.supplier, presetPo]);
 
   const onSupplier = (name) => {
     const s = suppliers.items.find((x) => x.name.toLowerCase() === name.trim().toLowerCase());
@@ -130,15 +137,16 @@ export function InvoiceDialog({ onClose, presetPo }) {
     if (!(Number(f.total_amount) > 0)) return setErr('Total tagihan wajib diisi.');
     const po = pos.items.find((p) => p.id === f.po_id);
     const fd = new FormData();
-    Object.entries({ ...f, po_no: po?.po_no || '', total_amount: Number(f.total_amount) }).forEach(([k, v]) => fd.append(k, String(v ?? '')));
+    Object.entries({ ...f, po_no: po?.po_no || presetPo?.po_no || '', total_amount: Number(f.total_amount) }).forEach(([k, v]) => fd.append(k, String(v ?? '')));
+    fd.append('sj_nos', JSON.stringify(sjNos));
     if (file) fd.append('file', file);
     if (taxFile) fd.append('tax_file', taxFile);
     setBusy(true);
     try {
       const rec = await pb.collection('supplier_invoices').create(fd);
-      toast.ok(`Invoice ${rec.invoice_no} tercatat`);
+      toast.ok(`Invoice ${rec.invoice_no} tercatat di map ${rec.po_no || 'PO'}`);
       onClose();
-      navigate(['hutang', rec.id]);
+      if (!stay) navigate(['hutang', rec.id]);
     } catch (ex) {
       setErr(ex?.response?.message || ex.message);
     } finally {
@@ -147,12 +155,12 @@ export function InvoiceDialog({ onClose, presetPo }) {
   };
 
   return (
-    <Dialog title="Catat Invoice Supplier" onClose={onClose} wide>
+    <Dialog title={presetPo ? `Invoice / Faktur untuk ${presetPo.po_no}` : 'Catat Invoice Supplier'} onClose={onClose} wide>
       <form onSubmit={submit}>
         <div className="dialog-body">
           <div className="form-grid cols-3">
             <Field label="Supplier" required className="span-2">
-              <Input list="sup-inv-list" value={f.supplier} onChange={(e) => onSupplier(e.target.value)} autoFocus />
+              <Input list="sup-inv-list" value={f.supplier} onChange={(e) => onSupplier(e.target.value)} readOnly={!!presetPo} autoFocus={!presetPo} />
             </Field>
             <datalist id="sup-inv-list">
               {suppliers.items.map((s) => (
@@ -160,10 +168,11 @@ export function InvoiceDialog({ onClose, presetPo }) {
               ))}
             </datalist>
             <Field label="No. invoice" required>
-              <Input value={f.invoice_no} onChange={(e) => set({ invoice_no: e.target.value })} />
+              <Input value={f.invoice_no} onChange={(e) => set({ invoice_no: e.target.value })} autoFocus={!!presetPo} />
             </Field>
             <Field label="Untuk PO" className="span-2">
               <Select
+                disabled={!!presetPo}
                 value={f.po_id}
                 onChange={(e) => {
                   const po = pos.items.find((p) => p.id === e.target.value);
@@ -180,6 +189,25 @@ export function InvoiceDialog({ onClose, presetPo }) {
             </Field>
             <Field label="Total tagihan" required>
               <MoneyInput value={f.total_amount} onChange={(v) => set({ total_amount: v })} />
+            </Field>
+            {receipts.length > 0 && (
+              <Field label="Untuk surat jalan" className="span-all" hint="1 PO bisa beberapa surat jalan; centang yang ditagih invoice ini">
+                <div className="row">
+                  {receipts.map((r) => (
+                    <label key={r.sjNo} className="check">
+                      <input
+                        type="checkbox"
+                        checked={sjNos.includes(r.sjNo)}
+                        onChange={(e) => setSjNos((xs) => (e.target.checked ? [...xs, r.sjNo] : xs.filter((x) => x !== r.sjNo)))}
+                      />
+                      {r.sjNo} ({date(r.date)})
+                    </label>
+                  ))}
+                </div>
+              </Field>
+            )}
+            <Field label="Dokumen diterima tanggal">
+              <Input type="date" value={f.received_date} onChange={(e) => set({ received_date: e.target.value })} />
             </Field>
             <Field label="Tanggal invoice">
               <Input type="date" value={f.date} onChange={(e) => set({ date: e.target.value })} />

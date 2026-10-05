@@ -54,6 +54,7 @@
 .parties .label, .terbilang .label { font-size: 8.5pt; color: #444; text-transform: uppercase; letter-spacing: 0.04em; }
 .parties .right { text-align: right; }
 .stamp { display: inline-block; margin-top: 6px; border: 2px solid #1d7a46; color: #1d7a46; font-weight: 800; padding: 2px 12px; transform: rotate(-6deg); letter-spacing: 0.1em; }
+.stamp-sm { font-size: 9pt; padding: 1px 8px; margin-top: 4px; }
 .sum-row { display: flex; justify-content: space-between; gap: 16px; margin-top: 8px; }
 .terbilang { max-width: 55%; font-size: 10pt; }
 .banks { margin-top: 8px; }

@@ -49,8 +49,8 @@ Kredensial development ada di `backend/.env.example` (salin ke `backend/.env` & 
 | `npm run backend` | PocketBase (`-- --lan` agar bisa dibuka dari HP/komputer lain di jaringan) |
 | `npm run setup` | Migrasi + superuser + data awal. `-- --url https://...` untuk server online, `-- --demo` transaksi contoh |
 | `npm run photos` | Pasang foto & lengkapi nama barang ke server yang sedang jalan |
-| `npm test` | Unit + integrasi (71 test) |
-| `npm run test:e2e` | Skenario browser end-to-end (16 skenario, Microsoft Edge) |
+| `npm test` | Unit + integrasi (91 test) |
+| `npm run test:e2e` | Skenario browser end-to-end (21 skenario, Microsoft Edge) |
 | `npm run build:server` | Build frontend ke `backend/pb_public` → satu server untuk semuanya |
 | `scripts\push.bat "pesan"` | Cek file rahasia, jalankan test & build, commit, tarik perubahan tim, lalu push ke GitHub |
 
@@ -63,7 +63,7 @@ palora/
 │  ├─ pb_hooks/             aturan bisnis & endpoint /api/palora/* (transaksi)
 │  ├─ seed/                 data awal: products.js (451 barang), partners.js, product-names.js,
 │  │                        foto-produk/ (foto katalog paletindo.com + mapping.json)
-│  ├─ windows/              jalankan-palora.bat, backup-palora.bat
+│  ├─ windows/              pasang-autostart.bat, pasang-tunnel.bat, jalankan-palora.bat, backup-palora.bat
 │  └─ .env.example          contoh kredensial
 ├─ src/                     APLIKASI (frontend React)
 │  ├─ layout/               login, menu utama (ikon aplikasi), topbar

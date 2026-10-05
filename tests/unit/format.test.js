@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { date, dateUpper, dueDateFromTerms, num, numOrDash, parseNum, rp, terbilang, waNumber } from '../../src/lib/format.js';
-import { mapRows, parseReport } from '../../src/lib/importers.js';
+import { mapRows, parseMoney, parseReport } from '../../src/lib/importers.js';
 
 describe('format angka & uang', () => {
   it('format Indonesia, nol jadi "-" seperti Excel', () => {
@@ -87,5 +87,17 @@ describe('laporan marketplace', () => {
 
   it('laporan yang salah (tanpa kolom pesanan/qty) ditolak dengan nama kolom', () => {
     expect(parseReport([{ Tanggal: 'x', Total: 1 }]).missing).toEqual(['order_no', 'qty', 'sku']);
+  });
+});
+
+describe('angka uang laporan marketplace', () => {
+  it('membaca format Indonesia, internasional & desimal', () => {
+    expect(parseMoney('Rp 125.000')).toBe(125000);
+    expect(parseMoney('125000.00')).toBe(125000);
+    expect(parseMoney('125,000.50')).toBe(125000.5);
+    expect(parseMoney('125.000,50')).toBe(125000.5);
+    expect(parseMoney('1.250.000')).toBe(1250000);
+    expect(parseMoney(98000)).toBe(98000);
+    expect(parseMoney('')).toBe(0);
   });
 });

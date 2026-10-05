@@ -26,7 +26,7 @@ import Marketplace from './modules/marketplace/Marketplace';
 import Laporan from './modules/laporan/Laporan';
 import Master from './modules/master/Master';
 import { Aktivitas, Pengaturan, Pengguna } from './modules/admin/Admin';
-import { NotaPrint, OpnamePrint, POPrint, SuratJalanPrint } from './print/Print';
+import { MapPOPrint, NotaPrint, OpnamePrint, POPrint, SuratJalanPrint } from './print/Print';
 
 export default function App() {
   const { user, login, logout, expired } = useAuth();
@@ -123,6 +123,7 @@ function Router() {
     if (type === 'sj') return <SuratJalanPrint id={id} />;
     if (type === 'nota' || type === 'invoice') return <NotaPrint id={id} kind={type} />;
     if (type === 'po') return <POPrint id={id} />;
+    if (type === 'map-po') return <MapPOPrint id={id} />;
     if (type === 'opname') return <OpnamePrint group={query.g || ''} />;
     return <NotFound />;
   }

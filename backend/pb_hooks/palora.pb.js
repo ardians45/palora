@@ -80,10 +80,123 @@ onRecordCreateRequest((e) => {
 // Invoice supplier: pencatat & nilai bayar awal diisi server
 onRecordCreateRequest((e) => {
   const u = require(`${__hooks}/utils.js`);
-  e.record.set("created_by", u.actorName(e.auth));
-  e.record.set("paid_amount", 0);
+  const r = e.record;
+  r.set("created_by", u.actorName(e.auth));
+  r.set("received_by", u.actorName(e.auth));
+  r.set("paid_amount", 0);
+  if (!r.getString("received_date")) r.set("received_date", u.parseDate("").iso);
+  if (!(r.getFloat("total_amount") > 0)) throw new BadRequestError("Total tagihan invoice wajib diisi.");
+
+  // Map PO: invoice menempel ke PO; supplier & no. PO diambil dari PO, surat jalan harus milik PO itu
+  const poId = r.getString("po_id");
+  if (poId) {
+    const po = e.app.findRecordById("purchase_orders", poId);
+    r.set("po_no", po.getString("po_no"));
+    r.set("supplier", po.getString("supplier"));
+    const own = (u.getJSON(po, "receipts") || []).map((x) => String(x.sjNo).toLowerCase());
+    const sjs = u.getJSON(r, "sj_nos") || [];
+    sjs.forEach((s) => {
+      if (own.indexOf(String(s).toLowerCase()) === -1) {
+        throw new BadRequestError("Surat jalan " + s + " bukan milik " + po.getString("po_no") + ".");
+      }
+    });
+  }
+  if (!r.getString("supplier").trim()) throw new BadRequestError("Supplier wajib diisi.");
+
+  // no. invoice yang sama dari supplier yang sama = dobel
+  try {
+    e.app.findFirstRecordByFilter("supplier_invoices", "supplier = {:s} && invoice_no = {:n} && deleted = false", {
+      s: r.getString("supplier"),
+      n: r.getString("invoice_no"),
+    });
+    throw new BadRequestError("Invoice " + r.getString("invoice_no") + " dari " + r.getString("supplier") + " sudah pernah dicatat.");
+  } catch (err) {
+    if (err instanceof BadRequestError) throw err;
+  }
   e.next();
 }, "supplier_invoices");
+
+// Ubah invoice supplier: nilai bayar & tautan PO dikunci, aturan dobel & surat jalan dicek ulang
+onRecordUpdateRequest((e) => {
+  const u = require(`${__hooks}/utils.js`);
+  const r = e.record;
+  const orig = r.original();
+  const body = e.requestInfo().body || {};
+  const myRole = u.role(e.auth);
+  ["paid_amount", "created_by", "received_by", "po_id", "po_no"].forEach((k) => r.set(k, orig.get(k)));
+  const poId = orig.getString("po_id");
+  if (poId) r.set("supplier", orig.getString("supplier"));
+
+  if (body.deleted !== undefined && r.getBool("deleted") !== orig.getBool("deleted")) {
+    if (myRole !== "owner" && myRole !== "finance") throw new ForbiddenError("Invoice hanya bisa diarsipkan Owner atau Keuangan.");
+    if (orig.getFloat("paid_amount") > 0) throw new BadRequestError("Invoice yang sudah dibayar tidak bisa diarsipkan.");
+  }
+  if (!(r.getFloat("total_amount") > 0)) throw new BadRequestError("Total tagihan invoice wajib diisi.");
+  if (r.getFloat("total_amount") < orig.getFloat("paid_amount")) {
+    throw new BadRequestError("Total invoice tidak boleh lebih kecil dari yang sudah dibayar " + u.rupiah(orig.getFloat("paid_amount")) + ".");
+  }
+  if (!r.getString("supplier").trim()) throw new BadRequestError("Supplier wajib diisi.");
+
+  if (poId && body.sj_nos !== undefined) {
+    const po = e.app.findRecordById("purchase_orders", poId);
+    const own = (u.getJSON(po, "receipts") || []).map((x) => String(x.sjNo).toLowerCase());
+    (u.getJSON(r, "sj_nos") || []).forEach((s) => {
+      if (own.indexOf(String(s).toLowerCase()) === -1) throw new BadRequestError("Surat jalan " + s + " bukan milik " + po.getString("po_no") + ".");
+    });
+  }
+  if (r.getString("invoice_no") !== orig.getString("invoice_no") || r.getString("supplier") !== orig.getString("supplier")) {
+    try {
+      e.app.findFirstRecordByFilter("supplier_invoices", "supplier = {:s} && invoice_no = {:n} && deleted = false && id != {:id}", {
+        s: r.getString("supplier"),
+        n: r.getString("invoice_no"),
+        id: r.id,
+      });
+      throw new BadRequestError("Invoice " + r.getString("invoice_no") + " dari " + r.getString("supplier") + " sudah pernah dicatat.");
+    } catch (err) {
+      if (err instanceof BadRequestError) throw err;
+    }
+  }
+  e.next();
+}, "supplier_invoices");
+
+// Pengiriman (surat jalan): status hanya berubah lewat endpoint
+onRecordUpdateRequest((e) => {
+  const orig = e.record.original();
+  ["sj_no", "uid", "order_id", "order_no", "status", "items", "received_by", "received_date", "signed_by", "customer"].forEach((k) =>
+    e.record.set(k, orig.get(k))
+  );
+  e.next();
+}, "deliveries");
+
+// Barang: kode tidak boleh diganti (dipakai di pesanan, PO & kartu stok); stok hanya lewat endpoint;
+// tidak bisa diarsipkan selama masih ada di pesanan/PO yang berjalan.
+onRecordUpdateRequest((e) => {
+  const r = e.record;
+  const orig = r.original();
+  const body = e.requestInfo().body || {};
+  r.set("stock", orig.getInt("stock"));
+  r.set("uid", orig.getString("uid"));
+  if (body.code !== undefined && String(body.code).trim() !== orig.getString("code")) {
+    throw new BadRequestError("Kode barang tidak bisa diganti karena dipakai di riwayat stok, pesanan dan PO. Buat barang baru bila perlu.");
+  }
+  r.set("code", orig.getString("code"));
+  if (r.getBool("deleted") && !orig.getBool("deleted")) {
+    const code = orig.getString("code");
+    const like = '"productCode":"' + code + '"';
+    const busy = [];
+    try {
+      e.app
+        .findRecordsByFilter("sales_orders", "(status = 'baru' || status = 'dp' || status = 'lunas') && items ~ {:c}", "", 5, 0, { c: like })
+        .forEach((o) => busy.push(o.getString("order_no")));
+      e.app
+        .findRecordsByFilter("purchase_orders", "(state = 'draft' || state = 'dikirim' || state = 'sebagian') && items ~ {:c}", "", 5, 0, { c: like })
+        .forEach((o) => busy.push(o.getString("po_no")));
+    } catch (_) {}
+    if (busy.length) throw new BadRequestError("Barang " + code + " masih dipakai di " + busy.join(", ") + ". Selesaikan dulu sebelum diarsipkan.");
+    if (orig.getInt("stock") > 0) throw new BadRequestError("Barang " + code + " masih ada stok " + orig.getInt("stock") + ". Koreksi stok ke 0 dulu sebelum diarsipkan.");
+  }
+  e.next();
+}, "products");
 
 // Dokumen arsip: uid & pengunggah diisi server
 onRecordCreateRequest((e) => {
@@ -143,14 +256,33 @@ onRecordUpdateRequest((e) => {
   const itemsChanged = reqBody.items !== undefined;
   const taxChanged = reqBody.tax_mode !== undefined && reqBody.tax_mode !== orig.getString("tax_mode");
 
-  // nomor & channel tidak boleh diubah
-  r.set("order_no", orig.getString("order_no"));
-  r.set("channel", orig.getString("channel"));
+  // Kolom milik server: selalu dikembalikan ke nilai lama (hanya endpoint /api/palora/* yang mengubahnya).
+  // Endpoint memakai tx.save() sehingga hook request ini tidak ikut berjalan di sana.
+  [
+    "order_no", "channel", "uid", "status", "paid_amount", "dp_amount", "remaining_amount", "subtotal", "tax_amount",
+    "total_amount", "release_approved", "dp_override_by", "store", "marketplace_order_no", "created_by", "cancel_reason", "items", "tax_mode", "returns",
+  ].forEach((k) => r.set(k, orig.get(k)));
+  if (reqBody.deleted !== undefined) {
+    if (u.role(e.auth) !== "owner" || ["baru", "batal"].indexOf(status) === -1 || orig.getFloat("paid_amount") > 0) {
+      throw new ForbiddenError("Pesanan tidak bisa diarsipkan. Gunakan Batalkan.");
+    }
+  }
+  const open = status === "baru" || status === "dp";
+  if (!open && orig.getString("channel") === "pesanan") {
+    // setelah lunas/keluar: data customer & tanggal ikut terkunci (sudah tercetak di nota/surat jalan)
+    ["customer", "date", "payment_type", "po_customer_ref"].forEach((k) => {
+      if (reqBody[k] !== undefined && String(reqBody[k]) !== orig.getString(k)) {
+        throw new BadRequestError("Data pesanan tidak bisa diubah setelah lunas atau barang keluar.");
+      }
+    });
+  }
 
   if (itemsChanged || taxChanged) {
-    if (status !== "baru" && status !== "dp") {
+    if (!open || (u.getJSON(orig, "items") || []).some((it) => Number(it.sentQty) > 0)) {
       throw new BadRequestError("Barang/harga tidak bisa diubah setelah pesanan lunas atau dikirim.");
     }
+    if (reqBody.items !== undefined) r.set("items", typeof reqBody.items === "string" ? JSON.parse(reqBody.items) : reqBody.items);
+    if (reqBody.tax_mode !== undefined) r.set("tax_mode", reqBody.tax_mode);
     const s = u.getSettings(e.app);
     const items = u.cleanItems(u.getJSON(r, "items"), { requireCode: true });
     const t = u.computeTotals(items, r.getString("tax_mode") || "none", s ? s.getFloat("ppn_rate") : 11);
@@ -186,6 +318,7 @@ onRecordCreateRequest((e) => {
   r.set("state", "draft");
   r.set("status", "Draft");
   r.set("receipts", []);
+  u.normalizeForOrders(e.app, r);
   r.set("created_by", u.actorName(e.auth));
   if (!r.getString("uid")) r.set("uid", u.uid("PO"));
   e.app.runInTransaction((tx) => {
@@ -198,12 +331,28 @@ onRecordUpdateRequest((e) => {
   const u = require(`${__hooks}/utils.js`);
   const r = e.record;
   const orig = e.record.original();
-  r.set("po_no", orig.getString("po_no"));
-  const itemsChanged = (e.requestInfo().body || {}).items !== undefined;
+  const reqBody = e.requestInfo().body || {};
+  const state = orig.getString("state");
+  // kolom milik server (penerimaan, status, total) hanya berubah lewat endpoint
+  ["po_no", "uid", "state", "status", "receipts", "total_amount", "created_by", "items"].forEach((k) => r.set(k, orig.get(k)));
+  const editable = state === "draft" || state === "dikirim";
+  if (!editable) {
+    ["supplier", "date"].forEach((k) => {
+      if (reqBody[k] !== undefined && String(reqBody[k]) !== orig.getString(k)) {
+        throw new BadRequestError("Supplier/tanggal PO tidak bisa diubah setelah ada penerimaan barang.");
+      }
+    });
+  }
+  if (reqBody.deleted !== undefined && reqBody.deleted !== orig.getBool("deleted") && !(state === "draft" || state === "batal")) {
+    throw new BadRequestError("Hanya PO draft atau batal yang bisa diarsipkan.");
+  }
+  if (reqBody.for_orders !== undefined) u.normalizeForOrders(e.app, r);
+  const itemsChanged = reqBody.items !== undefined;
   if (itemsChanged) {
-    if (orig.getString("state") !== "draft" && orig.getString("state") !== "dikirim") {
+    if (!editable) {
       throw new BadRequestError("Barang PO tidak bisa diubah setelah ada penerimaan.");
     }
+    r.set("items", typeof reqBody.items === "string" ? JSON.parse(reqBody.items) : reqBody.items);
     const items = u.cleanItems(u.getJSON(r, "items")).map((it) => {
       it.receivedQty = 0;
       return it;
@@ -231,18 +380,30 @@ routerAdd(
       const po = tx.findRecordById("purchase_orders", String(body.po_id || ""));
       const from = po.getString("state");
       const to = String(body.state || "");
-      const allowed = { dikirim: ["draft"], batal: ["draft", "dikirim"] };
+      // selesai dari "sebagian" = tutup PO walau barang kurang (supplier tidak mengirim sisanya)
+      const allowed = { dikirim: ["draft"], batal: ["draft", "dikirim"], selesai: ["sebagian"] };
       if (!allowed[to] || allowed[to].indexOf(from) === -1) {
         throw new BadRequestError("PO " + po.getString("po_no") + " tidak bisa diubah dari '" + from + "' ke '" + to + "'.");
       }
       if (to === "batal" && (u.getJSON(po, "receipts") || []).length > 0) {
         throw new BadRequestError("PO yang sudah ada penerimaan barang tidak bisa dibatalkan.");
       }
+      const reason = String(body.reason || "").trim();
+      if (to === "selesai" && !reason) throw new BadRequestError("Alasan menutup PO wajib diisi (mis. sisa tidak dikirim supplier).");
       po.set("state", to);
-      po.set("status", to === "dikirim" ? "Dikirim ke Supplier" : "Dibatalkan");
-      if (to === "batal") po.set("notes", (po.getString("notes") + "\nDibatalkan: " + String(body.reason || "-")).trim());
+      po.set("status", to === "dikirim" ? "Dikirim ke Supplier" : to === "selesai" ? "Selesai (ditutup kurang)" : "Dibatalkan");
+      if (to === "batal") po.set("notes", (po.getString("notes") + "\nDibatalkan: " + (reason || "-")).trim());
+      if (to === "selesai") {
+        const short = (u.getJSON(po, "items") || [])
+          .filter((it) => (Number(it.receivedQty) || 0) < Number(it.qty))
+          .map((it) => it.name + " kurang " + (Number(it.qty) - (Number(it.receivedQty) || 0)));
+        po.set("notes", (po.getString("notes") + "\nDitutup kurang: " + reason + (short.length ? " (" + short.join(", ") + ")" : "")).trim());
+      }
       tx.save(po);
-      u.writeAudit(tx, "purchase_orders", po, to === "batal" ? "cancel" : "state", e.auth, { state: { from: from, to: to } });
+      u.writeAudit(tx, "purchase_orders", po, to === "batal" ? "cancel" : to === "selesai" ? "close_short" : "state", e.auth, {
+        state: { from: from, to: to },
+        reason: reason ? { from: null, to: reason } : undefined,
+      });
       out = u.toPlain(po);
     });
     return e.json(200, out);
@@ -277,6 +438,8 @@ routerAdd(
       const date = u.parseDate(body.date).iso;
       const items = u.getJSON(po, "items") || [];
       const received = [];
+      const over = [];
+      const overReason = String(body.over_reason || "").trim();
       let any = false;
 
       lines.forEach((ln) => {
@@ -287,16 +450,28 @@ routerAdd(
         const bad = Number(ln.bad) || 0;
         if (good < 0 || bad < 0) throw new BadRequestError("Qty tidak boleh minus.");
         if (good === 0 && bad === 0) return;
-        const remaining = Number(it.qty) - (Number(it.receivedQty) || 0);
-        if (good > remaining) {
+        if (Math.floor(good) !== good || Math.floor(bad) !== bad) throw new BadRequestError("Qty harus bilangan bulat.");
+        const remaining = Math.max(0, Number(it.qty) - (Number(it.receivedQty) || 0));
+        if (good > remaining && !overReason) {
           throw new BadRequestError(
-            it.name + ": diterima " + good + " melebihi sisa PO " + remaining + " " + (it.unit || "pcs") + "."
+            it.name + ": diterima " + good + " melebihi sisa PO " + remaining + " " + (it.unit || "pcs") +
+              ". Bila supplier memang mengirim lebih, isi alasan kelebihan."
           );
         }
+        if (good > remaining) over.push(it.name + " +" + (good - remaining));
         any = true;
         if (good > 0) {
           const product = u.findProductByCode(tx, it.productCode);
           if (!product) throw new BadRequestError("Kode " + it.productCode + " (" + it.name + ") belum ada di master barang.");
+          // harga modal master mengikuti harga PO terakhir yang benar-benar diterima
+          const price = Number(it.price) || 0;
+          const oldPrice = product.getFloat("buy_price");
+          if (price > 0 && price !== oldPrice) {
+            product.set("buy_price", price);
+            u.writeAudit(tx, "products", product, "cost_update", e.auth, {
+              buy_price: { from: oldPrice, to: price, ref: po.getString("po_no") },
+            });
+          }
           u.moveStock(
             tx,
             product,
@@ -339,7 +514,7 @@ routerAdd(
         sjNo: sjNo,
         date: date,
         driver: String(body.driver || ""),
-        note: String(body.note || ""),
+        note: [String(body.note || "").trim(), over.length ? "Kelebihan " + over.join(", ") + ": " + overReason : ""].filter(Boolean).join(" · "),
         items: received,
         docId: docId,
         by: u.actorName(e.auth),
@@ -411,6 +586,10 @@ routerAdd(
         order.set("remaining_amount", total - paidBefore - amount);
         const before = status;
         order.set("status", u.statusAfterPayment(order, s ? s.getFloat("min_dp_percent") : 25));
+        // pelanggan tempo: barang sudah dikirim & surat jalan sudah diterima, pelunasan datang belakangan -> selesai
+        if (order.getString("status") === "dikirim" || order.getString("status") === "diambil") {
+          order.set("status", u.statusAfterOut(tx, order));
+        }
         tx.save(order);
         u.writeAudit(tx, "sales_orders", order, "payment", e.auth, {
           paid_amount: { from: paidBefore, to: paidBefore + amount },
@@ -486,8 +665,9 @@ routerAdd(
       const status = order.getString("status");
       const no = order.getString("order_no");
       if (status === "batal") throw new BadRequestError("Pesanan " + no + " sudah dibatalkan.");
-      if (["dikirim", "diambil", "selesai"].indexOf(status) !== -1) {
-        throw new BadRequestError("Barang pesanan " + no + " sudah keluar.");
+      const items = u.getJSON(order, "items") || [];
+      if (["dikirim", "diambil", "selesai"].indexOf(status) !== -1 || u.allSent(status, items)) {
+        throw new BadRequestError("Barang pesanan " + no + " sudah keluar semua.");
       }
       if (status !== "lunas" && !order.getBool("release_approved")) {
         throw new BadRequestError(
@@ -496,19 +676,44 @@ routerAdd(
         );
       }
       const date = u.parseDate(body.date).iso;
-      const items = u.getJSON(order, "items") || [];
+
+      // Barang yang keluar kali ini: lines [{index, qty}] (kirim bertahap) atau semua sisa bila tidak diisi
+      const lines = Array.isArray(body.lines) ? body.lines : typeof body.lines === "string" ? JSON.parse(body.lines) : null;
+      const outLines = [];
+      if (lines) {
+        lines.forEach((ln) => {
+          const idx = Number(ln.index);
+          const it = items[idx];
+          const qty = Number(ln.qty) || 0;
+          if (!it) throw new BadRequestError("Baris pesanan tidak ditemukan.");
+          if (qty === 0) return;
+          const left = Number(it.qty) - u.sentQty(status, it);
+          if (qty < 0 || Math.floor(qty) !== qty) throw new BadRequestError("Qty keluar " + it.name + " harus bilangan bulat.");
+          if (qty > left) throw new BadRequestError(it.name + ": keluar " + qty + " melebihi sisa pesanan " + left + " " + (it.unit || "pcs") + ".");
+          outLines.push({ it: it, qty: qty });
+        });
+      } else {
+        items.forEach((it) => {
+          const left = Number(it.qty) - u.sentQty(status, it);
+          if (left > 0) outLines.push({ it: it, qty: left });
+        });
+      }
+      if (outLines.length === 0) throw new BadRequestError("Isi qty barang yang keluar minimal satu barang.");
+
       let sjNo = "";
       let delivery = null;
       if (mode === "kirim") sjNo = u.docNumber(tx, "SJ", date);
       const ref = mode === "kirim" ? sjNo : no;
 
-      items.forEach((it) => {
+      outLines.forEach((x) => {
+        const it = x.it;
         const product = u.findProductByCode(tx, it.productCode);
         if (!product) throw new BadRequestError("Kode " + it.productCode + " (" + it.name + ") tidak ada di master barang.");
+        it.sentQty = u.sentQty(status, it) + x.qty;
         u.moveStock(
           tx,
           product,
-          -Number(it.qty),
+          -x.qty,
           {
             type: "OUT",
             refNo: ref,
@@ -537,22 +742,25 @@ routerAdd(
         delivery.set("status", "dikirim");
         delivery.set(
           "items",
-          items.map((it) => ({ productCode: it.productCode, name: it.name, color: it.color, size: it.size, qty: it.qty, unit: it.unit }))
+          outLines.map((x) => ({ productCode: x.it.productCode, name: x.it.name, color: x.it.color, size: x.it.size, qty: x.qty, unit: x.it.unit }))
         );
         tx.save(delivery);
         u.writeAudit(tx, "deliveries", delivery, "create", e.auth, { sj_no: { from: null, to: sjNo } });
       }
 
       const before = status;
-      const fullyPaid = order.getFloat("paid_amount") >= order.getFloat("total_amount");
-      order.set("status", mode === "kirim" ? "dikirim" : fullyPaid ? "selesai" : "diambil");
+      order.set("items", items);
+      const complete = u.allSent(status, items);
+      // belum semua keluar: status tetap (masih "siap keluar" untuk sisa barangnya)
+      if (complete) order.set("status", u.statusAfterOut(tx, order));
       if (body.destination) order.set("destination", String(body.destination));
       tx.save(order);
       u.writeAudit(tx, "sales_orders", order, mode === "kirim" ? "dispatch" : "pickup", e.auth, {
-        status: { from: before, to: order.getString("status") },
+        status: before !== order.getString("status") ? { from: before, to: order.getString("status") } : undefined,
         sj_no: sjNo ? { from: null, to: sjNo } : undefined,
+        items: { from: null, to: outLines.map((x) => x.it.name + " " + x.qty).join(", ") },
       });
-      out = { order: u.toPlain(order), delivery: delivery ? u.toPlain(delivery) : null };
+      out = { order: u.toPlain(order), delivery: delivery ? u.toPlain(delivery) : null, complete: u.allSent(status, items) };
     });
     return e.json(200, out);
   },
@@ -585,10 +793,15 @@ routerAdd(
       const orderId = d.getString("order_id");
       if (orderId) {
         const order = tx.findRecordById("sales_orders", orderId);
-        if (order.getString("status") === "dikirim" && order.getFloat("paid_amount") >= order.getFloat("total_amount")) {
-          order.set("status", "selesai");
-          tx.save(order);
-          u.writeAudit(tx, "sales_orders", order, "state", e.auth, { status: { from: "dikirim", to: "selesai" } });
+        const st = order.getString("status");
+        // selesai hanya bila semua barang sudah keluar, semua surat jalan diterima, dan lunas
+        if (st !== "batal" && u.allSent(st, u.getJSON(order, "items") || [])) {
+          const next = u.statusAfterOut(tx, order);
+          if (next !== st) {
+            order.set("status", next);
+            tx.save(order);
+            u.writeAudit(tx, "sales_orders", order, "state", e.auth, { status: { from: st, to: next } });
+          }
         }
       }
       out = u.toPlain(d);
@@ -612,8 +825,9 @@ routerAdd(
     e.app.runInTransaction((tx) => {
       const order = tx.findRecordById("sales_orders", String(body.order_id || ""));
       const status = order.getString("status");
-      if (["baru", "dp", "lunas"].indexOf(status) === -1) {
-        throw new BadRequestError("Pesanan yang barangnya sudah keluar tidak bisa dibatalkan.");
+      const anySent = (u.getJSON(order, "items") || []).some((it) => u.sentQty(status, it) > 0);
+      if (["baru", "dp", "lunas"].indexOf(status) === -1 || anySent) {
+        throw new BadRequestError("Pesanan yang barangnya sudah keluar (sebagian/semua) tidak bisa dibatalkan. Gunakan Retur.");
       }
       if (order.getFloat("paid_amount") > 0 && u.role(e.auth) !== "owner") {
         throw new ForbiddenError("Pesanan yang sudah dibayar hanya bisa dibatalkan Owner (urus pengembalian dana).");
@@ -625,6 +839,145 @@ routerAdd(
       out = u.toPlain(order);
     });
     return e.json(200, out);
+  },
+  $apis.requireAuth("users", "_superusers")
+);
+
+// --- Retur barang dari customer (rusak / salah kirim) ---
+// mode "refund": tagihan berkurang, kelebihan bayar dikembalikan (dicatat Owner/Keuangan)
+// mode "ganti" : barang diganti, tagihan tetap; baris dibuka lagi untuk dikirim ulang
+routerAdd(
+  "POST",
+  "/api/palora/orders/return",
+  (e) => {
+    const u = require(`${__hooks}/utils.js`);
+    u.requireRole(e.auth, ["owner", "gudang", "finance"], "mencatat retur");
+    const body = e.requestInfo().body || {};
+    const mode = String(body.mode || "");
+    const reason = String(body.reason || "").trim();
+    if (mode !== "refund" && mode !== "ganti") throw new BadRequestError("Pilih: uang dikembalikan atau barang diganti.");
+    if (!reason) throw new BadRequestError("Alasan retur wajib diisi.");
+    const lines = Array.isArray(body.lines) ? body.lines : [];
+    const myRole = u.role(e.auth);
+    let out;
+
+    e.app.runInTransaction((tx) => {
+      const order = tx.findRecordById("sales_orders", String(body.order_id || ""));
+      const status = order.getString("status");
+      const no = order.getString("order_no");
+      if (status === "batal") throw new BadRequestError("Pesanan " + no + " sudah dibatalkan.");
+      const items = u.getJSON(order, "items") || [];
+      const date = u.parseDate(body.date).iso;
+      const done = [];
+
+      lines.forEach((ln) => {
+        const it = items[Number(ln.index)];
+        const qty = Number(ln.qty) || 0;
+        if (!it) throw new BadRequestError("Baris pesanan tidak ditemukan.");
+        if (qty === 0) return;
+        if (qty < 0 || Math.floor(qty) !== qty) throw new BadRequestError("Qty retur " + it.name + " harus bilangan bulat.");
+        const sent = u.sentQty(status, it);
+        const returned = Number(it.returnedQty) || 0;
+        const can = sent - returned;
+        if (qty > can) throw new BadRequestError(it.name + ": retur " + qty + " melebihi barang yang sudah keluar (" + can + ").");
+        const good = String(ln.condition || "baik") === "baik";
+        if (good) {
+          const product = u.findProductByCode(tx, it.productCode);
+          if (!product) throw new BadRequestError("Kode " + it.productCode + " tidak ada di master barang.");
+          u.moveStock(
+            tx,
+            product,
+            qty,
+            { type: "RETUR", refNo: no, refType: "order", refId: order.id, reason: "Retur " + order.getString("customer") + ": " + reason, date: date },
+            e.auth
+          );
+        }
+        it.sentQty = sent - (mode === "ganti" ? qty : 0);
+        if (mode === "refund") {
+          it.returnedQty = returned + qty;
+          it.sentQty = sent;
+        }
+        done.push({ index: Number(ln.index), name: it.name, qty: qty, condition: good ? "baik" : "rusak" });
+      });
+      if (done.length === 0) throw new BadRequestError("Isi qty barang yang diretur.");
+
+      const before = { status: status, total: order.getFloat("total_amount"), paid: order.getFloat("paid_amount") };
+      let refund = 0;
+      if (mode === "refund") {
+        // tagihan dihitung ulang dari qty bersih (dipesan - diretur)
+        const s = u.getSettings(tx);
+        const net = items.map((it) => {
+          const q = Number(it.qty) - (Number(it.returnedQty) || 0);
+          return { total: Math.round(q * Number(it.price)) };
+        });
+        const t = u.computeTotals(net, order.getString("tax_mode") || "none", s ? s.getFloat("ppn_rate") : 11);
+        const paid = order.getFloat("paid_amount");
+        refund = Math.max(0, paid - t.total);
+        if (refund > 0 && myRole !== "owner" && myRole !== "finance") {
+          throw new ForbiddenError("Retur ini perlu pengembalian dana " + u.rupiah(refund) + ": dicatat oleh Owner atau Keuangan.");
+        }
+        order.set("subtotal", t.subtotal);
+        order.set("tax_amount", t.tax);
+        order.set("total_amount", t.total);
+        order.set("paid_amount", paid - refund);
+        order.set("dp_amount", paid - refund);
+        order.set("remaining_amount", t.total - (paid - refund));
+        if (refund > 0) {
+          const pay = new Record(tx.findCollectionByNameOrId("payments"));
+          pay.set("kind", "refund");
+          pay.set("order_id", order.id);
+          pay.set("ref_no", no);
+          pay.set("partner", order.getString("customer"));
+          pay.set("date", date);
+          pay.set("amount", refund);
+          pay.set("method", String(body.method || "Transfer"));
+          pay.set("note", "Pengembalian dana retur: " + reason);
+          pay.set("recorded_by", u.actorLabel(e.auth));
+          tx.save(pay);
+        }
+      }
+
+      order.set("items", items);
+      // status: barang ganti dibuka lagi untuk dikirim ulang; selain itu dihitung dari pengiriman & pembayaran
+      if (!u.allSent(status, items)) {
+        const s = u.getSettings(tx);
+        order.set("status", "baru");
+        order.set("status", u.statusAfterPayment(order, s ? s.getFloat("min_dp_percent") : 25));
+        if (order.getString("status") !== "lunas") order.set("release_approved", true); // sudah pernah diizinkan keluar
+      } else if (["dikirim", "diambil", "selesai"].indexOf(status) !== -1) {
+        order.set("status", u.statusAfterOut(tx, order));
+      }
+      const log = u.getJSON(order, "returns") || [];
+      log.push({ date: date, mode: mode, reason: reason, lines: done, refund: refund, by: u.actorName(e.auth) });
+      order.set("returns", log);
+      tx.save(order);
+      u.writeAudit(tx, "sales_orders", order, "return", e.auth, {
+        items: { from: null, to: done.map((d) => d.name + " " + d.qty + " (" + d.condition + ")").join(", ") },
+        reason: { from: null, to: reason },
+        total_amount: before.total !== order.getFloat("total_amount") ? { from: before.total, to: order.getFloat("total_amount") } : undefined,
+        paid_amount: refund > 0 ? { from: before.paid, to: before.paid - refund } : undefined,
+        status: before.status !== order.getString("status") ? { from: before.status, to: order.getString("status") } : undefined,
+      });
+      out = { order: u.toPlain(order), refund: refund };
+    });
+    return e.json(200, out);
+  },
+  $apis.requireAuth("users", "_superusers")
+);
+
+// --- Catat dokumen yang dicetak (riwayat cetak) ---
+routerAdd(
+  "POST",
+  "/api/palora/printed",
+  (e) => {
+    const u = require(`${__hooks}/utils.js`);
+    u.requireRole(e.auth, ["owner", "gudang", "finance"], "mencetak");
+    const body = e.requestInfo().body || {};
+    const coll = String(body.collection || "");
+    if (["sales_orders", "deliveries", "purchase_orders"].indexOf(coll) === -1) throw new BadRequestError("Dokumen tidak dikenal.");
+    const rec = e.app.findRecordById(coll, String(body.id || ""));
+    u.writeAudit(e.app, coll, rec, "print", e.auth, { doc: { from: null, to: String(body.doc || "").slice(0, 60) } });
+    return e.json(200, { ok: true });
   },
   $apis.requireAuth("users", "_superusers")
 );
@@ -757,7 +1110,11 @@ routerAdd(
           throw new BadRequestError("Hasil hitung harus bilangan bulat 0 atau lebih.");
         }
         const p = tx.findRecordById("products", String(ln.product_id || ""));
-        const system = p.getInt("stock");
+        // Selisih dihitung terhadap stok sistem SAAT lembar dihitung (system_at_count), supaya penjualan/penerimaan
+        // yang terjadi antara menghitung dan menyimpan tidak ikut "dikoreksi".
+        const snap = ln.system_at_count;
+        const hasSnap = snap !== undefined && snap !== null && snap !== "" && isFinite(Number(snap));
+        const system = hasSnap ? Number(snap) : p.getInt("stock");
         const delta = counted - system;
         if (delta !== 0) {
           u.moveStock(

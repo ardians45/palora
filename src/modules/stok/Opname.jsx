@@ -1,5 +1,6 @@
-// Stok opname: isi hasil hitung fisik. Hanya baris yang diisi yang disesuaikan,
-// dan selisih dihitung server terhadap stok TERKINI (penjualan saat opname tidak tertimpa).
+// Stok opname: isi hasil hitung fisik. Hanya baris yang diisi yang disesuaikan.
+// Stok sistem dicatat saat angka hitung diketik (snapshot); server menghitung selisih terhadap snapshot itu,
+// jadi penjualan/penerimaan yang terjadi sambil opname berjalan tidak ikut "dikoreksi".
 import React, { useMemo, useState } from 'react';
 import { ClipboardCheck, Plus, Printer } from 'lucide-react';
 import { action, useRecord, useRecords } from '../../lib/data';
@@ -51,6 +52,7 @@ export function OpnameNew() {
   const group = query.g || '';
   const search = query.q || '';
   const [counts, setCounts] = useState({}); // productId -> angka | ''
+  const [snaps, setSnaps] = useState({}); // productId -> stok sistem saat dihitung
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
@@ -61,7 +63,7 @@ export function OpnameNew() {
   const diffs = filled
     .map(([pid, v]) => {
       const p = products.find((x) => x.id === pid);
-      return p ? { p, counted: Number(v), diff: Number(v) - p.stock } : null;
+      return p ? { p, counted: Number(v), diff: Number(v) - (snaps[pid] ?? p.stock) } : null;
     })
     .filter(Boolean);
   const changed = diffs.filter((d) => d.diff !== 0);
@@ -81,7 +83,7 @@ export function OpnameNew() {
         date: today(),
         scope: group || 'Semua barang',
         note,
-        lines: filled.map(([product_id, counted]) => ({ product_id, counted })),
+        lines: filled.map(([product_id, counted]) => ({ product_id, counted, system_at_count: snaps[product_id] })),
       });
       toast.ok(`Opname ${sess.code} tersimpan: ${sess.adjusted_count} barang disesuaikan`);
       navigate(['opname', sess.id]);
@@ -142,6 +144,7 @@ export function OpnameNew() {
                 onChange={(e) => {
                   const n = parseNum(e.target.value);
                   setCounts((c) => ({ ...c, [p.id]: e.target.value === '' || Number.isNaN(n) ? '' : Math.max(0, Math.round(n)) }));
+                  setSnaps((sn) => (p.id in sn ? sn : { ...sn, [p.id]: p.stock }));
                 }}
                 aria-label={`Hitung fisik ${p.code}`}
               />
@@ -155,7 +158,7 @@ export function OpnameNew() {
             render: (p) => {
               const v = counts[p.id];
               if (v === '' || v === undefined) return '';
-              const d = Number(v) - p.stock;
+              const d = Number(v) - (snaps[p.id] ?? p.stock);
               return <span className={d < 0 ? 'text-bad strong' : d > 0 ? 'text-ok strong' : 'muted'}>{d > 0 ? `+${d}` : d}</span>;
             },
           },

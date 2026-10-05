@@ -346,3 +346,34 @@ table.dt { width: 100%; border-collapse: separate; border-spacing: 0; font-size:
 .photo-panel { display: flex; flex-direction: column; gap: var(--s2); }
 .photo-panel .source { font-size: var(--text-xs); color: var(--text-3); word-break: break-all; }
 .mono { white-space: nowrap; }
+
+/* ===================== map PO ===================== */
+.checklist { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--s2); margin-bottom: var(--s3); }
+.check-item { display: flex; gap: 8px; align-items: flex-start; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text-3); }
+.check-item b { display: block; font-size: var(--text-sm); color: var(--text-2); }
+.check-item span { display: block; font-size: var(--text-xs); }
+.check-item.on { border-color: #b7dfc6; background: var(--ok-bg); color: var(--ok); }
+.check-item.on b { color: var(--ok); }
+.check-item.warn { border-color: #f1d29a; background: var(--warn-bg); color: var(--warn); }
+.timeline { list-style: none; margin: 0; padding: var(--s3) var(--s4); }
+.timeline li { display: grid; grid-template-columns: 96px 1fr; gap: var(--s3); padding: 8px 0 8px; border-left: 2px solid var(--border); padding-left: var(--s3); position: relative; }
+.timeline li::before { content: ''; position: absolute; left: -6px; top: 13px; width: 10px; height: 10px; border-radius: 50%; background: var(--border-strong); }
+.timeline li.tl-sj::before { background: var(--info); }
+.timeline li.tl-inv::before, .timeline li.tl-faktur::before { background: var(--warn); }
+.timeline li.tl-pay::before { background: var(--ok); }
+.timeline .tl-date { font-size: var(--text-sm); color: var(--text-3); white-space: nowrap; }
+.timeline .tl-body a { display: inline-flex; align-items: center; gap: 4px; }
+.totals.compact { width: 100%; margin-top: 0; }
+.contact .dl { font-size: var(--text-sm); }
+@media (max-width: 640px) { .timeline li { grid-template-columns: 1fr; gap: 2px; } }
+
+/* Pesanan customer yang ditautkan ke PO */
+.chips { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; }
+.chip {
+  display: inline-flex; align-items: center; gap: var(--s1); padding: 4px 4px 4px 10px;
+  border: 1px solid var(--border); border-radius: 999px; background: var(--surface-2); font-size: var(--text-sm);
+}
+.chip button { border: 0; background: none; color: var(--text-2); cursor: pointer; padding: 0 6px; font-size: 16px; line-height: 1; }
+.chip button:hover { color: var(--bad); }
+.panel-note { padding: var(--s2) var(--s3); }
+.mb-2 { margin-bottom: var(--s2); }

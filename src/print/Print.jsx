@@ -2,10 +2,12 @@
 // Kop & logo: PT Paletindo Prakarsa Unggul. Surat jalan meniru form kertas asli (A5).
 import React, { useEffect, useMemo } from 'react';
 import { Printer } from 'lucide-react';
-import { useRecord } from '../lib/data';
+import { action, useRecord } from '../lib/data';
 import { useSession } from '../lib/session';
 import { date, dateLong, dateUpper, num, rp, terbilang, today } from '../lib/format';
 import { Button, ErrorBox, Loading } from '../ui/core';
+import { usePoFolder } from '../modules/pembelian/POFolder';
+import { isOrderConfirmation } from '../lib/status';
 
 function Kop({ s, compact }) {
   return (
@@ -34,7 +36,21 @@ function Sign({ title, name }) {
   );
 }
 
-function useAutoPrint(ready) {
+function useAutoPrint(ready, log) {
+  const logKey = log ? `${log.collection}/${log.id}/${log.doc}` : '';
+  useEffect(() => {
+    // riwayat cetak: setiap dialog print dibuka (otomatis, tombol, atau Ctrl+P) tercatat di riwayat dokumen
+    if (!ready || !logKey) return undefined;
+    const [collection, id, doc] = logKey.split('/');
+    let last = 0;
+    const onPrint = () => {
+      if (Date.now() - last < 3000) return;
+      last = Date.now();
+      action('printed', { collection, id, doc }).catch(() => {});
+    };
+    window.addEventListener('beforeprint', onPrint);
+    return () => window.removeEventListener('beforeprint', onPrint);
+  }, [ready, logKey]);
   useEffect(() => {
     // ?preview=1 = hanya lihat (tanpa dialog print otomatis)
     if (!ready || window.location.hash.includes('preview=1')) return undefined;
@@ -72,7 +88,8 @@ const addressLines = (text) =>
 export function SuratJalanPrint({ id }) {
   const { settings } = useSession();
   const { item: d, loading, error } = useRecord('deliveries', id);
-  useAutoPrint(!!d && !!settings);
+  const { item: order, loading: orderLoading } = useRecord('sales_orders', d?.order_id || '');
+  useAutoPrint(!!d && !!settings && !orderLoading, d && { collection: 'deliveries', id: d.id, doc: 'Surat Jalan' });
   if (loading && !d) return <Loading />;
   if (error || !d) return <ErrorBox error={error} />;
   const items = d.items || [];
@@ -123,6 +140,7 @@ export function SuratJalanPrint({ id }) {
                 {d.up_person && <div>UP. {d.up_person.toUpperCase()}</div>}
                 {d.destination && <div>KIRIM KE : {d.destination.toUpperCase()}</div>}
                 {d.order_no && <div className="muted-print">Ref. nota: {d.order_no}</div>}
+                {order && order.status !== 'batal' && order.remaining_amount <= 0 && <div className="stamp stamp-sm">LUNAS</div>}
               </td>
             </tr>
           </tbody>
@@ -142,20 +160,23 @@ export function SuratJalanPrint({ id }) {
 export function NotaPrint({ id, kind }) {
   const { settings } = useSession();
   const { item: o, loading, error } = useRecord('sales_orders', id);
-  useAutoPrint(!!o && !!settings);
+  useAutoPrint(!!o && !!settings, o && { collection: 'sales_orders', id: o.id, doc: isOrderConfirmation(o) ? 'Konfirmasi Pesanan' : kind === 'invoice' ? 'Invoice' : 'Nota' });
   if (loading && !o) return <Loading />;
   if (error || !o) return <ErrorBox error={error} />;
-  const isInvoice = kind === 'invoice';
+  const isConfirm = isOrderConfirmation(o);
+  const isInvoice = kind === 'invoice' && !isConfirm;
   const lunas = o.remaining_amount <= 0;
+  const docTitle = isConfirm ? 'Konfirmasi Pesanan' : isInvoice ? 'Invoice' : 'Nota';
+  const minDp = Number(settings?.min_dp_percent ?? 25);
   const banks = settings?.bank_accounts || [];
   return (
     <div className="print-root page-a4">
-      <Toolbar title={`${isInvoice ? 'Invoice' : 'Nota'} ${o.order_no}`} />
+      <Toolbar title={`${docTitle} ${o.order_no}`} />
       <div className="paper paper-a4">
         <div className="doc-head">
           <Kop s={settings} />
           <div className="doc-title">
-            <h1>{isInvoice ? 'INVOICE' : 'NOTA'}</h1>
+            <h1>{docTitle.toUpperCase()}</h1>
             <table className="kv">
               <tbody>
                 <tr>
@@ -271,6 +292,12 @@ export function NotaPrint({ id, kind }) {
             </tbody>
           </table>
         </div>
+        {isConfirm && (
+          <p className="note">
+            Dokumen ini konfirmasi pesanan, <b>bukan nota/bukti pembayaran</b>. Pesanan diproses setelah DP minimal {minDp}% (
+            {rp(Math.ceil((o.total_amount * minDp) / 100))}) diterima.
+          </p>
+        )}
         {o.notes && <p className="note">Catatan: {o.notes}</p>}
         <div className="signs two">
           <Sign title="Penerima" />
@@ -285,7 +312,7 @@ export function NotaPrint({ id, kind }) {
 export function POPrint({ id }) {
   const { settings } = useSession();
   const { item: po, loading, error } = useRecord('purchase_orders', id);
-  useAutoPrint(!!po && !!settings);
+  useAutoPrint(!!po && !!settings, po && { collection: 'purchase_orders', id: po.id, doc: 'PO' });
   if (loading && !po) return <Loading />;
   if (error || !po) return <ErrorBox error={error} />;
   const items = po.items || [];
@@ -405,6 +432,104 @@ export function OpnamePrint({ group }) {
           <Sign title="Dihitung oleh" />
           <Sign title="Diperiksa oleh" />
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Lembar sampul map PO: ditempel di map kertas, daftar isi dokumen PO -> SJ -> invoice -> faktur -> bayar
+export function MapPOPrint({ id }) {
+  const { settings } = useSession();
+  const { item: po, loading, error } = useRecord('purchase_orders', id);
+  const folder = usePoFolder(po);
+  useAutoPrint(!!po && !!settings && !!folder && !folder.loading, po && { collection: 'purchase_orders', id: po.id, doc: 'Lembar Map' });
+  if (loading && !po) return <Loading />;
+  if (error || !po) return <ErrorBox error={error} />;
+  if (!folder) return <Loading />;
+  const rows = [
+    { doc: 'Purchase Order', no: po.po_no, date: po.date, note: `${num(folder.ordered)} barang · ${rp(po.total_amount)}`, ok: true },
+    ...folder.receipts.map((r, i) => ({
+      doc: `Surat Jalan ${i + 1}`,
+      no: r.sjNo,
+      date: r.date,
+      note: `${num((r.items || []).reduce((s, x) => s + (Number(x.qty) || 0), 0))} barang diterima${r.driver ? ` · ${r.driver}` : ''}`,
+      ok: true,
+    })),
+    ...(folder.invoices.length
+      ? folder.invoices.flatMap((inv) => [
+          { doc: 'Invoice', no: inv.invoice_no, date: inv.date, note: `${rp(inv.total_amount)}${inv.due_date ? ` · jatuh tempo ${date(inv.due_date)}` : ''}`, ok: true },
+          { doc: 'Faktur Pajak', no: inv.tax_invoice_no || '', date: inv.tax_invoice_no || inv.tax_file ? inv.date : '', note: '', ok: !!(inv.tax_invoice_no || inv.tax_file) },
+        ])
+      : [
+          { doc: 'Invoice', no: '', date: '', note: '', ok: false },
+          { doc: 'Faktur Pajak', no: '', date: '', note: '', ok: false },
+        ]),
+    ...folder.payments.map((p) => ({ doc: 'Pembayaran', no: p.ref_no, date: p.date, note: `${rp(p.amount)} · ${p.method}`, ok: true })),
+  ];
+  const c = folder.contact;
+  return (
+    <div className="print-root page-a4">
+      <Toolbar title={`Lembar Map ${po.po_no}`} />
+      <div className="paper paper-a4">
+        <Kop s={settings} compact />
+        <div className="po-title">
+          <h1>MAP DOKUMEN {po.po_no}</h1>
+          <div className="po-meta">
+            <span>Supplier: {po.supplier}</span>
+            <span>Tanggal PO: {dateLong(po.date)}</span>
+          </div>
+          <div className="po-meta">
+            <span>
+              Kontak: {[c.person, c.whatsapp, c.email].filter(Boolean).join(' · ') || '-'}
+            </span>
+            <span>{c.terms}</span>
+          </div>
+        </div>
+        <table className="pt bordered">
+          <thead>
+            <tr>
+              <th className="n">No</th>
+              <th>Dokumen</th>
+              <th>Nomor</th>
+              <th>Tanggal</th>
+              <th>Keterangan</th>
+              <th>Ada</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r, i) => (
+              <tr key={i}>
+                <td className="n">{i + 1}</td>
+                <td>{r.doc}</td>
+                <td>{r.no}</td>
+                <td>{r.date ? date(r.date) : ''}</td>
+                <td>{r.note}</td>
+                <td className="write">{r.ok ? '✓' : ''}</td>
+              </tr>
+            ))}
+            <tr className="empty-line">
+              <td colSpan={6} />
+            </tr>
+          </tbody>
+        </table>
+        <table className="kv sum mt-3">
+          <tbody>
+            <tr>
+              <td>Total invoice</td>
+              <td className="r">{num(folder.invoiced)}</td>
+            </tr>
+            <tr>
+              <td>Sudah dibayar</td>
+              <td className="r">{num(folder.paid)}</td>
+            </tr>
+            <tr className="grand">
+              <td>Sisa hutang</td>
+              <td className="r">{rp(folder.remaining)}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p className="note">Dicetak dari PALORA {date(today())}. Simpan lembar ini paling depan di map PO.</p>
       </div>
     </div>
   );

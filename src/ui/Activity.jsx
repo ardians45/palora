@@ -17,6 +17,10 @@ const ACTION = {
   state: 'mengubah status',
   stock: 'mengubah stok',
   import: 'memperbarui lewat import Excel',
+  return: 'mencatat retur',
+  print: 'mencetak',
+  close_short: 'menutup PO (barang kurang)',
+  cost_update: 'memperbarui harga modal dari PO',
 };
 
 const FIELD = {
@@ -36,6 +40,7 @@ const FIELD = {
   release_approved: 'Izin kirim',
   reason: 'Alasan',
   min_stock: 'Stok minimum',
+  doc: 'Dokumen',
 };
 
 const show = (v) => {

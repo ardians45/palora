@@ -5,12 +5,12 @@ import { useRecords, q } from '../../lib/data';
 import { navigate, replaceQuery, useRoute } from '../../lib/router';
 import { useSession } from '../../lib/session';
 import { date, daysFromToday, num, rp, waLink } from '../../lib/format';
-import { ORDER_STATUS, dueTone } from '../../lib/status';
+import { ORDER_STATUS, RECEIVABLE_FILTER, dueTone } from '../../lib/status';
 import { Badge, Button, Empty, Input, Kpi, PageHeader, Panel, Select, StatusBadge } from '../../ui/core';
 import DataTable, { matchText } from '../../ui/DataTable';
 import PaymentDialog from '../../ui/PaymentDialog';
 
-const OPEN = 'remaining_amount > 0 && status != "batal"';
+const OPEN = RECEIVABLE_FILTER;
 
 export function PiutangList() {
   const { query } = useRoute();
