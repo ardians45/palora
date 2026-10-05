@@ -102,7 +102,7 @@ test('Owner: tambah akun baru, akun nonaktif tidak bisa login', async ({ page })
 
   await page.getByRole('button', { name: 'Keluar', exact: true }).click();
   await page.getByLabel('Email').fill('rizki@palora.local');
-  await page.getByLabel('Password').fill('rizki-12345');
+  await page.getByLabel('Password', { exact: true }).fill('rizki-12345');
   page.__allowHttpErrors = true;
   await page.getByRole('button', { name: 'Masuk' }).click();
   await expect(page.getByRole('alert')).toContainText('belum diaktifkan');
@@ -126,7 +126,7 @@ test('Foto barang tampil di Stok, kartu stok, dan Kasir; nama varian sudah lengk
 
   await page.goto('/#/kasir');
   await page.getByLabel('Cari barang').fill('Smart Box SS - 800');
-  await expect(page.locator('.pos-results tbody tr').first().locator('img.thumb')).toBeVisible();
+  await expect(page.locator('.pos-results .pos-item').first().locator('img.thumb')).toBeVisible();
   // gambar benar-benar termuat
   const ok = await page.locator('.pos-results img.thumb').first().evaluate((img) => img.complete && img.naturalWidth > 0);
   expect(ok).toBe(true);

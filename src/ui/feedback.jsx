@@ -99,7 +99,7 @@ function ConfirmDialog({ title, message, confirmLabel = 'Lanjutkan', cancelLabel
 }
 
 /** Kerangka dialog: Esc menutup, fokus pindah ke dialog, klik luar TIDAK menutup (isian tidak hilang). */
-export function Dialog({ title, onClose, wide, children }) {
+export function Dialog({ title, onClose, wide, size, children }) {
   const ref = useRef(null);
   useEffect(() => {
     const prev = document.activeElement;
@@ -121,7 +121,7 @@ export function Dialog({ title, onClose, wide, children }) {
 
   return (
     <div className="overlay">
-      <div ref={ref} className={`dialog ${wide ? 'wide' : ''}`} role="dialog" aria-modal="true" aria-label={title}>
+      <div ref={ref} className={`dialog ${wide ? 'wide' : ''} ${size || ''}`} role="dialog" aria-modal="true" aria-label={title}>
         <div className="dialog-head">
           <h2>{title}</h2>
         </div>

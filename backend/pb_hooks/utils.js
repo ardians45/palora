@@ -168,12 +168,15 @@ function docNumber(txApp, type, dateStr) {
  */
 function cleanItems(items, opts) {
   opts = opts || {};
+  // draft: boleh belum ada barang / qty & harga belum diisi (dilengkapi nanti sebelum dikirim)
+  if (opts.draft && (!Array.isArray(items) || items.length === 0)) return [];
   if (!Array.isArray(items) || items.length === 0) throw new BadRequestError("Minimal harus ada 1 barang.");
   return items.map((it, i) => {
-    const qty = Number(it.qty);
-    const price = Number(it.price);
+    const blank = (v) => v === "" || v === null || v === undefined;
+    const qty = opts.draft && blank(it.qty) ? 0 : Number(it.qty);
+    const price = opts.draft && blank(it.price) ? 0 : Number(it.price);
     const label = it.name || it.productCode || "baris " + (i + 1);
-    if (!isFinite(qty) || qty <= 0) throw new BadRequestError("Qty " + label + " harus lebih dari 0.");
+    if (!isFinite(qty) || qty < 0 || (qty === 0 && !opts.draft)) throw new BadRequestError("Qty " + label + " harus lebih dari 0.");
     if (Math.floor(qty) !== qty) throw new BadRequestError("Qty " + label + " harus bilangan bulat (tanpa koma).");
     if (!isFinite(price) || price < 0) throw new BadRequestError("Harga " + label + " tidak valid.");
     if (opts.requireCode && !it.productCode) throw new BadRequestError("Kode barang " + label + " belum dipilih.");
@@ -315,7 +318,50 @@ function normalizeForOrders(app, record) {
   record.set("for_orders", out);
 }
 
+/** PO siap dikirim/diterima: ada barang dan semua qty terisi. */
+function requireCompletePo(po) {
+  const items = getJSON(po, "items") || [];
+  const label = po.getString("po_no");
+  if (items.length === 0) throw new BadRequestError(label + " masih draft tanpa barang. Lengkapi dulu barangnya.");
+  const bad = items.filter((it) => !(Number(it.qty) > 0));
+  if (bad.length) throw new BadRequestError(label + " masih draft: qty " + bad.map((it) => it.name).join(", ") + " belum diisi.");
+}
+
+/**
+ * Cegah tagihan dobel per PO:
+ * - total semua invoice PO tidak boleh melebihi nilai PO (termasuk PPN & barang lebih yang diterima)
+ * - satu surat jalan hanya boleh ditagih oleh satu invoice
+ */
+function checkPoInvoice(app, po, record, excludeId) {
+  const s = getSettings(app);
+  const ppn = s ? s.getFloat("ppn_rate") : 11;
+  const items = getJSON(po, "items") || [];
+  const value = items.reduce((sum, it) => sum + Math.max(Number(it.qty) || 0, Number(it.receivedQty) || 0) * (Number(it.price) || 0), 0);
+  const cap = Math.round(value * (1 + ppn / 100));
+  const others = app
+    .findRecordsByFilter("supplier_invoices", "po_id = {:po} && deleted = false && id != {:id}", "created", 0, 0, { po: po.id, id: excludeId || "" });
+  const billed = others.reduce((sum, x) => sum + x.getFloat("total_amount"), 0);
+  const total = record.getFloat("total_amount");
+  if (billed + total > cap) {
+    const list = others.map((x) => x.getString("invoice_no") + " " + rupiah(x.getFloat("total_amount"))).join(", ");
+    throw new BadRequestError(
+      po.getString("po_no") + " bernilai " + rupiah(value) + " (maks. " + rupiah(cap) + " termasuk PPN). Sudah ditagih " + rupiah(billed) +
+        (list ? " (" + list + ")" : "") + ", jadi invoice ini paling banyak " + rupiah(Math.max(0, cap - billed)) +
+        ". Bila ini invoice yang sama dengan sebelumnya, jangan dicatat dua kali."
+    );
+  }
+  const mine = (getJSON(record, "sj_nos") || []).map((x) => String(x).toLowerCase());
+  others.forEach((x) => {
+    const dup = (getJSON(x, "sj_nos") || []).filter((sj) => mine.indexOf(String(sj).toLowerCase()) !== -1);
+    if (dup.length) {
+      throw new BadRequestError("Surat jalan " + dup.join(", ") + " sudah ditagih di invoice " + x.getString("invoice_no") + ".");
+    }
+  });
+}
+
 module.exports = {
+  checkPoInvoice,
+  requireCompletePo,
   normalizeForOrders,
   sentQty,
   allSent,

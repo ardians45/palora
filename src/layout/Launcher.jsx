@@ -4,7 +4,7 @@ import { pb } from '../lib/pb';
 import { href } from '../lib/router';
 import { useSession } from '../lib/session';
 import { today } from '../lib/format';
-import { MODULES } from '../modules/registry';
+import { GROUPS, GROUP_ORDER, MODULES } from '../modules/registry';
 import { RECEIVABLE_FILTER } from '../lib/status';
 import { Input } from '../ui/core';
 import { Topbar } from './Shell';
@@ -19,6 +19,7 @@ function useCounts(role) {
       siapKeluar: ['sales_orders', '(status = "lunas" || (release_approved = true && (status = "baru" || status = "dp")))'],
       poBelum: ['purchase_orders', '(state = "dikirim" || state = "sebagian")'],
       sjJalan: ['deliveries', 'status = "dikirim"'],
+      draft: ['sales_orders', 'status = "draft" && deleted = false'],
     };
     if (role === 'owner' || role === 'finance') {
       queries.piutangLewat = ['sales_orders', `${RECEIVABLE_FILTER} && due_date != "" && due_date < "${t}"`];
@@ -61,8 +62,17 @@ export default function Launcher() {
 
   const apps = MODULES.filter((m) => m.roles.includes(role)).filter((m) => !query || m.title.toLowerCase().includes(query.toLowerCase()));
 
+  const tile = (m) => (
+    <a key={m.id} className="app-tile" href={href([m.id])}>
+      <span className="icon">{m.icon}</span>
+      <span className="label">{m.title}</span>
+      {badge[m.id] > 0 && <span className="badge-count" aria-label={`${badge[m.id]} perlu ditindaklanjuti`}>{badge[m.id]}</span>}
+    </a>
+  );
+
   const todos = [
     counts.siapKeluar > 0 && { to: ['penjualan'], query: { tab: 'siap' }, label: 'Pesanan lunas / diizinkan, siap dikirim atau diambil', n: counts.siapKeluar, roles: ['owner', 'gudang'] },
+    counts.draft > 0 && { to: ['penjualan'], query: { tab: 'draft' }, label: 'Draft pesanan belum diselesaikan', n: counts.draft, roles: ['owner', 'gudang'] },
     counts.pesananDp > 0 && { to: ['penjualan'], query: { tab: 'baru' }, label: 'Pesanan masuk menunggu DP', n: counts.pesananDp },
     counts.poBelum > 0 && { to: ['pembelian'], query: { tab: 'proses' }, label: 'PO belum diterima lengkap', n: counts.poBelum },
     counts.sjJalan > 0 && { to: ['surat-jalan'], query: { tab: 'dikirim' }, label: 'Surat jalan belum dikonfirmasi diterima', n: counts.sjJalan, roles: ['owner', 'gudang'] },
@@ -79,15 +89,21 @@ export default function Launcher() {
           <h1>Halo, {user.name || user.email}</h1>
           <Input className="launcher-search" placeholder="Cari menu..." value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Cari menu" />
         </div>
-        <div className="launcher-grid">
-          {apps.map((m) => (
-            <a key={m.id} className="app-tile" href={href([m.id])}>
-              <span className="icon">{m.icon}</span>
-              <span className="label">{m.title}</span>
-              {badge[m.id] > 0 && <span className="badge-count" aria-label={`${badge[m.id]} perlu ditindaklanjuti`}>{badge[m.id]}</span>}
-            </a>
-          ))}
-        </div>
+        {query ? (
+          <div className="launcher-grid">{apps.map(tile)}</div>
+        ) : (
+          (GROUP_ORDER[role] || GROUP_ORDER.owner)
+            .map((k) => GROUPS.find((g) => g.key === k))
+            .map((g) => ({ ...g, apps: g.ids.map((id) => apps.find((m) => m.id === id)).filter(Boolean) }))
+            .filter((g) => g.apps.length > 0)
+            .map((g) => (
+              <section key={g.key} className="launcher-group" aria-label={g.title}>
+                <h2>{g.title}</h2>
+                <div className="launcher-grid">{g.apps.map(tile)}</div>
+              </section>
+            ))
+        )}
+        {query && apps.length === 0 && <p className="muted">Tidak ada menu "{query}".</p>}
 
         {todos.length > 0 && (
           <section className="launcher-section">

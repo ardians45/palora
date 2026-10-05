@@ -22,7 +22,7 @@ Backend: **PocketBase 0.40** (SQLite). Definisi: `backend/pb_migrations/`, atura
 | `products` | kode, nama, kelompok, warna, ukuran, satuan, stok, stok minimum, harga modal/jual, **foto** (+thumbnail otomatis) | stok hanya via endpoint |
 | `stock_movements` | mutasi IN/OUT/OPNAME/ADJUSTMENT: sebelum, sesudah, dokumen, petugas | hanya server |
 | `customers`, `suppliers` | master mitra (UP, WA, email, syarat bayar, aturan diskon) | arsip, bukan hapus |
-| `sales_orders` | pesanan / nota kasir / penjualan marketplace: `status` (baru, dp, lunas, dikirim, diambil, selesai, batal), `channel`, PPN, dibayar, sisa, jatuh tempo, izin kirim Owner; per baris `sentQty` (sudah keluar) & `returnedQty`; `returns` (riwayat retur) | nomor INV/NT/MP dibuat server. Pesanan baru tanpa DP belum dihitung omzet/piutang (dokumennya "Konfirmasi Pesanan") |
+| `sales_orders` | pesanan / nota kasir / penjualan marketplace: `status` (draft = disimpan belum lengkap, belum bernomor INV & tidak dihitung; baru, dp, lunas, dikirim, diambil, selesai, batal), `channel`, PPN, dibayar, sisa, jatuh tempo, izin kirim Owner; per baris `sentQty` (sudah keluar) & `returnedQty`; `returns` (riwayat retur) | nomor INV/NT/MP dibuat server. Pesanan baru tanpa DP belum dihitung omzet/piutang (dokumennya "Konfirmasi Pesanan") |
 | `payments` | DP, pelunasan, cicilan (customer), bayar invoice supplier, `refund` (dana retur dikembalikan) + foto bukti | hanya via endpoint |
 | `deliveries` | surat jalan customer + konfirmasi diterima + foto SJ bertanda tangan | dibuat saat barang keluar |
 | `purchase_orders` | PO supplier: `state` (draft, dikirim, sebagian, selesai, batal), baris barang + `receivedQty`, `receipts` per surat jalan supplier, `for_orders` (pesanan customer tujuan bila barang langsung dikirim ke customer) | penerimaan via endpoint; harga modal barang mengikuti harga PO terakhir yang diterima |
@@ -46,7 +46,7 @@ Meniru map kertas Paletindo: **PO → surat jalan 1..n → invoice → faktur �
 | Endpoint | Fungsi | Role |
 |---|---|---|
 | `po/state` | PO draft → dikirim; batal (bila belum ada penerimaan); sebagian → selesai = **tutup PO kurang** (wajib alasan, barang yang kurang dicatat) | Owner, Gudang |
-| `po/receive` | terima barang bertahap per surat jalan supplier (+ foto), rusak tidak masuk stok; melebihi sisa PO hanya dengan `over_reason`; harga modal master diperbarui ke harga PO | Owner, Gudang |
+| `po/receive` | terima barang bertahap per surat jalan supplier (+ foto), rusak tidak masuk stok; melebihi sisa PO hanya dengan `over_reason`; no. surat jalan yang sudah dipakai PO lain dari supplier yang sama ditolak (1 SJ = 1 PO); harga modal master diperbarui ke harga PO | Owner, Gudang |
 | `payment` | catat DP / pelunasan / cicilan / bayar supplier, tidak boleh melebihi sisa; status pesanan diperbarui otomatis | lihat tabel hak akses |
 | `orders/release` | izinkan barang keluar sebelum lunas (pelanggan tempo) | Owner |
 | `orders/dispatch` | keluarkan barang: dikirim (terbit surat jalan) atau diambil sendiri; stok terpotong. `lines` [{index, qty}] = **kirim bertahap** (1 pesanan beberapa surat jalan); status "dikirim" setelah semua keluar | Owner, Gudang |

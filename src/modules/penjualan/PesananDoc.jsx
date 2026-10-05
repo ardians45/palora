@@ -1,6 +1,7 @@
 // Halaman dokumen pesanan: status alur, aksi langkah berikutnya, barang, pembayaran, surat jalan, riwayat.
 import React, { useState } from 'react';
-import { Ban, CreditCard, MessageCircle, Package, Pencil, Printer, RotateCcw, ShieldCheck, Truck } from 'lucide-react';
+import { Ban, CreditCard, MessageCircle, Package, Pencil, Printer, RotateCcw, ShieldCheck, Trash2, Truck } from 'lucide-react';
+import { pb } from '../../lib/pb';
 import { action, fileUrl, useRecord, useRecords, q } from '../../lib/data';
 import { href, navigate } from '../../lib/router';
 import { useSession } from '../../lib/session';
@@ -24,6 +25,7 @@ export default function PesananDoc({ id }) {
 
   if (loading && !o) return <Loading />;
   if (error || !o) return <ErrorBox error={error} onRetry={reload} />;
+  if (o.status === 'draft') return <DraftDoc o={o} />;
 
   const st = o.status;
   const open = st === 'baru' || st === 'dp';
@@ -545,5 +547,53 @@ function ReturnDialog({ order, canRefund, onClose }) {
         </div>
       </form>
     </Dialog>
+  );
+}
+
+/** Draft pesanan: belum bernomor invoice, belum ada pembayaran. Hanya bisa dilanjutkan atau dihapus. */
+function DraftDoc({ o }) {
+  const toast = useToast();
+  const confirm = useConfirm();
+  const remove = async () => {
+    const ok = await confirm({ title: 'Hapus draft ini?', message: `Draft pesanan ${o.customer || 'tanpa nama'} akan dihapus dari daftar.`, confirmLabel: 'Hapus Draft', danger: true });
+    if (!ok) return;
+    try {
+      await pb.collection('sales_orders').update(o.id, { deleted: true });
+      toast.ok('Draft dihapus');
+      navigate(['penjualan'], { tab: 'draft' });
+    } catch (ex) {
+      toast.error(ex);
+    }
+  };
+  return (
+    <>
+      <PageHeader crumbs={[{ label: 'Penjualan', to: ['penjualan'] }, { label: 'Draft' }]} title={`Draft pesanan${o.customer ? ` · ${o.customer}` : ''}`} sub={`Disimpan ${o.created_by || ''}`} />
+      <div className="doc-bar">
+        <div className="actions">
+          <LinkButton to={['penjualan', o.id, 'ubah']} variant="primary" icon={Pencil}>
+            Lanjutkan Draft
+          </LinkButton>
+          <Button variant="danger" icon={Trash2} onClick={remove}>
+            Hapus Draft
+          </Button>
+        </div>
+      </div>
+      <div className="alert info mb-3">
+        Pesanan ini masih draft: belum punya nomor invoice, belum memesan stok, dan belum bisa dicatat DP-nya. Klik "Lanjutkan Draft", lengkapi, lalu "Simpan Pesanan".
+      </div>
+      <div className="sheet">
+        <div className="two-col">
+          <DescList items={[['Customer', o.customer ? <b key="c">{o.customer}</b> : null], ['UP', o.up_person], ['Telepon', o.customer_phone], ['Kirim ke', o.destination]]} />
+          <DescList items={[['Tanggal', date(o.date)], ['Syarat bayar', o.payment_type]]} />
+        </div>
+        <div className="mt-4">
+          {(o.items || []).length ? <LineItems items={o.items} products={[]} readOnly onChange={() => {}} /> : <div className="empty">Belum ada barang.</div>}
+        </div>
+        <div className="totals">
+          <span className="grand">Total sementara</span>
+          <span className="grand right">{rp(o.total_amount)}</span>
+        </div>
+      </div>
+    </>
   );
 }

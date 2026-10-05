@@ -133,7 +133,17 @@ const blank = () => ({ productCode: '', name: '', size: '', color: '', unit: 'pc
  * showStock: tampilkan stok saat ini di samping qty (penjualan)
  * columns: tampilkan kolom Ukuran/Warna (PO meniru PO 37: Tipe · Ukuran · Warna · Harga · Qty · Jumlah)
  */
-export default function LineItems({ items, onChange, products, priceField = 'sell_price', showStock = false, showSize = false, readOnly = false }) {
+export default function LineItems({
+  items,
+  onChange,
+  products,
+  priceField = 'sell_price',
+  showStock = false,
+  showSize = false,
+  readOnly = false,
+  placeholder = '+ Ketik kode / nama barang',
+  hint = 'Enter untuk pindah kolom. Harga bisa diubah (nego).',
+}) {
   const refs = useRef({});
   const rows = readOnly ? items : [...items, blank()];
   const byCode = useMemo(() => new Map(products.map((p) => [String(p.code), p])), [products]);
@@ -220,7 +230,7 @@ export default function LineItems({ items, onChange, products, priceField = 'sel
                         value={it.productCode ? `${it.productCode} · ${it.name}` : ''}
                         onPick={(prod) => pickProduct(i, prod)}
                         inputRef={(el) => (refs.current[`${i}-product`] = el)}
-                        placeholder={isBlank ? '+ Ketik kode / nama barang' : ''}
+                        placeholder={isBlank ? placeholder : ''}
                       />
                     )}
                   </td>
@@ -277,7 +287,7 @@ export default function LineItems({ items, onChange, products, priceField = 'sel
         </table>
       </div>
       <div className="small muted mt-2">
-        {readOnly ? '' : 'Enter untuk pindah kolom. Harga bisa diubah (nego).'}
+        {readOnly ? '' : hint}
       </div>
     </div>
   );

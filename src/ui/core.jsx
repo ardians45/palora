@@ -79,7 +79,8 @@ export function PageHeader({ crumbs = [], title, sub, actions }) {
 export function Field({ label, required, hint, error, className = '', children, htmlFor }) {
   const auto = useId();
   const id = htmlFor || auto;
-  const child = React.isValidElement(children) && !children.props.id ? React.cloneElement(children, { id }) : children;
+  // htmlFor diisi = kontrol ada di dalam pembungkus (mis. password + tombol mata): pembungkus tidak diberi id
+  const child = !htmlFor && React.isValidElement(children) && !children.props.id ? React.cloneElement(children, { id }) : children;
   return (
     <div className={`field ${className}`}>
       {label && (

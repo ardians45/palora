@@ -9,7 +9,8 @@ import { Badge, Empty, Input, LinkButton, PageHeader, Select, StatusBadge, Tabs 
 import DataTable, { matchText } from '../../ui/DataTable';
 
 const TABS = [
-  { key: 'semua', label: 'Semua', test: () => true },
+  { key: 'semua', label: 'Semua', test: (o) => o.status !== 'draft' },
+  { key: 'draft', label: 'Draft', test: (o) => o.status === 'draft' },
   { key: 'baru', label: 'Menunggu DP', test: (o) => o.status === 'baru' },
   { key: 'dp', label: 'DP Diterima', test: (o) => o.status === 'dp' && !o.release_approved },
   {
@@ -28,7 +29,7 @@ export default function PesananList() {
   const tab = query.tab || 'semua';
   const channel = query.ch || '';
   const search = query.q || '';
-  const { items, loading, error, reload } = useRecords('sales_orders', { sort: '-date,-created' });
+  const { items, loading, error, reload } = useRecords('sales_orders', { filter: 'deleted = false', sort: '-date,-created' });
 
   const base = useMemo(
     () => items.filter((o) => (!channel || o.channel === channel) && matchText(o, search, ['order_no', 'customer', 'po_customer_ref', 'marketplace_order_no'])),
@@ -37,7 +38,7 @@ export default function PesananList() {
   const rows = base.filter(TABS.find((t) => t.key === tab)?.test || (() => true));
 
   const columns = [
-    { key: 'order_no', label: 'No. Nota', render: (o) => <span className="mono">{o.order_no}</span> },
+    { key: 'order_no', label: 'No. Nota', render: (o) => (o.status === 'draft' ? <Badge tone="neutral">Draft</Badge> : <span className="mono">{o.order_no}</span>) },
     { key: 'date', label: 'Tanggal', render: (o) => <span className="nowrap">{date(o.date)}</span> },
     { key: 'customer', label: 'Customer' },
     { key: 'channel', label: 'Saluran', render: (o) => CHANNEL_LABEL[o.channel] || 'Pesanan' },

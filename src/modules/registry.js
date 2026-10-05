@@ -100,3 +100,18 @@ export const canOpen = (id, role) => {
   const m = moduleById(id);
   return !!m && m.roles.includes(role);
 };
+
+// Menu utama dikelompokkan mengikuti alur kerja: beli -> gudang -> jual -> laporan -> sistem.
+export const GROUPS = [
+  { key: 'beli', title: 'Beli barang', ids: ['pembelian', 'hutang', 'arsip'] },
+  { key: 'gudang', title: 'Gudang', ids: ['stok', 'opname'] },
+  { key: 'jual', title: 'Jual barang', ids: ['penjualan', 'kasir', 'marketplace', 'surat-jalan', 'piutang'] },
+  { key: 'data', title: 'Laporan & data', ids: ['laporan', 'pelanggan', 'supplier'] },
+  { key: 'sistem', title: 'Sistem', ids: ['aktivitas', 'pengguna', 'pengaturan'] },
+];
+// Urutan kelompok per role: yang paling sering dipakai di atas
+export const GROUP_ORDER = {
+  owner: ['beli', 'gudang', 'jual', 'data', 'sistem'],
+  gudang: ['gudang', 'jual', 'beli', 'data', 'sistem'],
+  finance: ['jual', 'beli', 'data', 'gudang', 'sistem'],
+};

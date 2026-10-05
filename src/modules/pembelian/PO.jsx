@@ -1,9 +1,9 @@
 // PO ke supplier: meniru "PO 37.xlsx" (No · Tipe · Ukuran · Warna · Harga · Qty · Jumlah),
 // penerimaan barang bertahap (1 PO bisa beberapa surat jalan), foto SJ supplier.
 import React, { useMemo, useState } from 'react';
-import { Ban, CircleSlash, FileText, FolderOpen, Mail, MessageCircle, PackageCheck, Pencil, Plus, Printer, Save, Send } from 'lucide-react';
+import { Ban, CircleSlash, FileText, LayoutGrid, FolderOpen, Mail, MessageCircle, PackageCheck, Pencil, Plus, Printer, Save, Send } from 'lucide-react';
 import { pb } from '../../lib/pb';
-import { action, fileUrl, useRecord, useRecords } from '../../lib/data';
+import { action, fileUrl, q, useRecord, useRecords } from '../../lib/data';
 import { href, navigate, replaceQuery, useRoute } from '../../lib/router';
 import { useSession } from '../../lib/session';
 import { date, num, rp, today, waLink } from '../../lib/format';
@@ -11,6 +11,7 @@ import { PO_STATUS, PO_STEPS } from '../../lib/status';
 import { Button, DescList, Empty, ErrorBox, Field, FilePick, Input, LinkButton, Loading, PageHeader, Panel, Select, StatusBadge, Steps, Tabs, Textarea } from '../../ui/core';
 import DataTable, { matchText } from '../../ui/DataTable';
 import DateRange from '../../ui/DateRange';
+import ProductPicker, { sameMaker } from '../../ui/ProductPicker';
 import LineItems, { lineTotal, validateLines } from '../../ui/LineItems';
 import Activity from '../../ui/Activity';
 import { ReasonDialog } from '../../ui/PaymentDialog';
@@ -133,8 +134,47 @@ function POFormInner({ existing }) {
   const openOrders = useRecords('sales_orders', { filter: 'channel = "pesanan" && (status = "baru" || status = "dp" || status = "lunas")', sort: '-created' });
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
+  const [picking, setPicking] = useState(false);
   const set = (patch) => setF((x) => ({ ...x, ...patch }));
   const byName = useMemo(() => new Map(suppliers.items.map((s) => [s.name.toLowerCase(), s])), [suppliers.items]);
+  // PO sebelumnya ke supplier ini: dasar "pernah dipesan" & "samakan dengan PO terakhir" di katalog
+  const knownSupplier = byName.get(f.supplier.trim().toLowerCase())?.name || '';
+  const history = useRecords('purchase_orders', {
+    filter: `supplier = ${q(knownSupplier)} && deleted = false && state != "batal"${existing ? ` && id != ${q(existing.id)}` : ''}`,
+    sort: '-date,-created',
+    limit: 20,
+    enabled: !!knownSupplier,
+  });
+
+  // barang yang dipesan customer = barang yang perlu dibeli (sisa yang belum keluar)
+  const copyOrderItems = (order) => {
+    const list = (order.items || [])
+      .map((it) => ({ product: products.find((p) => p.code === it.productCode), qty: Number(it.qty) - (Number(it.sentQty) || 0) }))
+      .filter((x) => x.product && x.qty > 0);
+    if (list.length === 0) return toast.error('Barang pesanan ini sudah keluar semua.');
+    addPicked(list);
+  };
+
+  const addPicked = (list) => {
+    const items = [...f.items];
+    for (const { product: p, qty } of list) {
+      const i = items.findIndex((it) => it.productCode === String(p.code));
+      if (i >= 0) items[i] = { ...items[i], qty: (Number(items[i].qty) || 0) + qty };
+      else {
+        const price = Number(p.buy_price) || 0;
+        items.push({ productCode: String(p.code), name: p.name, size: p.size || '', color: p.color || '', unit: p.unit || 'pcs', qty, price, originalPrice: price });
+      }
+    }
+    set({ items });
+    setPicking(false);
+    toast.ok(`${list.length} barang masuk ke PO. Harga bisa diubah bila hasil nego berbeda.`);
+  };
+  // cegah salah PO: barang yang di master tercatat dari pabrik lain
+  const otherMaker = f.supplier.trim()
+    ? f.items
+        .map((it) => ({ it, p: products.find((x) => x.code === it.productCode) }))
+        .filter(({ p }) => p?.factory && !sameMaker(p.factory, f.supplier))
+    : [];
 
   const onSupplier = (name) => {
     const s = byName.get(name.trim().toLowerCase());
@@ -142,17 +182,24 @@ function POFormInner({ existing }) {
     else set({ supplier: name });
   };
 
-  const submit = async (e) => {
-    e.preventDefault();
+  // asDraft: simpan dulu walau belum lengkap (barang/qty/harga dilengkapi nanti sebelum dikirim ke supplier)
+  const save = async (asDraft) => {
     setErr('');
     if (!f.supplier.trim()) return setErr('Supplier wajib diisi. 1 PO = 1 supplier.');
-    const lineErr = validateLines(f.items);
-    if (lineErr) return setErr(lineErr);
-    const body = { ...f, for_orders: f.for_orders.map((o) => ({ id: o.id })), items: f.items.map((it) => ({ ...it, qty: Number(it.qty), price: Number(it.price) })) };
-    setBusy(true);
+    if (!asDraft) {
+      const lineErr = validateLines(f.items);
+      if (lineErr) return setErr(lineErr);
+    }
+    const body = {
+      ...f,
+      is_draft: asDraft,
+      for_orders: f.for_orders.map((o) => ({ id: o.id })),
+      items: f.items.map((it) => ({ ...it, qty: it.qty === '' ? '' : Number(it.qty), price: it.price === '' ? '' : Number(it.price) })),
+    };
+    setBusy(asDraft ? 'draft' : 'final');
     try {
       const rec = existing ? await pb.collection('purchase_orders').update(existing.id, body) : await pb.collection('purchase_orders').create(body);
-      toast.ok(`${rec.po_no} tersimpan`);
+      toast.ok(asDraft ? `Draft ${rec.po_no} tersimpan. Bisa dilanjutkan kapan saja dari menu Pembelian.` : `${rec.po_no} tersimpan`);
       navigate(['pembelian', rec.id]);
     } catch (ex) {
       setErr(ex?.response?.message || ex.message);
@@ -160,6 +207,11 @@ function POFormInner({ existing }) {
       setBusy(false);
     }
   };
+  const submit = (e) => {
+    e.preventDefault();
+    save(false);
+  };
+  const isDraftPo = !existing || poState(existing) === 'draft';
 
   return (
     <form className="stack" onSubmit={submit}>
@@ -169,7 +221,12 @@ function POFormInner({ existing }) {
         actions={
           <>
             <Button onClick={() => window.history.back()}>Batal</Button>
-            <Button type="submit" variant="primary" icon={Save} busy={busy}>
+            {isDraftPo && (
+              <Button icon={FileText} busy={busy === 'draft'} disabled={!!busy} onClick={() => save(true)} title="Simpan dulu walau belum lengkap">
+                Simpan Draft
+              </Button>
+            )}
+            <Button type="submit" variant="primary" icon={Save} busy={busy === 'final'} disabled={!!busy}>
               Simpan PO
             </Button>
           </>
@@ -200,43 +257,103 @@ function POFormInner({ existing }) {
           </Field>
         </div>
       </Panel>
-      <Panel title="Barang">
-        <LineItems items={f.items} onChange={(items) => set({ items })} products={products} priceField="buy_price" showSize />
+      <Panel
+        title="Barang"
+        actions={
+          <Button variant={f.items.length ? undefined : 'primary'} icon={LayoutGrid} onClick={() => setPicking(true)}>
+            Pilih dari Katalog
+          </Button>
+        }
+      >
+        {f.items.length === 0 && (
+          <div className="lines-empty">
+            <p>Tidak hafal kode atau nama barang? Buka katalog bergambar: barang {knownSupplier || 'supplier ini'} dan yang pernah dipesan tampil duluan.</p>
+            <Button variant="primary" icon={LayoutGrid} onClick={() => setPicking(true)}>
+              Pilih dari Katalog
+            </Button>
+          </div>
+        )}
+        <LineItems
+          items={f.items}
+          onChange={(items) => set({ items })}
+          products={products}
+          priceField="buy_price"
+          showSize
+          placeholder="+ Ketik nama / warna / ukuran (mis. palet merah)"
+          hint='Enter untuk pindah kolom. Harga bisa diubah (nego). Lupa nama barang? Klik "Pilih dari Katalog".'
+        />
         <div className="totals">
           <span className="grand">Total</span>
           <span className="grand right">{rp(lineTotal(f.items))}</span>
         </div>
+        {otherMaker.length > 0 && (
+          <div className="alert warn mt-3">
+            Cek lagi, barang ini di master tercatat dari pabrik lain:{' '}
+            {otherMaker.map(({ it, p }) => `${it.name} (${p.factory})`).join(', ')}. Pastikan tidak salah barang atau salah supplier.
+          </div>
+        )}
+        {picking && (
+          <ProductPicker products={products} supplier={knownSupplier || f.supplier} history={history.items.map((po) => ({ no: po.po_no, date: po.date, items: po.items }))} onAdd={addPicked} onClose={() => setPicking(false)} />
+        )}
       </Panel>
-      <Panel title="Untuk pesanan customer (opsional)">
-        <p className="small muted mb-2">Isi bila barang PO ini langsung dikirim ke customer tanpa disimpan di gudang. Setelah barang diterima, keluarkan dari halaman pesanannya.</p>
-        <div className="chips">
-          {f.for_orders.map((o) => (
-            <span key={o.id} className="chip">
-              {o.order_no} · {o.customer}
-              <button type="button" aria-label={`Hapus ${o.order_no}`} onClick={() => set({ for_orders: f.for_orders.filter((x) => x.id !== o.id) })}>
-                ×
-              </button>
-            </span>
-          ))}
+      <Panel
+        title="Untuk pesanan customer (opsional)"
+        actions={
+          <Button icon={Plus} onClick={() => window.open(href(['penjualan', 'baru']), '_blank')}>
+            Buat pesanan baru
+          </Button>
+        }
+      >
+        <p className="small muted mb-3">
+          Isi bila barang PO ini langsung dikirim ke customer tanpa disimpan di gudang. Customer dicatat lewat <b>pesanan</b> di menu Penjualan; belum ada
+          pesanannya? Klik "Buat pesanan baru" (terbuka di tab baru), simpan, lalu pilih di sini. Setelah barang diterima, keluarkan dari halaman pesanannya.
+        </p>
+        {f.for_orders.length > 0 && (
+          <ul className="linked-orders">
+            {f.for_orders.map((o) => {
+              const full = openOrders.items.find((x) => x.id === o.id);
+              return (
+                <li key={o.id}>
+                  <div>
+                    <b>{o.customer}</b>
+                    <span className="mono muted small"> {o.order_no}</span>
+                    {full && <div className="small muted">{(full.items || []).map((it) => `${it.name} ${num(it.qty)}`).join(' · ')}</div>}
+                  </div>
+                  {full && (
+                    <Button size="sm" onClick={() => copyOrderItems(full)}>
+                      Salin barangnya ke PO
+                    </Button>
+                  )}
+                  <Button size="sm" variant="ghost" onClick={() => set({ for_orders: f.for_orders.filter((x) => x.id !== o.id) })} aria-label={`Lepas ${o.order_no}`}>
+                    Lepas
+                  </Button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+        <Field label="Tambah pesanan customer" className="w-lg">
           <Select
-            className="w-md"
             value=""
             onChange={(e) => {
               const o = openOrders.items.find((x) => x.id === e.target.value);
               if (o) set({ for_orders: [...f.for_orders, { id: o.id, order_no: o.order_no, customer: o.customer }] });
             }}
-            aria-label="Tambah pesanan customer"
           >
-            <option value="">+ Pilih pesanan customer...</option>
+            <option value="">
+              {openOrders.items.some((o) => !f.for_orders.some((x) => x.id === o.id))
+                ? 'Pilih customer / pesanan...'
+                : 'Belum ada pesanan customer yang menunggu barang'}
+            </option>
             {openOrders.items
               .filter((o) => !f.for_orders.some((x) => x.id === o.id))
               .map((o) => (
                 <option key={o.id} value={o.id}>
-                  {o.order_no} · {o.customer}
+                  {o.customer} · {o.order_no} · {date(o.date)} · {rp(o.total_amount)}
                 </option>
               ))}
           </Select>
-        </div>
+        </Field>
       </Panel>
       <Panel title="Lainnya">
         <div className="form-grid">
@@ -265,6 +382,8 @@ export function PODoc({ id }) {
 
   const st = poState(po);
   const editable = can('owner', 'gudang');
+  // draft yang belum lengkap belum boleh dikirim ke supplier / diterima
+  const incomplete = (po.items || []).length === 0 || (po.items || []).some((it) => !(Number(it.qty) > 0));
   const company = settings?.company_name || 'PT Paletindo Prakarsa Unggul';
   const message = [
     `PURCHASE ORDER ${po.supplier}`,
@@ -328,7 +447,7 @@ export function PODoc({ id }) {
       <PageHeader crumbs={[{ label: 'Pembelian', to: ['pembelian'] }, { label: po.po_no }]} title={po.po_no} sub={po.supplier} />
       <div className="doc-bar">
         <div className="actions">
-          {editable && ['dikirim', 'sebagian', 'draft'].includes(st) && (
+          {editable && ['dikirim', 'sebagian', 'draft'].includes(st) && !incomplete && (
             <Button variant="primary" icon={PackageCheck} onClick={() => setDlg('receive')}>
               Terima Barang
             </Button>
@@ -344,7 +463,7 @@ export function PODoc({ id }) {
           <Button icon={FolderOpen} onClick={() => window.open(href(['cetak', 'map-po', po.id]), '_blank')}>
             Cetak Lembar Map
           </Button>
-          {editable && st !== 'batal' && (
+          {editable && st !== 'batal' && !incomplete && (
             <>
               <Button icon={MessageCircle} onClick={sendWa}>
                 Kirim WA
@@ -354,7 +473,7 @@ export function PODoc({ id }) {
               </Button>
             </>
           )}
-          {editable && st === 'draft' && (
+          {editable && st === 'draft' && !incomplete && (
             <Button icon={Send} onClick={markSent}>
               Tandai Sudah Dikirim
             </Button>
@@ -377,6 +496,13 @@ export function PODoc({ id }) {
         </div>
         <Steps steps={PO_STEPS} current={st} exception={st === 'batal' ? 'Dibatalkan' : null} />
       </div>
+      {st === 'draft' && (
+        <div className={`alert ${incomplete ? 'warn' : 'info'} mb-3`}>
+          {incomplete
+            ? 'Draft belum lengkap: isi barang dan qty-nya lewat tombol "Ubah" sebelum PO dikirim ke supplier.'
+            : 'PO masih draft dan belum dikirim ke supplier. Kirim lewat WA / Email, atau klik "Tandai Sudah Dikirim".'}
+        </div>
+      )}
       {st !== 'batal' && <PoChecklist po={po} folder={folder} />}
       <div className="doc-layout">
         <div className="stack">

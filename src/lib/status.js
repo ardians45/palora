@@ -3,6 +3,7 @@
 import { daysFromToday } from './format';
 
 export const ORDER_STATUS = {
+  draft: { label: 'Draft', tone: 'neutral' },
   baru: { label: 'Pesanan Masuk', tone: 'neutral' },
   dp: { label: 'DP Diterima', tone: 'info' },
   lunas: { label: 'Lunas, Siap Keluar', tone: 'info' },
@@ -77,9 +78,9 @@ export const ROLE_LABEL = { owner: 'Owner', gudang: 'Admin Gudang & Kasir', fina
 // yang dicetak/dikirim hanya "Konfirmasi Pesanan".
 export const isOrderConfirmation = (o) => o.channel === 'pesanan' && o.status === 'baru' && !(o.paid_amount > 0);
 
-// Pesanan yang sudah "jadi" (ada DP, diizinkan keluar, atau barang sudah keluar). Pesanan baru tanpa DP
+// Pesanan yang sudah "jadi" (ada DP, diizinkan keluar, atau barang sudah keluar). Draft dan pesanan baru tanpa DP
 // belum dihitung sebagai omzet maupun piutang (masih konfirmasi pesanan).
-export const ORDER_COMMITTED = '(status != "baru" || paid_amount > 0 || release_approved = true)';
+export const ORDER_COMMITTED = '(deleted = false && status != "draft" && (status != "baru" || paid_amount > 0 || release_approved = true))';
 export const RECEIVABLE_FILTER = `remaining_amount > 0 && status != "batal" && ${ORDER_COMMITTED}`;
 
 // Qty barang yang sudah keluar per baris pesanan (data lama tanpa sentQty: semua keluar bila status sudah keluar)

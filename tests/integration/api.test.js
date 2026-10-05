@@ -716,3 +716,105 @@ describe('PO untuk pesanan customer & riwayat cetak', () => {
     await errorOf(post(S.finance, '/api/palora/printed', { collection: 'users', id: o.id }));
   });
 });
+
+describe('1 surat jalan hanya untuk 1 PO', () => {
+  it('no. surat jalan yang sama dari supplier yang sama ditolak di PO lain', async () => {
+    const p = await freshProduct('T-SJ1', 0);
+    const mk = async () => {
+      const po = await S.gudang.collection('purchase_orders').create({ supplier: 'PT SJ', items: [line(p, 10, 1000)] });
+      await post(S.gudang, '/api/palora/po/state', { po_id: po.id, state: 'dikirim' });
+      return po;
+    };
+    const a = await mk();
+    const b = await mk();
+    await post(S.gudang, '/api/palora/po/receive', { po_id: a.id, sj_no: 'SJ-777', lines: [{ index: 0, good: 4 }] });
+    const err = await errorOf(post(S.gudang, '/api/palora/po/receive', { po_id: b.id, sj_no: 'sj-777', lines: [{ index: 0, good: 4 }] }));
+    expect(err.message).toMatch(new RegExp(`sudah dipakai di ${a.po_no.replace(/[/]/g, '\/')}`));
+    // PO yang sama boleh beberapa surat jalan (mobil tidak muat)
+    await post(S.gudang, '/api/palora/po/receive', { po_id: a.id, sj_no: 'SJ-778', lines: [{ index: 0, good: 6 }] });
+    // supplier lain boleh punya nomor yang kebetulan sama
+    const c = await S.gudang.collection('purchase_orders').create({ supplier: 'PT LAIN', items: [line(p, 1, 1000)] });
+    await post(S.gudang, '/api/palora/po/receive', { po_id: c.id, sj_no: 'SJ-777', lines: [{ index: 0, good: 1 }] });
+  });
+});
+
+describe('Draft PO', () => {
+  it('draft boleh belum lengkap, tapi tidak bisa dikirim/diterima sebelum dilengkapi', async () => {
+    const p = await freshProduct('T-DRF', 0);
+    const d = await S.gudang.collection('purchase_orders').create({ supplier: 'PT DRAFT', items: [], is_draft: true });
+    expect(d).toMatchObject({ state: 'draft', total_amount: 0 });
+    expect(d.po_no).toMatch(/^PO-\d+\/PPU\//);
+    await errorOf(S.gudang.collection('purchase_orders').create({ supplier: 'PT DRAFT', items: [] })); // tanpa draft = wajib barang
+    const upd = await S.gudang.collection('purchase_orders').update(d.id, { is_draft: true, items: [{ ...line(p, 1, 0), qty: '', price: '' }] });
+    expect(upd.items[0]).toMatchObject({ qty: 0, price: 0 });
+    const err = await errorOf(post(S.gudang, '/api/palora/po/state', { po_id: d.id, state: 'dikirim' }));
+    expect(err.message).toMatch(/masih draft: qty .* belum diisi/);
+    await errorOf(post(S.gudang, '/api/palora/po/receive', { po_id: d.id, sj_no: 'SJ-DRF', lines: [{ index: 0, good: 1 }] }));
+    await errorOf(S.gudang.collection('purchase_orders').update(d.id, { items: [{ ...line(p, 1, 0), qty: 0 }] })); // simpan biasa = wajib lengkap
+    await S.gudang.collection('purchase_orders').update(d.id, { items: [line(p, 25, 9000)] });
+    const sent = await post(S.gudang, '/api/palora/po/state', { po_id: d.id, state: 'dikirim' });
+    expect(sent).toMatchObject({ state: 'dikirim', total_amount: 225000 });
+  });
+});
+
+describe('Draft pesanan', () => {
+  it('draft belum bernomor invoice, belum dihitung; nomor INV dibuat saat disimpan final', async () => {
+    const p = await freshProduct('T-DRS', 20, { sell_price: 10000 });
+    await errorOf(S.gudang.collection('sales_orders').create({ is_draft: true, items: [] })); // kosong total
+    const d = await S.gudang.collection('sales_orders').create({ is_draft: true, customer: 'Toko Draft', items: [{ ...line(p, 1), qty: '' }] });
+    expect(d).toMatchObject({ status: 'draft', total_amount: 0 });
+    expect(d.order_no).toMatch(/^DRAFT-/);
+    const pay = await errorOf(post(S.finance, '/api/palora/payment', { kind: 'customer', order_id: d.id, amount: 1000 }));
+    expect(pay.message).toMatch(/masih draft/);
+    await errorOf(post(S.owner, '/api/palora/orders/release', { order_id: d.id }));
+    // masih draft: boleh belum lengkap
+    const d2 = await S.gudang.collection('sales_orders').update(d.id, { is_draft: true, items: [line(p, 3)] });
+    expect(d2).toMatchObject({ status: 'draft', total_amount: 30000 });
+    // final tanpa customer ditolak, dengan customer -> nomor INV & status baru
+    await errorOf(S.gudang.collection('sales_orders').update(d.id, { is_draft: false, customer: '' }));
+    const fin = await S.gudang.collection('sales_orders').update(d.id, { is_draft: false, payment_type: 'Tempo 7 Hari', date: '2026-10-05' });
+    expect(fin.order_no).toMatch(/^INV\/PPU\/202610\/\d{4}$/);
+    expect(fin).toMatchObject({ status: 'baru', total_amount: 30000, remaining_amount: 30000, due_date: '2026-10-12' });
+    // setelah final tidak bisa dihapus seperti draft
+    await errorOf(S.gudang.collection('sales_orders').update(d.id, { deleted: true }));
+  });
+
+  it('draft bisa dihapus pembuatnya', async () => {
+    const d = await S.gudang.collection('sales_orders').create({ is_draft: true, customer: 'Hapus Saya' });
+    const r = await S.gudang.collection('sales_orders').update(d.id, { deleted: true });
+    expect(r.deleted).toBe(true);
+  });
+});
+
+describe('Invoice dobel per PO (kasus PO-039)', () => {
+  it('invoice kedua senilai PO ditolak; surat jalan tidak bisa ditagih dua kali; sisa nilai boleh', async () => {
+    const p = await freshProduct('T-INV2', 0);
+    const po = await S.gudang.collection('purchase_orders').create({ supplier: 'PT LAMA', items: [line(p, 100, 27200)] });
+    await post(S.gudang, '/api/palora/po/state', { po_id: po.id, state: 'dikirim' });
+    // invoice pertama dicatat sebelum barang datang (supplier minta bayar dulu)
+    await S.gudang.collection('supplier_invoices').create({ po_id: po.id, invoice_no: 'INT', total_amount: 2720000, date: today() });
+    await post(S.gudang, '/api/palora/po/receive', { po_id: po.id, sj_no: 'SJ-A', lines: [{ index: 0, good: 80, bad: 10 }] });
+    await post(S.gudang, '/api/palora/po/receive', { po_id: po.id, sj_no: 'SJ-B', lines: [{ index: 0, good: 20 }] });
+    const err = await errorOf(
+      S.gudang.collection('supplier_invoices').create({ po_id: po.id, invoice_no: 'APJDADA', total_amount: 2720000, date: today(), sj_nos: ['SJ-A', 'SJ-B'] })
+    );
+    expect(err.message).toMatch(/Sudah ditagih Rp 2\.720\.000 \(INT Rp 2\.720\.000\)/);
+    expect(err.message).toMatch(/paling banyak Rp 299\.200/); // sisa = PPN 11%
+    // invoice PPN terpisah masih boleh (dalam batas nilai PO + PPN)
+    await S.gudang.collection('supplier_invoices').create({ po_id: po.id, invoice_no: 'PPN-1', total_amount: 299200, date: today(), sj_nos: ['SJ-A'] });
+    const dupSj = await errorOf(S.gudang.collection('supplier_invoices').create({ po_id: po.id, invoice_no: 'X', total_amount: 1, date: today(), sj_nos: ['SJ-A'] }));
+    expect(dupSj.message).toMatch(/PO-.*bernilai|sudah ditagih di invoice PPN-1/);
+  });
+
+  it('PO dibagi 2 invoice (per surat jalan) tetap boleh', async () => {
+    const p = await product(S.owner, 'T-INV2');
+    const po = await S.gudang.collection('purchase_orders').create({ supplier: 'PT LAMA', items: [line(p, 10, 1000)] });
+    await post(S.gudang, '/api/palora/po/state', { po_id: po.id, state: 'dikirim' });
+    await post(S.gudang, '/api/palora/po/receive', { po_id: po.id, sj_no: 'S1', lines: [{ index: 0, good: 6 }] });
+    await post(S.gudang, '/api/palora/po/receive', { po_id: po.id, sj_no: 'S2', lines: [{ index: 0, good: 4 }] });
+    await S.gudang.collection('supplier_invoices').create({ po_id: po.id, invoice_no: 'I-1', total_amount: 6000, date: today(), sj_nos: ['S1'] });
+    await S.gudang.collection('supplier_invoices').create({ po_id: po.id, invoice_no: 'I-2', total_amount: 4000, date: today(), sj_nos: ['S2'] });
+    const e2 = await errorOf(S.gudang.collection('supplier_invoices').create({ po_id: po.id, invoice_no: 'I-3', total_amount: 1000, date: today(), sj_nos: ['S2'] }));
+    expect(e2.message).toMatch(/S2 sudah ditagih di invoice I-2/);
+  });
+});

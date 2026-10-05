@@ -15,7 +15,7 @@ test('Pak De: PO 2 barang -> terima 60% + foto SJ -> terima sisa -> selesai, sto
   await page.goto('/#/pembelian/baru');
   await page.getByLabel(/^Supplier/).fill('PT LINHUI');
   await expect(page.getByLabel('Up (sales supplier)')).toHaveValue('Ibu Fitri');
-  const prod = page.getByPlaceholder('+ Ketik kode / nama barang');
+  const prod = page.getByPlaceholder(/^\+ Ketik/);
   await prod.fill('BOX-0029');
   await prod.press('Enter');
   await page.keyboard.type('10');

@@ -1,5 +1,5 @@
 // Hutang ke supplier: invoice supplier (foto invoice & faktur), jatuh tempo, cicilan pembayaran.
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { CreditCard, Plus } from 'lucide-react';
 import { pb } from '../../lib/pb';
 import { fileUrl, useRecord, useRecords, q } from '../../lib/data';
@@ -112,9 +112,26 @@ export function InvoiceDialog({ onClose, presetPo, stay = false }) {
     notes: '',
     received_date: today(),
   });
-  // surat jalan PO yang ditagih invoice ini (default: semua)
+  // surat jalan PO yang ditagih invoice ini (default: semua yang belum ditagih invoice lain)
   const receipts = presetPo?.receipts || [];
-  const [sjNos, setSjNos] = useState(() => receipts.map((r) => r.sjNo));
+  const [sjNos, setSjNos] = useState(null);
+  const [totalTouched, setTotalTouched] = useState(false);
+  // invoice lain di PO yang sama: cegah tagihan dobel
+  const prior = useRecords('supplier_invoices', { filter: `po_id = ${q(f.po_id)} && deleted = false`, enabled: !!f.po_id });
+  const billedBy = useMemo(() => {
+    const m = new Map();
+    for (const inv of prior.items) for (const sj of inv.sj_nos || []) m.set(String(sj).toLowerCase(), inv.invoice_no);
+    return m;
+  }, [prior.items]);
+  const billed = prior.items.reduce((sum, inv) => sum + inv.total_amount, 0);
+  const selectedPo = presetPo || pos.items.find((x) => x.id === f.po_id);
+  const unbilled = selectedPo ? Math.max(0, selectedPo.total_amount - billed) : 0;
+  const chosenSj = sjNos ?? receipts.map((r) => r.sjNo).filter((sj) => !billedBy.has(String(sj).toLowerCase()));
+  useEffect(() => {
+    // total awal = nilai PO yang belum ditagih (bukan seluruh nilai PO)
+    if (!totalTouched && selectedPo && !prior.loading) set({ total_amount: unbilled || '' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prior.loading, billed, f.po_id]);
   const [file, setFile] = useState(null);
   const [taxFile, setTaxFile] = useState(null);
   const [err, setErr] = useState('');
@@ -138,7 +155,7 @@ export function InvoiceDialog({ onClose, presetPo, stay = false }) {
     const po = pos.items.find((p) => p.id === f.po_id);
     const fd = new FormData();
     Object.entries({ ...f, po_no: po?.po_no || presetPo?.po_no || '', total_amount: Number(f.total_amount) }).forEach(([k, v]) => fd.append(k, String(v ?? '')));
-    fd.append('sj_nos', JSON.stringify(sjNos));
+    fd.append('sj_nos', JSON.stringify(chosenSj));
     if (file) fd.append('file', file);
     if (taxFile) fd.append('tax_file', taxFile);
     setBusy(true);
@@ -158,6 +175,16 @@ export function InvoiceDialog({ onClose, presetPo, stay = false }) {
     <Dialog title={presetPo ? `Invoice / Faktur untuk ${presetPo.po_no}` : 'Catat Invoice Supplier'} onClose={onClose} wide>
       <form onSubmit={submit}>
         <div className="dialog-body">
+          {prior.items.length > 0 && selectedPo && (
+            <div className={`alert ${unbilled > 0 ? 'warn' : 'error'}`}>
+              {selectedPo.po_no} (nilai {rp(selectedPo.total_amount)}) sudah punya invoice:{' '}
+              {prior.items.map((inv) => `${inv.invoice_no} ${rp(inv.total_amount)}`).join(', ')}.{' '}
+              {unbilled > 0
+                ? `Yang belum ditagih ± ${rp(unbilled)}.`
+                : 'Nilai PO sudah ditagih semua.'}{' '}
+              Kalau kertas yang datang adalah invoice yang sama, jangan dicatat lagi: lengkapi foto/faktur di invoice yang sudah ada.
+            </div>
+          )}
           <div className="form-grid cols-3">
             <Field label="Supplier" required className="span-2">
               <Input list="sup-inv-list" value={f.supplier} onChange={(e) => onSupplier(e.target.value)} readOnly={!!presetPo} autoFocus={!presetPo} />
@@ -188,21 +215,31 @@ export function InvoiceDialog({ onClose, presetPo, stay = false }) {
               </Select>
             </Field>
             <Field label="Total tagihan" required>
-              <MoneyInput value={f.total_amount} onChange={(v) => set({ total_amount: v })} />
+              <MoneyInput
+                value={f.total_amount}
+                onChange={(v) => {
+                  setTotalTouched(true);
+                  set({ total_amount: v });
+                }}
+              />
             </Field>
             {receipts.length > 0 && (
               <Field label="Untuk surat jalan" className="span-all" hint="1 PO bisa beberapa surat jalan; centang yang ditagih invoice ini">
                 <div className="row">
-                  {receipts.map((r) => (
-                    <label key={r.sjNo} className="check">
-                      <input
-                        type="checkbox"
-                        checked={sjNos.includes(r.sjNo)}
-                        onChange={(e) => setSjNos((xs) => (e.target.checked ? [...xs, r.sjNo] : xs.filter((x) => x !== r.sjNo)))}
-                      />
-                      {r.sjNo} ({date(r.date)})
-                    </label>
-                  ))}
+                  {receipts.map((r) => {
+                    const by = billedBy.get(String(r.sjNo).toLowerCase());
+                    return (
+                      <label key={r.sjNo} className={`check ${by ? 'muted' : ''}`}>
+                        <input
+                          type="checkbox"
+                          disabled={!!by}
+                          checked={!by && chosenSj.includes(r.sjNo)}
+                          onChange={(e) => setSjNos(e.target.checked ? [...chosenSj, r.sjNo] : chosenSj.filter((x) => x !== r.sjNo))}
+                        />
+                        {r.sjNo} ({date(r.date)}){by ? ` · sudah ditagih ${by}` : ''}
+                      </label>
+                    );
+                  })}
                 </div>
               </Field>
             )}

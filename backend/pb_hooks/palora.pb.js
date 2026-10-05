@@ -100,6 +100,7 @@ onRecordCreateRequest((e) => {
         throw new BadRequestError("Surat jalan " + s + " bukan milik " + po.getString("po_no") + ".");
       }
     });
+    u.checkPoInvoice(e.app, po, r, "");
   }
   if (!r.getString("supplier").trim()) throw new BadRequestError("Supplier wajib diisi.");
 
@@ -143,6 +144,9 @@ onRecordUpdateRequest((e) => {
     (u.getJSON(r, "sj_nos") || []).forEach((s) => {
       if (own.indexOf(String(s).toLowerCase()) === -1) throw new BadRequestError("Surat jalan " + s + " bukan milik " + po.getString("po_no") + ".");
     });
+  }
+  if (poId && !r.getBool("deleted") && (body.total_amount !== undefined || body.sj_nos !== undefined)) {
+    u.checkPoInvoice(e.app, e.app.findRecordById("purchase_orders", poId), r, r.id);
   }
   if (r.getString("invoice_no") !== orig.getString("invoice_no") || r.getString("supplier") !== orig.getString("supplier")) {
     try {
@@ -213,15 +217,20 @@ onRecordCreateRequest((e) => {
   const u = require(`${__hooks}/utils.js`);
   const r = e.record;
   const s = u.getSettings(e.app);
-  const items = u.cleanItems(u.getJSON(r, "items"), { requireCode: true });
+  // draft: boleh belum lengkap, belum dapat nomor invoice (nomor dibuat saat disimpan final)
+  const isDraft = !!(e.requestInfo().body || {}).is_draft;
+  const items = u.cleanItems(u.getJSON(r, "items"), { requireCode: true, draft: isDraft });
   const taxMode = r.getString("tax_mode") || "none";
   const t = u.computeTotals(items, taxMode, s ? s.getFloat("ppn_rate") : 11);
   const date = u.parseDate(r.getString("date")).iso;
 
-  if (!r.getString("customer").trim()) throw new BadRequestError("Nama customer wajib diisi.");
+  if (!isDraft && !r.getString("customer").trim()) throw new BadRequestError("Nama customer wajib diisi.");
+  if (isDraft && !r.getString("customer").trim() && items.length === 0) {
+    throw new BadRequestError("Isi minimal nama customer atau satu barang sebelum menyimpan draft.");
+  }
   r.set("date", date);
-  // jatuh tempo default dari syarat bayar ("Tempo 14 Hari"), selain itu 14 hari
-  if (!r.getString("due_date")) {
+  // jatuh tempo default dari syarat bayar ("Tempo 14 Hari"), selain itu 14 hari (draft: dihitung saat disimpan final)
+  if (!isDraft && !r.getString("due_date")) {
     const m = /(\d+)\s*hari/i.exec(r.getString("payment_type"));
     const d = new Date(date + "T00:00:00Z");
     d.setUTCDate(d.getUTCDate() + (m ? Number(m[1]) : 14));
@@ -235,15 +244,19 @@ onRecordCreateRequest((e) => {
   r.set("paid_amount", 0);
   r.set("dp_amount", 0);
   r.set("remaining_amount", t.total);
-  r.set("status", "baru");
+  r.set("status", isDraft ? "draft" : "baru");
   r.set("channel", "pesanan");
   r.set("release_approved", false);
   r.set("created_by", u.actorName(e.auth));
   if (!r.getString("uid")) r.set("uid", u.uid("ORD"));
 
-  e.app.runInTransaction((tx) => {
-    r.set("order_no", u.docNumber(tx, "INV", date));
-  });
+  if (isDraft) {
+    r.set("order_no", "DRAFT-" + Date.now().toString(36).toUpperCase() + Math.floor(Math.random() * 1296).toString(36).toUpperCase());
+  } else {
+    e.app.runInTransaction((tx) => {
+      r.set("order_no", u.docNumber(tx, "INV", date));
+    });
+  }
   e.next();
 }, "sales_orders");
 
@@ -263,10 +276,44 @@ onRecordUpdateRequest((e) => {
     "total_amount", "release_approved", "dp_override_by", "store", "marketplace_order_no", "created_by", "cancel_reason", "items", "tax_mode", "returns",
   ].forEach((k) => r.set(k, orig.get(k)));
   if (reqBody.deleted !== undefined) {
-    if (u.role(e.auth) !== "owner" || ["baru", "batal"].indexOf(status) === -1 || orig.getFloat("paid_amount") > 0) {
+    const draftDelete = status === "draft"; // draft boleh dihapus pembuatnya (belum bernomor, belum ada uang)
+    if (!draftDelete && (u.role(e.auth) !== "owner" || ["baru", "batal"].indexOf(status) === -1 || orig.getFloat("paid_amount") > 0)) {
       throw new ForbiddenError("Pesanan tidak bisa diarsipkan. Gunakan Batalkan.");
     }
   }
+
+  // Draft: tetap draft (boleh belum lengkap) atau disimpan final -> nomor invoice dibuat sekarang
+  if (status === "draft") {
+    const finalize = reqBody.is_draft === false;
+    if (reqBody.items !== undefined) r.set("items", typeof reqBody.items === "string" ? JSON.parse(reqBody.items) : reqBody.items);
+    if (reqBody.tax_mode !== undefined) r.set("tax_mode", reqBody.tax_mode);
+    const s = u.getSettings(e.app);
+    const items = u.cleanItems(u.getJSON(r, "items"), { requireCode: true, draft: !finalize });
+    const t = u.computeTotals(items, r.getString("tax_mode") || "none", s ? s.getFloat("ppn_rate") : 11);
+    r.set("items", items);
+    r.set("subtotal", t.subtotal);
+    r.set("tax_amount", t.tax);
+    r.set("total_amount", t.total);
+    r.set("remaining_amount", t.total);
+    if (finalize) {
+      if (!r.getString("customer").trim()) throw new BadRequestError("Nama customer wajib diisi.");
+      const date = u.parseDate(r.getString("date")).iso;
+      r.set("date", date);
+      if (!r.getString("due_date")) {
+        const m = /(\d+)\s*hari/i.exec(r.getString("payment_type"));
+        const d = new Date(date + "T00:00:00Z");
+        d.setUTCDate(d.getUTCDate() + (m ? Number(m[1]) : 14));
+        r.set("due_date", d.toISOString().slice(0, 10));
+      }
+      r.set("status", "baru");
+      e.app.runInTransaction((tx) => {
+        r.set("order_no", u.docNumber(tx, "INV", date));
+      });
+    }
+    e.next();
+    return;
+  }
+
   const open = status === "baru" || status === "dp";
   if (!open && orig.getString("channel") === "pesanan") {
     // setelah lunas/keluar: data customer & tanggal ikut terkunci (sudah tercetak di nota/surat jalan)
@@ -307,7 +354,8 @@ onRecordCreateRequest((e) => {
   const u = require(`${__hooks}/utils.js`);
   const r = e.record;
   if (!r.getString("supplier").trim()) throw new BadRequestError("Supplier wajib dipilih.");
-  const items = u.cleanItems(u.getJSON(r, "items")).map((it) => {
+  const draft = !!(e.requestInfo().body || {}).is_draft;
+  const items = u.cleanItems(u.getJSON(r, "items"), { draft: draft }).map((it) => {
     it.receivedQty = 0;
     return it;
   });
@@ -353,7 +401,8 @@ onRecordUpdateRequest((e) => {
       throw new BadRequestError("Barang PO tidak bisa diubah setelah ada penerimaan.");
     }
     r.set("items", typeof reqBody.items === "string" ? JSON.parse(reqBody.items) : reqBody.items);
-    const items = u.cleanItems(u.getJSON(r, "items")).map((it) => {
+    // barang PO yang masih draft boleh belum lengkap; setelah dikirim ke supplier harus lengkap
+    const items = u.cleanItems(u.getJSON(r, "items"), { draft: !!reqBody.is_draft && state === "draft" }).map((it) => {
       it.receivedQty = 0;
       return it;
     });
@@ -389,6 +438,7 @@ routerAdd(
         throw new BadRequestError("PO yang sudah ada penerimaan barang tidak bisa dibatalkan.");
       }
       const reason = String(body.reason || "").trim();
+      if (to === "dikirim") u.requireCompletePo(po);
       if (to === "selesai" && !reason) throw new BadRequestError("Alasan menutup PO wajib diisi (mis. sisa tidak dikirim supplier).");
       po.set("state", to);
       po.set("status", to === "dikirim" ? "Dikirim ke Supplier" : to === "selesai" ? "Selesai (ditutup kurang)" : "Dibatalkan");
@@ -431,9 +481,23 @@ routerAdd(
       if (state === "batal" || state === "selesai") {
         throw new BadRequestError("PO " + po.getString("po_no") + " sudah " + (state === "batal" ? "dibatalkan" : "selesai") + ".");
       }
+      u.requireCompletePo(po);
       const receipts = u.getJSON(po, "receipts") || [];
       if (receipts.some((r) => String(r.sjNo).toLowerCase() === sjNo.toLowerCase())) {
         throw new BadRequestError("Surat jalan " + sjNo + " sudah pernah diterima untuk PO ini.");
+      }
+      // aturan Paletindo: 1 PO boleh beberapa surat jalan, tapi 1 surat jalan tidak boleh untuk 2 PO
+      const other = tx
+        .findRecordsByFilter("purchase_orders", "supplier = {:s} && id != {:id} && receipts ~ {:sj}", "", 20, 0, {
+          s: po.getString("supplier"),
+          id: po.id,
+          sj: '"sjNo":"' + sjNo,
+        })
+        .filter((x) => (u.getJSON(x, "receipts") || []).some((r) => String(r.sjNo).toLowerCase() === sjNo.toLowerCase()));
+      if (other.length) {
+        throw new BadRequestError(
+          "Surat jalan " + sjNo + " sudah dipakai di " + other[0].getString("po_no") + ". Satu surat jalan hanya untuk satu PO."
+        );
       }
       const date = u.parseDate(body.date).iso;
       const items = u.getJSON(po, "items") || [];
@@ -564,6 +628,7 @@ routerAdd(
         const order = tx.findRecordById("sales_orders", String(body.order_id || ""));
         const status = order.getString("status");
         if (status === "batal") throw new BadRequestError("Pesanan sudah dibatalkan.");
+        if (status === "draft") throw new BadRequestError("Pesanan masih draft. Simpan sebagai pesanan dulu, baru catat DP.");
         // DP & pelunasan sebelum barang keluar boleh dicatat gudang; piutang setelah barang keluar hanya Owner/Keuangan
         const preDispatch = status === "baru" || status === "dp";
         if (!(myRole === "owner" || myRole === "finance" || (myRole === "gudang" && preDispatch))) {

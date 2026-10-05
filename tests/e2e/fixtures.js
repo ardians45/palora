@@ -23,7 +23,7 @@ export { expect };
 export async function login(page, role) {
   await page.goto('/');
   await page.getByLabel('Email').fill(USERS[role]);
-  await page.getByLabel('Password').fill(USER_PASSWORD);
+  await page.getByLabel('Password', { exact: true }).fill(USER_PASSWORD);
   await page.getByRole('button', { name: 'Masuk' }).click();
   await expect(page.getByRole('heading', { name: /^Halo,/ })).toBeVisible();
 }

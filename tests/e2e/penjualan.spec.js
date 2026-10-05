@@ -49,7 +49,7 @@ test('Pesanan tempo: DP 25% -> Owner izinkan -> surat jalan -> Bude catat 2x cic
   await page.getByLabel('UP (penerima)').fill('Pak Uji');
   await page.getByLabel('Telepon / WA').fill('0812-1111-2222');
   await page.getByLabel('Alamat kirim').fill('Jl. Uji No. 1, Tangerang');
-  const prod = page.getByPlaceholder('+ Ketik kode / nama barang');
+  const prod = page.getByPlaceholder(/^\+ Ketik/);
   await prod.fill('PLT-0006');
   await prod.press('Enter');
   await page.keyboard.type('10');
@@ -113,7 +113,7 @@ test('Ambil sendiri: lunas -> serahkan barang tanpa surat jalan', async ({ page 
   await login(page, 'gudang');
   await page.goto('/#/penjualan/baru');
   await page.getByLabel(/^Customer/).fill('Pembeli Ambil Sendiri');
-  const prod = page.getByPlaceholder('+ Ketik kode / nama barang');
+  const prod = page.getByPlaceholder(/^\+ Ketik/);
   await prod.fill('PLT-0007');
   await prod.press('Enter');
   await page.keyboard.type('4');
@@ -135,7 +135,7 @@ test('Pembatalan wajib alasan dan tercatat', async ({ page }) => {
   await login(page, 'gudang');
   await page.goto('/#/penjualan/baru');
   await page.getByLabel(/^Customer/).fill('Customer Batal');
-  const prod = page.getByPlaceholder('+ Ketik kode / nama barang');
+  const prod = page.getByPlaceholder(/^\+ Ketik/);
   await prod.fill('PLT-0009');
   await prod.press('Enter');
   await page.getByRole('button', { name: 'Simpan Pesanan' }).click();

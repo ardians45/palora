@@ -1,19 +1,31 @@
-// Kasir penjualan langsung: cari barang -> qty/harga -> Bayar. Target 3 langkah.
+// Kasir penjualan langsung: klik/ketik barang -> atur qty -> Bayar. Target 3 langkah.
+// Kiri: barang bergambar per kelompok (bisa tanpa hafal kode). Kanan: keranjang & pembayaran.
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Printer, Trash2, MessageCircle, Plus } from 'lucide-react';
+import { CheckCircle2, Minus, Plus, Printer, MessageCircle, Search, ShoppingCart, Trash2, UserRound } from 'lucide-react';
 import { action } from '../../lib/data';
 import { href } from '../../lib/router';
 import { useSession } from '../../lib/session';
-import { num, parseNum, rp, today, waLink } from '../../lib/format';
-import { Button, Field, Input, MoneyInput, PageHeader, Panel, Segmented } from '../../ui/core';
+import { num, rp, today, waLink } from '../../lib/format';
+import { Button, Field, Input, MoneyInput, PageHeader, Segmented } from '../../ui/core';
 import { searchProducts } from '../../ui/LineItems';
 import { useToast } from '../../ui/feedback';
 import ProductPhoto from '../../ui/ProductPhoto';
+
+const LIMIT = 60;
+
+/** Tombol uang cepat: uang pas + pecahan terdekat di atas total. */
+function cashOptions(total) {
+  if (!(total > 0)) return [];
+  const out = new Set([total]);
+  for (const step of [10000, 20000, 50000, 100000]) out.add(Math.ceil(total / step) * step);
+  return [...out].sort((a, b) => a - b).slice(0, 4);
+}
 
 export default function Kasir() {
   const { products } = useSession();
   const toast = useToast();
   const [search, setSearch] = useState('');
+  const [group, setGroup] = useState('');
   const [active, setActive] = useState(0);
   const [cart, setCart] = useState([]);
   const [customer, setCustomer] = useState('');
@@ -24,13 +36,24 @@ export default function Kasir() {
   const [err, setErr] = useState('');
   const [done, setDone] = useState(null);
   const searchRef = useRef(null);
+  const cartRef = useRef(null);
 
-  const results = useMemo(() => searchProducts(products, search, 12), [products, search]);
+  const groups = useMemo(() => [...new Set(products.map((p) => p.group_name || 'Lainnya'))].sort((a, b) => a.localeCompare(b, 'id')), [products]);
+  const results = useMemo(() => {
+    const pool = group ? products.filter((p) => (p.group_name || 'Lainnya') === group) : products;
+    if (search.trim()) return searchProducts(pool, search, LIMIT);
+    // tanpa pencarian: barang yang ada stoknya dulu
+    return [...pool].sort((a, b) => (b.stock > 0) - (a.stock > 0)).slice(0, LIMIT);
+  }, [products, search, group]);
+  const inCart = useMemo(() => new Map(cart.map((it) => [it.productCode, Number(it.qty) || 0])), [cart]);
+
   const total = cart.reduce((s, it) => s + (Number(it.qty) || 0) * (Number(it.price) || 0), 0);
+  const count = cart.reduce((s, it) => s + (Number(it.qty) || 0), 0);
   const paid = received === '' ? total : Number(received);
   const change = paid - total;
 
   const add = (p) => {
+    if (p.stock <= 0) return setErr(`Stok ${p.name} habis.`);
     setErr('');
     setCart((c) => {
       const i = c.findIndex((x) => x.productCode === String(p.code));
@@ -41,6 +64,7 @@ export default function Kasir() {
     setActive(0);
     searchRef.current?.focus();
   };
+  const setLine = (i, patch) => setCart((c) => c.map((x, j) => (j === i ? { ...x, ...patch } : x)));
 
   const pay = async () => {
     setErr('');
@@ -80,7 +104,7 @@ export default function Kasir() {
     requestAnimationFrame(() => searchRef.current?.focus());
   };
 
-  // F9 = bayar (selalu memakai state terbaru)
+  // F9 = bayar, F2 = ke kotak cari (selalu memakai state terbaru)
   const payRef = useRef(pay);
   useEffect(() => {
     payRef.current = pay;
@@ -90,6 +114,9 @@ export default function Kasir() {
       if (e.key === 'F9') {
         e.preventDefault();
         if (!done) payRef.current();
+      } else if (e.key === 'F2') {
+        e.preventDefault();
+        searchRef.current?.focus();
       }
     };
     window.addEventListener('keydown', onKey);
@@ -102,18 +129,21 @@ export default function Kasir() {
     return (
       <>
         <PageHeader crumbs={[{ label: 'Penjualan', to: ['penjualan'] }, { label: 'Kasir' }]} title="Transaksi selesai" />
-        <div className="sheet stack">
-          <div className="doc-no">{o.order_no}</div>
-          <div className="row-between">
+        <div className="pos-done">
+          <CheckCircle2 className="pos-done-icon" aria-hidden="true" />
+          <div className="mono muted">{o.order_no}</div>
+          <div className="pos-done-grid">
             <span>Total</span>
-            <span className="pos-total">{rp(o.total_amount)}</span>
+            <b>{rp(o.total_amount)}</b>
+            <span>Dibayar ({o.payment_type})</span>
+            <b>{rp(o.total_amount + (done.change || 0))}</b>
+            {done.change > 0 && (
+              <>
+                <span>Kembalian</span>
+                <b className="pos-change">{rp(done.change)}</b>
+              </>
+            )}
           </div>
-          {done.change > 0 && (
-            <div className="row-between">
-              <span>Kembalian</span>
-              <span className="pos-total">{rp(done.change)}</span>
-            </div>
-          )}
           <div className="actions">
             <Button variant="primary" size="lg" icon={Printer} onClick={() => window.open(href(['cetak', 'nota', o.id]), '_blank')} autoFocus>
               Cetak Nota
@@ -132,158 +162,216 @@ export default function Kasir() {
 
   return (
     <>
-      <PageHeader crumbs={[{ label: 'Penjualan', to: ['penjualan'] }, { label: 'Kasir' }]} title="Kasir" sub="Penjualan langsung, stok langsung terpotong" />
+      <PageHeader crumbs={[{ label: 'Penjualan', to: ['penjualan'] }, { label: 'Kasir' }]} title="Kasir" sub="Klik barang atau ketik lalu Enter · F9 bayar · F2 cari" />
       <div className="pos">
-        <div className="pos-search">
-          <Input
-            ref={searchRef}
-            autoFocus
-            type="search"
-            placeholder="Ketik kode atau nama barang, Enter untuk tambah"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setActive(0);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                setActive((a) => Math.min(a + 1, results.length - 1));
-              } else if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                setActive((a) => Math.max(a - 1, 0));
-              } else if (e.key === 'Enter' && results[active]) {
-                e.preventDefault();
-                add(results[active]);
-              }
-            }}
-            aria-label="Cari barang"
-          />
-          <div className="table-wrap auto-h pos-results">
-            <table className="dt">
-              <thead>
-                <tr>
-                  <th aria-label="Foto" />
-                  <th>Kode</th>
-                  <th>Nama Barang</th>
-                  <th>Warna</th>
-                  <th className="right">Stok</th>
-                  <th className="right">Harga</th>
-                </tr>
-              </thead>
-              <tbody>
-                {results.map((p, i) => (
-                  <tr key={p.id} className={`clickable ${i === active ? 'kbd-active' : ''}`} onClick={() => add(p)} aria-selected={i === active}>
-                    <td className="photo-cell">
-                      <ProductPhoto product={p} size="md" />
-                    </td>
-                    <td className="mono">{p.code}</td>
-                    <td>{p.name}</td>
-                    <td>{p.color}</td>
-                    <td className={`right ${p.stock <= 0 ? 'text-bad' : ''}`}>{num(p.stock)}</td>
-                    <td className="right">{num(p.sell_price)}</td>
-                  </tr>
-                ))}
-                {results.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="muted">
-                      Tidak ada barang "{search}"
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+        <section className="pos-left" aria-label="Pilih barang">
+          <div className="pos-search">
+            <Search size={18} aria-hidden="true" />
+            <Input
+              ref={searchRef}
+              autoFocus
+              type="search"
+              placeholder="Cari kode, nama, atau warna... (Enter untuk tambah)"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setActive(0);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                  e.preventDefault();
+                  setActive((a) => Math.min(a + 1, results.length - 1));
+                } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                  e.preventDefault();
+                  setActive((a) => Math.max(a - 1, 0));
+                } else if (e.key === 'Enter' && results[active]) {
+                  e.preventDefault();
+                  add(results[active]);
+                } else if (e.key === 'Escape') {
+                  setSearch('');
+                }
+              }}
+              aria-label="Cari barang"
+            />
           </div>
-        </div>
+          <div className="pos-groups" role="tablist" aria-label="Kelompok barang">
+            <button type="button" role="tab" aria-selected={!group} className={!group ? 'on' : ''} onClick={() => setGroup('')}>
+              Semua
+            </button>
+            {groups.map((g) => (
+              <button type="button" role="tab" key={g} aria-selected={group === g} className={group === g ? 'on' : ''} onClick={() => setGroup(g)}>
+                {g}
+              </button>
+            ))}
+          </div>
+          <div className="pos-results">
+            {results.map((p, i) => {
+              const q = inCart.get(String(p.code)) || 0;
+              const out = p.stock <= 0;
+              return (
+                <button
+                  type="button"
+                  key={p.id}
+                  className={`pos-item ${i === active && search ? 'kbd-active' : ''} ${q ? 'in-cart' : ''} ${out ? 'out' : ''}`}
+                  onClick={() => add(p)}
+                  disabled={out}
+                  aria-label={`Tambah ${p.name}${out ? ' (stok habis)' : ''}`}
+                >
+                  {q > 0 && <span className="pos-item-qty">{num(q)}</span>}
+                  <ProductPhoto product={p} size="md" className="pos-item-photo" />
+                  <span className="pos-item-name">{p.name}</span>
+                  <span className="pos-item-price">{rp(p.sell_price)}</span>
+                  <span className={`pos-item-stock ${out ? 'text-bad' : p.stock <= 5 ? 'text-warn' : ''}`}>{out ? 'Stok habis' : `stok ${num(p.stock)}`}</span>
+                </button>
+              );
+            })}
+            {results.length === 0 && <div className="empty">Tidak ada barang "{search}". Coba kata lain atau pilih kelompok "Semua".</div>}
+          </div>
+        </section>
 
-        <Panel title={`Keranjang (${cart.length})`} bodyClass="panel-body stack">
-          {cart.length === 0 ? (
-            <p className="muted small">Belum ada barang. Ketik kode di kotak cari lalu tekan Enter.</p>
-          ) : (
-            <table className="lines">
-              <thead>
-                <tr>
-                  <th>Barang</th>
-                  <th className="right">Qty</th>
-                  <th className="right">Harga</th>
-                  <th />
-                </tr>
-              </thead>
-              <tbody>
-                {cart.map((it, i) => (
-                  <tr key={it.productCode}>
-                    <td>
-                      <div className="row">
-                        <ProductPhoto product={it._product} />
-                        <span>{it.name}</span>
-                      </div>
-                      <div className={`stock-hint ${Number(it.qty) > it.stock ? 'low' : ''}`}>
+        <aside className="pos-cart" aria-label="Keranjang" ref={cartRef}>
+          <div className="pos-cart-head">
+            <h2>
+              <ShoppingCart size={18} aria-hidden="true" /> Keranjang ({cart.length})
+            </h2>
+            {cart.length > 0 && (
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => setCart([])}>
+                Kosongkan
+              </button>
+            )}
+          </div>
+
+          <div className="pos-lines">
+            {cart.length === 0 ? (
+              <div className="pos-empty">
+                <ShoppingCart size={28} aria-hidden="true" />
+                <p>Belum ada barang. Klik barang di sebelah kiri, atau ketik di kotak cari lalu tekan Enter.</p>
+              </div>
+            ) : (
+              cart.map((it, i) => {
+                const q = Number(it.qty) || 0;
+                const overStock = q > it.stock;
+                return (
+                  <div className="pos-line" key={it.productCode}>
+                    <ProductPhoto product={it._product} />
+                    <div className="pos-line-main">
+                      <div className="pos-line-name">{it.name}</div>
+                      <div className={`stock-hint ${overStock ? 'low' : ''}`}>
                         {it.productCode} · stok {num(it.stock)}
+                        {overStock ? ' · melebihi stok' : ''}
                       </div>
-                    </td>
-                    <td className="right">
-                      <input
-                        className="cell num"
-                        inputMode="numeric"
-                        value={it.qty}
-                        onChange={(e) => {
-                          const n = parseNum(e.target.value);
-                          setCart((c) => c.map((x, j) => (j === i ? { ...x, qty: Number.isNaN(n) ? '' : n } : x)));
-                        }}
-                        aria-label={`Qty ${it.name}`}
-                      />
-                    </td>
-                    <td className="right">
-                      <MoneyInput className="cell" value={it.price} onChange={(v) => setCart((c) => c.map((x, j) => (j === i ? { ...x, price: v } : x)))} aria-label={`Harga ${it.name}`} />
-                      {Number(it.price) !== it.originalPrice && <div className="stock-hint">normal {num(it.originalPrice)}</div>}
-                    </td>
-                    <td>
+                      <div className="pos-line-ctrl">
+                        <div className="stepper">
+                          <button type="button" onClick={() => setLine(i, { qty: Math.max(1, q - 1) })} aria-label={`Kurangi ${it.name}`} disabled={q <= 1}>
+                            <Minus size={14} />
+                          </button>
+                          <input
+                            className="cell num"
+                            inputMode="numeric"
+                            value={it.qty}
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => {
+                              const digits = e.target.value.replace(/\D/g, '');
+                              setLine(i, { qty: digits === '' ? '' : Number(digits) });
+                            }}
+                            aria-label={`Qty ${it.name}`}
+                          />
+                          <button type="button" onClick={() => setLine(i, { qty: q + 1 })} aria-label={`Tambah ${it.name}`}>
+                            <Plus size={14} />
+                          </button>
+                        </div>
+                        <span className="muted">×</span>
+                        <MoneyInput className="cell pos-price" value={it.price} onChange={(v) => setLine(i, { price: v })} aria-label={`Harga ${it.name}`} />
+                      </div>
+                      {Number(it.price) !== it.originalPrice && <div className="stock-hint">harga normal {num(it.originalPrice)} (nego)</div>}
+                    </div>
+                    <div className="pos-line-end">
+                      <b>{num(q * (Number(it.price) || 0))}</b>
                       <button type="button" className="btn btn-ghost btn-sm btn-icon" onClick={() => setCart((c) => c.filter((_, j) => j !== i))} aria-label={`Hapus ${it.name}`}>
                         <Trash2 size={15} />
                       </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-          <div className="row-between">
-            <span>Total</span>
-            <span className="pos-total">{rp(total)}</span>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
-          <div className="form-grid">
-            <Field label="Nama pembeli (opsional)">
-              <Input value={customer} onChange={(e) => setCustomer(e.target.value)} placeholder="Pelanggan Umum" />
-            </Field>
-            <Field label="No. WA (opsional)">
-              <Input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" />
-            </Field>
-          </div>
-          <Segmented
-            value={method}
-            onChange={setMethod}
-            options={[
-              { value: 'Tunai', label: 'Tunai' },
-              { value: 'Transfer', label: 'Transfer' },
-              { value: 'QRIS', label: 'QRIS' },
-            ]}
-          />
-          {method === 'Tunai' && (
-            <div className="form-grid">
-              <Field label="Uang diterima">
-                <MoneyInput value={received === '' ? total : received} onChange={setReceived} />
-              </Field>
-              <Field label="Kembalian">
-                <Input readOnly value={change >= 0 ? num(change) : `kurang ${num(-change)}`} className={`num ${change < 0 ? 'invalid' : ''}`} />
-              </Field>
+
+          <div className="pos-pay">
+            <div className="pos-total-row">
+              <span>
+                Total <span className="muted small">({num(count)} pcs)</span>
+              </span>
+              <span className="pos-total">{rp(total)}</span>
             </div>
-          )}
-          {err && <div className="alert error" role="alert">{err}</div>}
-          <Button variant="primary" size="lg" busy={busy} onClick={pay} disabled={cart.length === 0}>
-            Bayar {rp(total)} (F9)
-          </Button>
-        </Panel>
+
+            <Segmented
+              value={method}
+              onChange={setMethod}
+              options={[
+                { value: 'Tunai', label: 'Tunai' },
+                { value: 'Transfer', label: 'Transfer' },
+                { value: 'QRIS', label: 'QRIS' },
+              ]}
+            />
+
+            {method === 'Tunai' && (
+              <>
+                <div className="form-grid">
+                  <Field label="Uang diterima">
+                    <MoneyInput value={received === '' ? total : received} onChange={setReceived} />
+                  </Field>
+                  <Field label="Kembalian">
+                    <Input readOnly value={change >= 0 ? num(change) : `kurang ${num(-change)}`} className={`num pos-change-input ${change < 0 ? 'invalid' : change > 0 ? 'has-change' : ''}`} />
+                  </Field>
+                </div>
+                {total > 0 && (
+                  <div className="cash-quick" aria-label="Uang cepat">
+                    {cashOptions(total).map((v) => (
+                      <button type="button" key={v} className={`btn btn-sm ${paid === v ? 'on' : ''}`} onClick={() => setReceived(v === total ? '' : v)}>
+                        {v === total ? 'Uang pas' : num(v)}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+
+            <details className="pos-buyer">
+              <summary>
+                <UserRound size={14} aria-hidden="true" /> Data pembeli (opsional){customer ? `: ${customer}` : ''}
+              </summary>
+              <div className="form-grid">
+                <Field label="Nama pembeli">
+                  <Input value={customer} onChange={(e) => setCustomer(e.target.value)} placeholder="Pelanggan Umum" />
+                </Field>
+                <Field label="No. WA">
+                  <Input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" placeholder="untuk kirim nota" />
+                </Field>
+              </div>
+            </details>
+
+            {err && (
+              <div className="alert error" role="alert">
+                {err}
+              </div>
+            )}
+            <Button variant="primary" size="lg" className="pos-pay-btn" busy={busy} onClick={pay} disabled={cart.length === 0}>
+              Bayar {rp(total)} (F9)
+            </Button>
+          </div>
+        </aside>
       </div>
+      {cart.length > 0 && (
+        <div className="pos-mobile-bar">
+          <span>
+            {cart.length} barang · <b>{rp(total)}</b>
+          </span>
+          <Button variant="primary" onClick={() => cartRef.current?.scrollIntoView({ block: 'start' })}>
+            Keranjang &amp; Bayar
+          </Button>
+        </div>
+      )}
     </>
   );
 }

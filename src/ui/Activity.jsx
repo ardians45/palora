@@ -41,6 +41,7 @@ const FIELD = {
   reason: 'Alasan',
   min_stock: 'Stok minimum',
   doc: 'Dokumen',
+  invoice_no: 'No. invoice',
 };
 
 const show = (v) => {
@@ -51,7 +52,7 @@ const show = (v) => {
   return String(v);
 };
 
-const CREATE_FIELDS = ['customer', 'supplier', 'name', 'total_amount', 'stock', 'sj_no'];
+const CREATE_FIELDS = ['invoice_no', 'customer', 'supplier', 'name', 'total_amount', 'stock', 'sj_no'];
 
 export function describeChanges(changes, action) {
   return Object.entries(changes || {})

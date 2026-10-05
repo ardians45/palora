@@ -1,15 +1,18 @@
 // Form pesanan customer (baru & ubah). Harga per baris bisa dinego.
 import React, { useMemo, useState } from 'react';
-import { Save } from 'lucide-react';
+import { FileText, LayoutGrid, Save } from 'lucide-react';
 import { pb } from '../../lib/pb';
-import { action, useRecords, useRecord } from '../../lib/data';
+import { action, q, useRecords, useRecord } from '../../lib/data';
 import { navigate } from '../../lib/router';
 import { useSession } from '../../lib/session';
 import { dueDateFromTerms, num, rp, today } from '../../lib/format';
 import { Button, Empty, ErrorBox, Field, FilePick, Input, Loading, MoneyInput, PageHeader, Panel, Select, Textarea } from '../../ui/core';
 import LineItems, { lineTotal, validateLines } from '../../ui/LineItems';
 import { useToast } from '../../ui/feedback';
+import ProductPicker from '../../ui/ProductPicker';
 import { PAY_METHODS } from '../../ui/PaymentDialog';
+
+const HINT = 'Enter untuk pindah kolom. Harga bisa diubah (nego). Lupa nama barang? Klik "Pilih dari Katalog".';
 
 export const TERMS = ['Tunai', 'Transfer', 'Tempo 7 Hari', 'Tempo 14 Hari', 'Tempo 30 Hari', 'Tempo 45 Hari'];
 
@@ -44,7 +47,7 @@ export default function PesananForm({ id }) {
   const { item: existing, loading, error } = useRecord('sales_orders', id || null);
   if (id && loading) return <Loading />;
   if (id && error) return <ErrorBox error={error} />;
-  if (id && existing && !['baru', 'dp'].includes(existing.status)) {
+  if (id && existing && !['draft', 'baru', 'dp'].includes(existing.status)) {
     return <Empty title="Pesanan ini tidak bisa diubah">Barang/harga hanya bisa diubah sebelum lunas atau dikirim.</Empty>;
   }
   return <Form existing={existing} />;
@@ -58,12 +61,37 @@ function Form({ existing }) {
   const [dp, setDp] = useState({ amount: '', method: 'Transfer BCA', file: null });
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
+  const [picking, setPicking] = useState(false);
+  // draft = pesanan baru yang disimpan dulu walau belum lengkap; nomor invoice dibuat saat disimpan final
+  const isDraftOrder = !existing || existing.status === 'draft';
   const rate = settings?.ppn_rate || 11;
   const minDp = settings?.min_dp_percent ?? 25;
   const t = calcTotals(form.items, form.tax_mode, rate);
   const set = (patch) => setForm((f) => ({ ...f, ...patch }));
 
   const known = useMemo(() => new Map(customers.items.map((c) => [c.name.toLowerCase(), c])), [customers.items]);
+  // pesanan sebelumnya dari customer ini: dasar "pernah dibeli" & "samakan dengan pesanan terakhir" di katalog
+  const knownCustomer = known.get(form.customer.trim().toLowerCase())?.name || '';
+  const history = useRecords('sales_orders', {
+    filter: `customer = ${q(knownCustomer)} && channel = "pesanan" && status != "batal" && status != "draft" && deleted = false${existing ? ` && id != ${q(existing.id)}` : ''}`,
+    sort: '-date,-created',
+    limit: 20,
+    enabled: !!knownCustomer,
+  });
+  const addPicked = (list) => {
+    const items = [...form.items];
+    for (const { product: pr, qty } of list) {
+      const i = items.findIndex((it) => it.productCode === String(pr.code));
+      if (i >= 0) items[i] = { ...items[i], qty: (Number(items[i].qty) || 0) + qty };
+      else {
+        const price = Number(pr.sell_price) || 0;
+        items.push({ productCode: String(pr.code), name: pr.name, size: pr.size || '', color: pr.color || '', unit: pr.unit || 'pcs', qty, price, originalPrice: price });
+      }
+    }
+    set({ items });
+    setPicking(false);
+    toast.ok(`${list.length} barang masuk ke pesanan. Harga bisa diubah bila nego.`);
+  };
 
   // pilih customer terdaftar -> isi UP, telepon, alamat kirim, syarat bayar
   const onCustomer = (name) => {
@@ -81,27 +109,29 @@ function Form({ existing }) {
     } else set({ customer: name });
   };
 
-  const submit = async (e) => {
-    e.preventDefault();
+  const save = async (asDraft) => {
     setErr('');
-    if (!form.customer.trim()) return setErr('Nama customer wajib diisi.');
-    const lineErr = validateLines(form.items);
-    if (lineErr) return setErr(lineErr);
-    const dpAmount = Number(dp.amount) || 0;
+    if (asDraft) {
+      if (!form.customer.trim() && form.items.length === 0) return setErr('Isi minimal nama customer atau satu barang untuk menyimpan draft.');
+    } else {
+      if (!form.customer.trim()) return setErr('Nama customer wajib diisi.');
+      const lineErr = validateLines(form.items);
+      if (lineErr) return setErr(lineErr);
+    }
+    const dpAmount = asDraft || !isDraftOrder ? 0 : Number(dp.amount) || 0;
     if (dpAmount > t.total) return setErr(`DP ${rp(dpAmount)} melebihi total ${rp(t.total)}.`);
 
     const body = {
       ...form,
-      items: form.items.map((it) => ({ ...it, qty: Number(it.qty), price: Number(it.price) })),
+      is_draft: asDraft,
+      items: form.items.map((it) => ({ ...it, qty: it.qty === '' ? '' : Number(it.qty), price: it.price === '' ? '' : Number(it.price) })),
     };
-    setBusy(true);
+    setBusy(asDraft ? 'draft' : 'final');
     try {
-      let rec;
-      if (existing) {
-        rec = await pb.collection('sales_orders').update(existing.id, body);
-        toast.ok(`Pesanan ${rec.order_no} diperbarui`);
+      const rec = existing ? await pb.collection('sales_orders').update(existing.id, body) : await pb.collection('sales_orders').create(body);
+      if (asDraft) {
+        toast.ok('Draft pesanan tersimpan. Lanjutkan kapan saja dari Penjualan, tab Draft.');
       } else {
-        rec = await pb.collection('sales_orders').create(body);
         if (dpAmount > 0) {
           try {
             await action('payment', { kind: 'customer', order_id: rec.id, amount: dpAmount, method: dp.method, date: form.date, note: 'DP', proof: dp.file || undefined });
@@ -111,7 +141,7 @@ function Form({ existing }) {
             return;
           }
         }
-        toast.ok(`Pesanan ${rec.order_no} tersimpan`);
+        toast.ok(existing && existing.status !== 'draft' ? `Pesanan ${rec.order_no} diperbarui` : `Pesanan ${rec.order_no} tersimpan`);
       }
       navigate(['penjualan', rec.id]);
     } catch (ex) {
@@ -120,18 +150,27 @@ function Form({ existing }) {
       setBusy(false);
     }
   };
+  const submit = (e) => {
+    e.preventDefault();
+    save(false);
+  };
 
   const dpPercent = t.total > 0 ? Math.round(((Number(dp.amount) || 0) / t.total) * 100) : 0;
 
   return (
     <form onSubmit={submit} className="stack">
       <PageHeader
-        crumbs={[{ label: 'Penjualan', to: ['penjualan'] }, existing ? { label: existing.order_no, to: ['penjualan', existing.id] } : null, { label: existing ? 'Ubah' : 'Pesanan Baru' }].filter(Boolean)}
-        title={existing ? `Ubah ${existing.order_no}` : 'Pesanan Baru'}
+        crumbs={[{ label: 'Penjualan', to: ['penjualan'] }, existing ? { label: existing.status === 'draft' ? 'Draft' : existing.order_no, to: ['penjualan', existing.id] } : null, { label: existing ? 'Ubah' : 'Pesanan Baru' }].filter(Boolean)}
+        title={existing ? (existing.status === 'draft' ? 'Lanjutkan Draft Pesanan' : `Ubah ${existing.order_no}`) : 'Pesanan Baru'}
         actions={
           <>
             <Button onClick={() => window.history.back()}>Batal</Button>
-            <Button type="submit" variant="primary" icon={Save} busy={busy}>
+            {isDraftOrder && (
+              <Button icon={FileText} busy={busy === 'draft'} disabled={!!busy} onClick={() => save(true)} title="Simpan dulu walau belum lengkap">
+                Simpan Draft
+              </Button>
+            )}
+            <Button type="submit" variant="primary" icon={Save} busy={busy === 'final'} disabled={!!busy}>
               Simpan Pesanan
             </Button>
           </>
@@ -167,8 +206,41 @@ function Form({ existing }) {
         </div>
       </Panel>
 
-      <Panel title="Barang">
-        <LineItems items={form.items} onChange={(items) => set({ items })} products={products} priceField="sell_price" showStock />
+      <Panel
+        title="Barang"
+        actions={
+          <Button variant={form.items.length ? undefined : 'primary'} icon={LayoutGrid} onClick={() => setPicking(true)}>
+            Pilih dari Katalog
+          </Button>
+        }
+      >
+        {form.items.length === 0 && (
+          <div className="lines-empty">
+            <p>Tidak hafal kode atau nama barang? Buka katalog bergambar{knownCustomer ? `: barang yang pernah dibeli ${knownCustomer} tampil duluan` : ''}.</p>
+            <Button variant="primary" icon={LayoutGrid} onClick={() => setPicking(true)}>
+              Pilih dari Katalog
+            </Button>
+          </div>
+        )}
+        <LineItems
+          items={form.items}
+          onChange={(items) => set({ items })}
+          products={products}
+          priceField="sell_price"
+          showStock
+          placeholder="+ Ketik nama / warna / ukuran (mis. palet merah)"
+          hint={HINT}
+        />
+        {picking && (
+          <ProductPicker
+            products={products}
+            priceField="sell_price"
+            history={history.items.map((o) => ({ no: o.order_no, date: o.date, items: o.items }))}
+            historyLabel={`Pernah dibeli ${knownCustomer}`}
+            onAdd={addPicked}
+            onClose={() => setPicking(false)}
+          />
+        )}
         <div className="row-between mt-3">
           <div className="form-grid w-md">
             <Field label="PPN">
@@ -203,7 +275,7 @@ function Form({ existing }) {
             <Input type="date" value={form.due_date} onChange={(e) => set({ due_date: e.target.value })} />
           </Field>
           <span />
-          {!existing && (
+          {isDraftOrder && (
             <>
               <Field label="DP diterima sekarang" hint={t.total > 0 ? `Minimal ${minDp}% = ${rp(Math.ceil((t.total * minDp) / 100))}${dp.amount ? ` · tercatat ${dpPercent}%` : ''}` : 'Boleh dikosongkan, dicatat nanti'}>
                 <MoneyInput value={dp.amount} onChange={(v) => setDp({ ...dp, amount: v })} placeholder="0" />
@@ -221,7 +293,7 @@ function Form({ existing }) {
           </Field>
         </div>
         <p className="small muted mt-2">
-          Pesanan diproses setelah DP minimal {minDp}%. Barang keluar setelah lunas, atau dengan izin Owner untuk pelanggan tempo.
+          {isDraftOrder ? 'DP hanya dicatat saat "Simpan Pesanan" (bukan saat simpan draft). ' : ''}Pesanan diproses setelah DP minimal {minDp}%. Barang keluar setelah lunas, atau dengan izin Owner untuk pelanggan tempo.
         </p>
       </Panel>
     </form>
