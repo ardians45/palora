@@ -32,9 +32,12 @@ dist-ssr
 temp_docx/
 
 
-# PocketBase (binary & data lokal)
+# PocketBase & Cloudflared (binary & data lokal)
 backend/pocketbase
 backend/pocketbase.exe
+backend/cloudflared*
+backend/CHANGELOG.md
+backend/LICENSE.md
 backend/pb_data/
 backend/pb_public/
 backend/.env
