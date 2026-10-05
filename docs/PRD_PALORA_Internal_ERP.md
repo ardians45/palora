@@ -5,7 +5,7 @@
 **Tanggal:** 23 September 2026  
 **Status:** Draft / Active Baseline  
 **Penulis:** Tim Pengembang (Proyek Kampus / Project Work)  
-**Sumber Utama:** Transkrip Wawancara Operasional (`perekaman-standar-17-mp3_dengan_penanda_waktu.txt`) & Dokumen Project Work PALORA
+**Sumber Utama:** Transkrip Wawancara Operasional (`referensi/wawancara/perekaman-standar-17-mp3_dengan_penanda_waktu.txt`) & Dokumen Project Work PALORA
 
 ---
 

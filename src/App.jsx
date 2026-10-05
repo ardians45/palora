@@ -1,354 +1,144 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import Navbar from './components/Navbar';
-import Sidebar from './components/Sidebar';
-import AppLauncher from './components/AppLauncher';
-import PrintModal from './components/PrintModal';
-import LoginScreen from './components/LoginScreen';
-
-// Modules
-import SalesModule from './components/modules/SalesModule';
-import PurchaseModule from './components/modules/PurchaseModule';
-import InventoryModule from './components/modules/InventoryModule';
-import DeliveryModule from './components/modules/DeliveryModule';
-import ReceivablesModule from './components/modules/ReceivablesModule';
-import DocumentModule from './components/modules/DocumentModule';
-import MarketplaceModule from './components/modules/MarketplaceModule';
-import MasterDataModule from './components/modules/MasterDataModule';
-import ReportsModule from './components/modules/ReportsModule';
-import SystemLogModule from './components/modules/SystemLogModule';
-import UsersModule from './components/modules/UsersModule';
-
-import { APP_MODULES } from './data/mockData';
+// PALORA v2: routing halaman + cek hak akses per role.
+import React from 'react';
 import { useAuth } from './lib/useAuth';
-import { usePbCollection, onSyncStatus } from './lib/usePbCollection';
-import { userLabel } from './lib/schema';
+import { useRoute } from './lib/router';
+import { SessionProvider, useSession } from './lib/session';
+import { FeedbackProvider } from './ui/feedback';
+import { Empty, LinkButton, Loading } from './ui/core';
+import Login from './layout/Login';
+import Launcher from './layout/Launcher';
+import Shell from './layout/Shell';
+import { canOpen, moduleById } from './modules/registry';
 
-// Indikator kecil di pojok kanan bawah saat ada data yang sedang disimpan ke server
-function SyncIndicator() {
-  const [pending, setPending] = useState(0);
-  useEffect(() => onSyncStatus(setPending), []);
-  if (!pending) return null;
-  return <div className="sync-indicator">Menyimpan {pending} perubahan...</div>;
-}
+import PesananList from './modules/penjualan/PesananList';
+import PesananForm from './modules/penjualan/PesananForm';
+import PesananDoc from './modules/penjualan/PesananDoc';
+import Kasir from './modules/penjualan/Kasir';
+import { SuratJalanList, SuratJalanDoc } from './modules/penjualan/SuratJalan';
+import StokList from './modules/stok/StokList';
+import StokCard, { HargaModal, MutasiList } from './modules/stok/StokCard';
+import { OpnameDoc, OpnameList, OpnameNew } from './modules/stok/Opname';
+import { PODoc, POForm, POList } from './modules/pembelian/PO';
+import { PiutangCustomer, PiutangList } from './modules/keuangan/Piutang';
+import { HutangDoc, HutangList } from './modules/keuangan/Hutang';
+import Arsip from './modules/arsip/Arsip';
+import Marketplace from './modules/marketplace/Marketplace';
+import Laporan from './modules/laporan/Laporan';
+import Master from './modules/master/Master';
+import { Aktivitas, Pengaturan, Pengguna } from './modules/admin/Admin';
+import { NotaPrint, OpnamePrint, POPrint, SuratJalanPrint } from './print/Print';
 
 export default function App() {
-  const { user, login, logout } = useAuth();
-  if (!user) return <LoginScreen onLogin={login} />;
-  // key = id user -> semua state di-reset bersih saat ganti akun
-  return <AuthenticatedApp key={user.id} user={user} onLogout={logout} />;
+  const { user, login, logout, expired } = useAuth();
+  if (!user) {
+    return (
+      <FeedbackProvider>
+        {expired && <div className="alert warn">Sesi login sudah habis. Silakan masuk lagi.</div>}
+        <Login onLogin={login} />
+      </FeedbackProvider>
+    );
+  }
+  return (
+    <FeedbackProvider>
+      {/* key = id user: semua state bersih saat ganti akun */}
+      <SessionProvider key={user.id} user={user} onLogout={logout}>
+        <Router />
+      </SessionProvider>
+    </FeedbackProvider>
+  );
 }
 
-function AuthenticatedApp({ user, onLogout }) {
-  const [activeModule, setActiveModule] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const currentRole = userLabel(user);
-  const role = user.role;
-  const isOwner = role === 'owner';
-
-  // Modul yang boleh dibuka sesuai role (PRD 6.7)
-  const allowedModules = useMemo(
-    () => APP_MODULES.filter(m => m.roleAccess.includes('all') || m.roleAccess.includes(role)),
-    [role]
+function NoAccess() {
+  return (
+    <Empty title="Akun Anda tidak punya akses ke halaman ini" action={<LinkButton to={[]}>Kembali ke menu utama</LinkButton>}>
+      Hubungi Owner bila perlu akses.
+    </Empty>
   );
-  const allowedModuleIds = useMemo(() => allowedModules.map(m => m.id), [allowedModules]);
+}
 
-  // Data utama: tersimpan di server PocketBase & tersinkron realtime antar perangkat
-  const [products, setProducts, productsMeta] = usePbCollection('products');
-  const [customers, setCustomers] = usePbCollection('customers');
-  const [suppliers, setSuppliers] = usePbCollection('suppliers');
-  const [orders, setOrders] = usePbCollection('orders');
-  const [purchaseOrders, setPurchaseOrders] = usePbCollection('purchaseOrders');
-  const [deliveries, setDeliveries] = usePbCollection('deliveries');
-  const [documents, setDocuments] = usePbCollection('documents');
-  const [stockMovements, setStockMovements] = usePbCollection('stockMovements');
-  const [systemLogs, setSystemLogs] = usePbCollection('systemLogs', isOwner);
+function NotFound() {
+  return <Empty title="Halaman tidak ditemukan" action={<LinkButton to={[]}>Kembali ke menu utama</LinkButton>} />;
+}
 
-  const addSystemLog = useCallback((module, action, detail) => {
-    const nowStr = new Date().toLocaleString('id-ID', {
-      year: 'numeric', month: '2-digit', day: '2-digit',
-      hour: '2-digit', minute: '2-digit', second: '2-digit'
-    }).replace(/\./g, ':').replace(',', '');
+function page(parts, query, role) {
+  const [mod, a, b] = parts;
+  switch (mod) {
+    case 'penjualan':
+      if (!a) return <PesananList />;
+      if (a === 'baru') return role === 'finance' ? <NoAccess /> : <PesananForm />;
+      if (b === 'ubah') return role === 'finance' ? <NoAccess /> : <PesananForm id={a} />;
+      return <PesananDoc id={a} />;
+    case 'kasir':
+      return <Kasir />;
+    case 'surat-jalan':
+      return a ? <SuratJalanDoc id={a} /> : <SuratJalanList />;
+    case 'stok':
+      if (!a) return <StokList />;
+      if (a === 'mutasi') return <MutasiList />;
+      if (a === 'harga') return role === 'owner' ? <HargaModal /> : <NoAccess />;
+      return <StokCard id={a} />;
+    case 'opname':
+      if (!a) return <OpnameList />;
+      if (a === 'baru') return <OpnameNew />;
+      return <OpnameDoc id={a} />;
+    case 'pembelian':
+      if (!a) return <POList />;
+      if (a === 'baru') return role === 'finance' ? <NoAccess /> : <POForm />;
+      if (b === 'ubah') return role === 'finance' ? <NoAccess /> : <POForm id={a} />;
+      return <PODoc id={a} />;
+    case 'piutang':
+      return a ? <PiutangCustomer name={a} /> : <PiutangList />;
+    case 'hutang':
+      return a ? <HutangDoc id={a} /> : <HutangList />;
+    case 'arsip':
+      return <Arsip />;
+    case 'marketplace':
+      return <Marketplace />;
+    case 'laporan':
+      return <Laporan />;
+    case 'pelanggan':
+      return <Master collection="customers" />;
+    case 'supplier':
+      return <Master collection="suppliers" />;
+    case 'aktivitas':
+      return <Aktivitas />;
+    case 'pengguna':
+      return <Pengguna />;
+    case 'pengaturan':
+      return <Pengaturan />;
+    default:
+      return <NotFound />;
+  }
+}
 
-    setSystemLogs(prev => [{
-      id: `LOG-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      date: nowStr,
-      user: currentRole,
-      module,
-      action,
-      detail
-    }, ...prev]);
-  }, [setSystemLogs, currentRole]);
+function Router() {
+  const { parts, query } = useRoute();
+  const { role, productsLoading, products } = useSession();
+  const mod = parts[0];
 
-  // Print Modal State
-  const [printModal, setPrintModal] = useState({
-    isOpen: false,
-    type: 'sj',
-    data: null
-  });
+  if (productsLoading && products.length === 0) return <div className="loading-screen"><Loading text="Memuat data PALORA..." /></div>;
 
-  const handleSelectModule = useCallback((mod) => {
-    if (!mod) {
-      if (window.location.hash && window.location.hash !== '#/' && window.location.hash !== '') {
-        window.location.hash = '#/';
-      }
-      setActiveModule(null);
-    } else if (allowedModuleIds.includes(mod.id)) {
-      window.location.hash = `#/${mod.id}`;
-      setActiveModule(mod);
-    } else {
-      window.alert(`Akun Anda (${currentRole}) tidak punya akses ke modul "${mod.title}".`);
-    }
-  }, [allowedModuleIds, currentRole]);
+  if (mod === 'cetak') {
+    const [, type, id] = parts;
+    if (type === 'sj') return <SuratJalanPrint id={id} />;
+    if (type === 'nota' || type === 'invoice') return <NotaPrint id={id} kind={type} />;
+    if (type === 'po') return <POPrint id={id} />;
+    if (type === 'opname') return <OpnamePrint group={query.g || ''} />;
+    return <NotFound />;
+  }
 
-  // URL Hash Routing Support (e.g. #/inventory, #/sales, #/purchases, etc.)
-  useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash.replace(/^#\/?/, '').split('?')[0];
-      if (!hash) {
-        setActiveModule(null);
-        return;
-      }
-      const matched = allowedModules.find(m => m.id === hash);
-      setActiveModule(matched || null);
-    };
-
-    handleHashChange();
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [allowedModules]);
-
-  // Keyboard shortcut: Press Escape to return to App Launcher
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && !printModal.isOpen) {
-        handleSelectModule(null);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [printModal.isOpen, handleSelectModule]);
-
-  const handleLogout = async () => {
-    if (!window.confirm('Keluar dari PALORA?')) return;
-    window.location.hash = '#/';
-    await onLogout();
-  };
-
-  // Open Document Print Preview
-  const handlePrintDocument = (type, data) => {
-    setPrintModal({
-      isOpen: true,
-      type,
-      data
-    });
-  };
-
-  // Close Print Modal
-  const handleClosePrint = () => {
-    setPrintModal({
-      isOpen: false,
-      type: 'sj',
-      data: null
-    });
-  };
-
-  if (!productsMeta.loaded) {
-    return <div className="app-loading">Memuat data PALORA dari server...</div>;
+  if (!mod) return <Launcher />;
+  if (!moduleById(mod)) {
+    return (
+      <Shell moduleId={null} path={parts}>
+        <NotFound />
+      </Shell>
+    );
   }
 
   return (
-    <div className="app-viewport">
-      {/* View Mode 1: Home Dashboard (App Launcher with Executive Metric Cards) */}
-      {!activeModule ? (
-        <div className="odoo-home-canvas">
-          <Navbar
-            activeModule={activeModule}
-            setActiveModule={handleSelectModule}
-            currentRole={currentRole}
-            onLogout={handleLogout}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-          />
-
-          <AppLauncher
-            onSelectModule={(mod) => handleSelectModule(mod)}
-            orders={orders}
-            products={products}
-            purchaseOrders={purchaseOrders}
-            deliveries={deliveries}
-            customers={customers}
-            suppliers={suppliers}
-            documents={documents}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            currentUser={currentRole}
-            allowedModuleIds={allowedModuleIds}
-          />
-        </div>
-      ) : (
-        /* View Mode 2: In-Module View with Left Sidebar & Main Content */
-        <div className="app-shell">
-          {/* Left In-Module Sidebar */}
-          <Sidebar
-            activeModule={activeModule}
-            setActiveModule={handleSelectModule}
-            currentRole={currentRole}
-            onLogout={handleLogout}
-            modules={allowedModules}
-          />
-
-          {/* Right Main Content Area */}
-          <div className="app-main-content">
-            <main>
-              {activeModule.id === 'sales' && (
-                <SalesModule
-                  orders={orders}
-                  setOrders={setOrders}
-                  products={products}
-                  setProducts={setProducts}
-                  customers={customers}
-                  setCustomers={setCustomers}
-                  setStockMovements={setStockMovements}
-                  onPrintDocument={handlePrintDocument}
-                  currentUser={currentRole}
-                  userRole={role}
-                  addSystemLog={addSystemLog}
-                />
-              )}
-
-              {activeModule.id === 'purchases' && (
-                <PurchaseModule
-                  purchaseOrders={purchaseOrders}
-                  setPurchaseOrders={setPurchaseOrders}
-                  suppliers={suppliers}
-                  products={products}
-                  setProducts={setProducts}
-                  stockMovements={stockMovements}
-                  setStockMovements={setStockMovements}
-                  documents={documents}
-                  setDocuments={setDocuments}
-                  onPrintDocument={handlePrintDocument}
-                  currentUser={currentRole}
-                  addSystemLog={addSystemLog}
-                />
-              )}
-
-              {activeModule.id === 'inventory' && (
-                <InventoryModule
-                  products={products}
-                  setProducts={setProducts}
-                  suppliers={suppliers}
-                  orders={orders}
-                  stockMovements={stockMovements}
-                  setStockMovements={setStockMovements}
-                  currentUser={currentRole}
-                  initialTab={activeModule.initialTab}
-                  initialFilter={activeModule.initialFilter}
-                  addSystemLog={addSystemLog}
-                  readOnly={role === 'finance'}
-                />
-              )}
-
-              {activeModule.id === 'deliveries' && (
-                <DeliveryModule
-                  deliveries={deliveries}
-                  setDeliveries={setDeliveries}
-                  orders={orders}
-                  setOrders={setOrders}
-                  products={products}
-                  setProducts={setProducts}
-                  stockMovements={stockMovements}
-                  setStockMovements={setStockMovements}
-                  documents={documents}
-                  setDocuments={setDocuments}
-                  onPrintDocument={handlePrintDocument}
-                  currentUser={currentRole}
-                  addSystemLog={addSystemLog}
-                />
-              )}
-
-              {activeModule.id === 'receivables' && (
-                <ReceivablesModule
-                  orders={orders}
-                  setOrders={setOrders}
-                  customers={customers}
-                  setCustomers={setCustomers}
-                  currentUser={currentRole}
-                  addSystemLog={addSystemLog}
-                />
-              )}
-
-              {activeModule.id === 'documents' && (
-                <DocumentModule
-                  documents={documents}
-                  setDocuments={setDocuments}
-                  purchaseOrders={purchaseOrders}
-                  setPurchaseOrders={setPurchaseOrders}
-                  addSystemLog={addSystemLog}
-                  currentUser={currentRole}
-                  initialFilter={activeModule.initialFilter}
-                />
-              )}
-
-              {activeModule.id === 'systemlogs' && (
-                <SystemLogModule
-                  systemLogs={systemLogs}
-                  currentUser={currentRole}
-                />
-              )}
-
-              {activeModule.id === 'marketplace' && (
-                <MarketplaceModule
-                  products={products}
-                  setProducts={setProducts}
-                  stockMovements={stockMovements}
-                  setStockMovements={setStockMovements}
-                  currentUser={currentRole}
-                  addSystemLog={addSystemLog}
-                />
-              )}
-
-              {activeModule.id === 'masterdata' && (
-                <MasterDataModule
-                  customers={customers}
-                  setCustomers={setCustomers}
-                  suppliers={suppliers}
-                  setSuppliers={setSuppliers}
-                  orders={orders}
-                  currentUser={currentRole}
-                  initialTab={activeModule.initialTab}
-                />
-              )}
-
-              {activeModule.id === 'reports' && (
-                <ReportsModule
-                  orders={orders}
-                  products={products}
-                  purchaseOrders={purchaseOrders}
-                  currentUser={currentRole}
-                />
-              )}
-
-              {activeModule.id === 'users' && (
-                <UsersModule
-                  currentUserId={user.id}
-                  addSystemLog={addSystemLog}
-                />
-              )}
-            </main>
-          </div>
-        </div>
-      )}
-
-      {/* Official PT Paletindo Document Print Preview Modal */}
-      <PrintModal
-        isOpen={printModal.isOpen}
-        onClose={handleClosePrint}
-        documentType={printModal.type}
-        data={printModal.data}
-      />
-
-      <SyncIndicator />
-    </div>
+    <Shell moduleId={mod} path={parts}>
+      {canOpen(mod, role) ? page(parts, query, role) : <NoAccess />}
+    </Shell>
   );
 }

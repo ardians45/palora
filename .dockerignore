@@ -8,4 +8,6 @@ backend/.env
 .git
 *.docx
 *.pdf
-data paletindo
+referensi
+backend/seed
+tests

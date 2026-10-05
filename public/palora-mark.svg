@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="PALORA">
+  <defs>
+    <linearGradient id="pb" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1F5FAE"/>
+      <stop offset="1" stop-color="#173F7A"/>
+    </linearGradient>
+    <linearGradient id="pg" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#1E7FC0"/>
+      <stop offset="1" stop-color="#3DBE8B"/>
+    </linearGradient>
+  </defs>
+  <!-- batang & lengkung huruf P -->
+  <path fill="url(#pb)" d="M11 8h22.5C43.7 8 51 15 51 24.5S43.7 41 33.5 41H21v15H11V8zm10 9v15h12c4.6 0 8-3.2 8-7.5S37.6 17 33 17H21z"/>
+  <!-- panah naik (pertumbuhan) -->
+  <path fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" d="M16 52C24 38 33 33 44 22"/>
+  <path fill="none" stroke="url(#pg)" stroke-width="6" stroke-linecap="round" d="M16 52C24 38 33 33 44 22"/>
+  <path fill="#3DBE8B" d="M55 10l-4.2 17.4-13.2-13.2z"/>
+</svg>

@@ -27,7 +27,7 @@ Repo ini sudah ada `Dockerfile` yang membangun frontend + PocketBase dalam satu 
    - `PB_ADMIN_EMAIL` = email admin
    - `PB_ADMIN_PASSWORD` = password admin yang kuat
 5. **Settings → Networking → Generate Domain**, lalu cek `https://<domain>/api/palora/health`.
-6. Isi data awal & akun tim dari laptop (pakai `backend/.env` yang berisi kredensial yang sama):
+6. Isi data awal, foto barang & akun tim dari laptop (pakai `backend/.env` yang berisi kredensial yang sama):
    ```bash
    npm run setup -- --url https://<domain>
    ```
@@ -35,6 +35,8 @@ Repo ini sudah ada `Dockerfile` yang membangun frontend + PocketBase dalam satu 
 
 > Alternatif tanpa Docker: [PocketHost.io](https://pockethost.io) (hosting khusus PocketBase).
 > Upload isi `backend/pb_migrations`, `backend/pb_hooks`, dan hasil `npm run build` (folder `dist`) ke `pb_public`.
+
+Foto barang bisa dipasang ulang kapan saja ke server mana pun: `npm run photos -- --url https://<domain>`.
 
 ## B. Server sendiri di gudang (Windows)
 

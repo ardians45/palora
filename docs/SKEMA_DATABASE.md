@@ -1,184 +1,65 @@
-# Skema Database PALORA
+# Skema Database PALORA (v2)
 
-Backend: **PocketBase 0.40** (SQLite). Definisi lengkap ada di
-[`backend/pb_migrations/1700000000_palora_schema.js`](../backend/pb_migrations/1700000000_palora_schema.js),
-aturan bisnis server di [`backend/pb_hooks/palora.pb.js`](../backend/pb_hooks/palora.pb.js).
+Backend: **PocketBase 0.40** (SQLite). Definisi: `backend/pb_migrations/`, aturan bisnis: `backend/pb_hooks/palora.pb.js`.
 
-## Prinsip desain
+## Prinsip
 
 | Prinsip | Penerapan |
 |---|---|
-| Mengikuti alur kerja yang ada (PRD §10) | Nomor dokumen, status, dan format tetap seperti kebiasaan Paletindo (PO-037/PIM/2026, 0062/DO/PIM/V/2026). |
-| Tidak ada hapus permanen (NFR 7.3) | `deleteRule = null` di semua tabel bisnis. Hapus = `deleted = true` (soft delete). |
-| Stok selalu benar walau dipakai banyak perangkat | `products.stock` **tidak bisa** diubah lewat update biasa. Perubahan stok wajib lewat endpoint atomik `POST /api/palora/increment` (transaksi database, menolak stok minus). |
-| Audit trail (Modul 9) | Setiap create/update/increment otomatis dicatat ke `audit_trail` oleh server, lengkap dengan nama pelaku & nilai sebelum/sesudah. |
-| Detail baris disimpan bersama dokumennya | `items`, `payments`, `receipts`, `invoice` berupa kolom JSON: selalu dibaca/ditulis bersama induknya, jadi tidak perlu tabel detail terpisah. |
-| Kolom `uid` | ID yang dipakai aplikasi (mis. `PRD-0001`, `ORD-...`). `id` adalah ID internal PocketBase. |
-| Kolom `extra` (JSON) | Menampung atribut tambahan dari UI yang belum punya kolom sendiri, supaya tidak ada data yang hilang. |
+| Ikuti alur lama | Nomor & format dokumen meniru kertas Paletindo (PO-038/PPU/2026, 0063/DO/PPU/X/2026). |
+| Stok & uang aman | `stock`, status & nilai uang pesanan, `receipts` PO, `paid_amount` **tidak bisa** diubah lewat API biasa. Hanya lewat endpoint `/api/palora/*` dalam **satu transaksi**. |
+| Tidak ada hapus permanen | `deleteRule = null`; arsip memakai `deleted = true`. |
+| Riwayat lengkap | Setiap perubahan tercatat di `audit_trail` (pelaku, waktu, nilai sebelum → sesudah) dan tampil sebagai panel "Riwayat" di tiap dokumen. |
+| Baris barang bersama dokumennya | `items`, `receipts` disimpan JSON di dokumen induk; total dihitung ulang oleh server. |
 
-## Diagram relasi (ERD)
+## Tabel
 
-Relasi antar dokumen bisnis memakai **nomor dokumen** (bukan foreign key), sama seperti
-dokumen fisik Paletindo yang saling merujuk lewat nomor.
+| Tabel | Isi | Catatan |
+|---|---|---|
+| `users` | akun login, `role` (owner/gudang/finance), `active` | user nonaktif tidak bisa login; sesi 8 jam |
+| `settings` | kop perusahaan, NPWP, rekening, penandatangan, kode dokumen (PPU), PPN %, minimal DP % | 1 baris, hanya Owner yang ubah |
+| `counters` | nomor urut dokumen per jenis | hanya server |
+| `products` | kode, nama, kelompok, warna, ukuran, satuan, stok, stok minimum, harga modal/jual, **foto** (+thumbnail otomatis) | stok hanya via endpoint |
+| `stock_movements` | mutasi IN/OUT/OPNAME/ADJUSTMENT: sebelum, sesudah, dokumen, petugas | hanya server |
+| `customers`, `suppliers` | master mitra (UP, WA, email, syarat bayar, aturan diskon) | arsip, bukan hapus |
+| `sales_orders` | pesanan / nota kasir / penjualan marketplace: `status` (baru, dp, lunas, dikirim, diambil, selesai, batal), `channel`, PPN, dibayar, sisa, jatuh tempo, izin kirim Owner | nomor INV/NT/MP dibuat server |
+| `payments` | DP, pelunasan, cicilan (customer) & bayar invoice supplier + foto bukti | hanya via endpoint |
+| `deliveries` | surat jalan customer + konfirmasi diterima + foto SJ bertanda tangan | dibuat saat barang keluar |
+| `purchase_orders` | PO supplier: `state` (draft, dikirim, sebagian, selesai, batal), baris barang + `receivedQty`, `receipts` per surat jalan supplier | penerimaan via endpoint |
+| `supplier_invoices` | hutang supplier: invoice, faktur pajak, jatuh tempo, dibayar | Owner & Keuangan |
+| `documents` | arsip foto/PDF (surat jalan, invoice, faktur, bukti) per no. PO / dokumen | maks 5 MB |
+| `marketplace_imports`, `sku_mappings` | riwayat import laporan marketplace & pemetaan SKU → kode barang | anti dobel per toko + no. pesanan |
+| `opname_sessions` | hasil stok opname: per barang stok sistem, hitung fisik, selisih | |
+| `audit_trail`, `system_logs` | riwayat perubahan | riwayat akun & pengaturan khusus Owner |
 
-```mermaid
-erDiagram
-    users ||--o{ audit_trail : "pelaku (actor)"
-    suppliers ||--o{ purchase_orders : "supplier = name"
-    purchase_orders ||--o{ documents : "ref_no = po_no / no. SJ"
-    customers ||--o{ sales_orders : "customer = name"
-    sales_orders ||--o{ deliveries : "order_no"
-    products ||--o{ stock_movements : "product_code"
-    products }o--o{ purchase_orders : "items[].productCode"
-    products }o--o{ sales_orders : "items[].productCode"
+## Endpoint aksi bisnis (`POST /api/palora/...`)
 
-    users {
-        text id PK
-        email email
-        text name
-        select role "owner | gudang | finance"
-        bool active
-    }
-    products {
-        text uid UK
-        text code UK "SKU, unik selama belum dihapus"
-        text name
-        text category
-        text factory
-        number stock "min 0, hanya via increment"
-        number min_stock
-        number buy_price
-        number sell_price
-        text location
-        text color
-        bool deleted
-    }
-    customers {
-        text uid UK
-        text name
-        text contact_person
-        text phone
-        text address
-        text npwp
-        text type "Korporat / Grosir"
-        number credit_limit
-        number current_debt "hanya via increment"
-        bool deleted
-    }
-    suppliers {
-        text uid UK
-        text name
-        text sales_person
-        text phone
-        text email
-        text terms "Tempo 30 Hari, dll"
-        json categories
-        bool deleted
-    }
-    purchase_orders {
-        text uid UK
-        text po_no UK
-        text date
-        text supplier
-        json items "productCode, qty, buyPrice, receivedQty"
-        number total_amount
-        text status
-        json receipts "penerimaan bertahap per surat jalan"
-        json invoice "invoice supplier + pembayaran"
-        bool deleted
-    }
-    sales_orders {
-        text uid UK
-        text order_no UK
-        text date
-        text customer
-        json items "productCode, qty, price (bisa nego)"
-        number total_amount
-        number dp_amount
-        number remaining_amount
-        text payment_status
-        text delivery_status
-        text due_date
-        json payments "riwayat cicilan"
-        bool release_approved "izin kirim sebelum lunas (Owner)"
-        bool deleted
-    }
-    deliveries {
-        text uid UK
-        text sj_no UK
-        text order_no
-        text customer
-        text driver_name
-        text vehicle_plate
-        text status
-        json items
-        bool deleted
-    }
-    documents {
-        text uid UK
-        text title
-        text type
-        text ref_no
-        text partner
-        file file "jpg/png/webp/heic/pdf maks 5MB"
-        text uploaded_by
-        text category
-        bool deleted
-    }
-    stock_movements {
-        text uid UK
-        text date
-        text type "IN | OUT | OPNAME | ADJUSTMENT"
-        text product_code
-        number qty
-        text ref_no
-        number before_stock
-        number after_stock
-        text operator "diisi server dari akun login"
-    }
-    system_logs {
-        text uid UK
-        text date
-        text user "diisi server dari akun login"
-        text module
-        text action
-        text detail
-    }
-    audit_trail {
-        text collection_name
-        text record_id
-        text action "create | update | soft_delete | increment"
-        relation actor FK
-        text actor_name
-        json changes "field: {from, to}"
-    }
-```
+| Endpoint | Fungsi | Role |
+|---|---|---|
+| `po/state` | PO draft → dikirim, atau batal (bila belum ada penerimaan) | Owner, Gudang |
+| `po/receive` | terima barang bertahap per surat jalan supplier (+ foto), rusak tidak masuk stok, tidak boleh melebihi sisa PO | Owner, Gudang |
+| `payment` | catat DP / pelunasan / cicilan / bayar supplier, tidak boleh melebihi sisa; status pesanan diperbarui otomatis | lihat tabel hak akses |
+| `orders/release` | izinkan barang keluar sebelum lunas (pelanggan tempo) | Owner |
+| `orders/dispatch` | keluarkan barang: dikirim (terbit surat jalan) atau diambil sendiri; stok terpotong | Owner, Gudang |
+| `deliveries/received` | konfirmasi surat jalan diterima customer | Owner, Gudang |
+| `orders/cancel` | batalkan pesanan sebelum barang keluar (yang sudah dibayar: Owner) | Owner, Gudang |
+| `kasir/checkout` | penjualan langsung: nota NT, stok terpotong, pembayaran tercatat | Owner, Gudang |
+| `stock/adjust` | koreksi stok satu barang (wajib alasan) | Owner, Gudang |
+| `opname/apply` | stok opname; hanya baris yang dihitung yang disesuaikan, terhadap stok terkini | Owner, Gudang |
+| `products/import` | import/update master barang dari Excel (kolom kosong tidak menimpa data) | Owner, Gudang |
+| `marketplace/import` | import laporan marketplace; `dry_run` untuk preview & SKU yang belum dikenal | Owner, Gudang |
 
-Semua tabel juga punya kolom otomatis `created` dan `updated`.
+## Hak akses (PRD 6.7)
 
-## Hak akses per tabel (PRD 6.7)
+| Fitur | Owner | Gudang & Kasir | Keuangan |
+|---|---|---|---|
+| Lihat stok, pesanan, PO, surat jalan, arsip | Ya | Ya | Ya |
+| Buat pesanan, kasir, PO, terima barang, surat jalan | Ya | Ya | – |
+| Master barang, koreksi stok, opname, marketplace | Ya | Ya | – |
+| Catat DP / pelunasan **sebelum** barang keluar | Ya | Ya | Ya |
+| Piutang setelah barang keluar, hutang supplier, laporan | Ya | – | Ya |
+| Izin kirim sebelum lunas | Ya | – | – |
+| Pengguna, pengaturan perusahaan, aktivitas sistem | Ya | – | – |
 
-| Tabel | Lihat | Tambah | Ubah | Hapus |
-|---|---|---|---|---|
-| products | semua | Owner, Gudang | Owner, Gudang (kecuali `stock`) | — |
-| customers | semua | semua | semua (kecuali `current_debt`) | — |
-| suppliers | semua | semua | semua | — |
-| sales_orders | semua | Owner, Gudang | semua (Keuangan mencatat pembayaran); `release_approved` hanya Owner | — |
-| purchase_orders | semua | Owner, Gudang | semua (Keuangan mencatat invoice & bayar supplier) | — |
-| deliveries | semua | Owner, Gudang | Owner, Gudang | — |
-| documents | semua | semua | semua | — |
-| stock_movements | semua | Owner, Gudang | — (tidak bisa diubah) | — |
-| system_logs | Owner | semua | — | — |
-| audit_trail | Owner | hanya server | — | — |
-| users | diri sendiri / Owner | Owner | Owner (user biasa hanya nama & password sendiri) | Owner |
-
-Endpoint `POST /api/palora/increment`:
-- `products.stock`: Owner & Gudang, ditolak bila hasilnya minus (*"Stok tidak cukup ... tersedia X pcs"*).
-- `customers.current_debt`: semua role, dibulatkan ke 0 bila minus.
-
-## Aturan bisnis di server
-
-1. **Surat jalan hanya untuk pesanan lunas** (F-SO04). Kalau masih ada sisa tagihan, server menolak, kecuali Owner menyalakan `release_approved` (tombol *Izinkan Kirim* di modul Penjualan).
-2. **Nama operator tidak bisa dipalsukan**: kolom `user` di `system_logs` dan `operator` di `stock_movements` ditimpa server dengan nama akun yang login.
-3. **Login hanya untuk akun aktif** (`authRule: active = true`), dengan sesi berakhir otomatis setelah 8 jam.
-4. **Nomor dokumen unik** (PO, nota, surat jalan, kode SKU) selama belum dihapus.
+Semua aturan di atas dicek **di server**; tampilan hanya menyembunyikan tombol yang tidak boleh dipakai.
+Dibuktikan oleh 47 test integrasi di `tests/api.test.js`.

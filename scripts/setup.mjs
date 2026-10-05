@@ -2,12 +2,14 @@
 //
 //   npm run setup                                  -> server lokal (backend/pb_data)
 //   npm run setup -- --url https://palora.domain   -> server yang sudah online (cloud / server gudang)
+//   tambah --demo untuk membuat beberapa transaksi contoh (presentasi)
 //
 // Kredensial dibaca dari backend/.env (salin dari backend/.env.example lalu ganti password-nya).
 import path from 'node:path';
 import PocketBase from 'pocketbase';
 import { BACKEND_DIR, loadEnv, startServer, upsertSuperuser } from './pb-utils.mjs';
-import { seed, defaultUsers } from './seed-data.mjs';
+import { seed, seedDemo, defaultUsers } from './seed-data.mjs';
+import { applyNames, applyPhotos } from './photos.mjs';
 
 const env = loadEnv();
 if (env.__file.endsWith('.env.example')) {
@@ -26,6 +28,18 @@ async function fill(url) {
   await pb.collection('_superusers').authWithPassword(env.PB_ADMIN_EMAIL, env.PB_ADMIN_PASSWORD);
   console.log('Mengisi data awal...');
   await seed(pb, { users: defaultUsers(env.SEED_USER_PASSWORD), log: (m) => console.log('  ' + m) });
+  await applyNames(pb, { log: (m) => console.log('  ' + m) });
+  await applyPhotos(pb, { log: (m) => console.log('  ' + m) });
+  if (process.argv.includes('--demo')) {
+    console.log('Membuat transaksi contoh (demo)...');
+    const login = async (email) => {
+      const c = new PocketBase(url);
+      c.autoCancellation(false);
+      await c.collection('users').authWithPassword(email, env.SEED_USER_PASSWORD);
+      return c;
+    };
+    await seedDemo(await login('heri@palora.local'), await login('bude@palora.local'), (m) => console.log('  ' + m));
+  }
 }
 
 if (remoteUrl) {

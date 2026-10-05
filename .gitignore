@@ -39,3 +39,7 @@ backend/pb_data/
 backend/pb_public/
 backend/.env
 backend/backups/
+
+# Playwright
+test-results/
+playwright-report/

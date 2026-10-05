@@ -1,0 +1,59 @@
+/* PALORA design tokens: tampilan software kerja, bukan halaman promosi.
+   Satu warna brand (biru logo PALORA), warna lain hanya untuk status. */
+:root {
+  --font: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+  /* skala teks (pengguna non-teknis: dasar 15px) */
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-md: 15px;
+  --text-lg: 17px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+
+  /* jarak 4px */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+
+  --radius: 6px;
+  --radius-lg: 10px;
+
+  /* netral */
+  --bg: #f3f4f6;
+  --surface: #ffffff;
+  --surface-2: #f9fafb;
+  --border: #dfe3e8;
+  --border-strong: #c4cad3;
+  --text: #1c2430;
+  --text-2: #4b5563;
+  --text-3: #6b7280;
+
+  /* brand */
+  --brand: #1f5fae;
+  --brand-hover: #194f93;
+  --brand-soft: #e8f0fa;
+  --focus: #1f5fae;
+
+  /* status (selalu disertai teks) */
+  --neutral: #4b5563;
+  --neutral-bg: #eef0f3;
+  --info: #1d5fae;
+  --info-bg: #e6effa;
+  --warn: #9a5b00;
+  --warn-bg: #fdf1dc;
+  --ok: #1d7a46;
+  --ok-bg: #e3f4ea;
+  --bad: #b42318;
+  --bad-bg: #fde8e6;
+
+  --row-h: 40px;
+  --topbar-h: 52px;
+  --shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.08);
+  --shadow-lg: 0 12px 32px rgba(16, 24, 40, 0.18);
+}

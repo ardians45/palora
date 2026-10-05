@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { pb } from './pb';
-import { flushSync } from './usePbCollection';
 
 const currentUser = () => (pb.authStore.isValid ? pb.authStore.record : null);
 
 export function useAuth() {
   const [user, setUser] = useState(currentUser);
+  const [expired, setExpired] = useState(false);
 
   useEffect(() => {
     const unsub = pb.authStore.onChange(() => setUser(currentUser()));
@@ -23,7 +23,7 @@ export function useAuth() {
     const timer = setInterval(() => {
       if (pb.authStore.token && !pb.authStore.isValid) {
         pb.authStore.clear();
-        window.alert('Sesi login sudah habis. Silakan login ulang.');
+        setExpired(true);
       }
     }, 60 * 1000);
 
@@ -35,13 +35,13 @@ export function useAuth() {
 
   const login = useCallback(async (email, password) => {
     await pb.collection('users').authWithPassword(email.trim(), password);
+    setExpired(false);
   }, []);
 
-  const logout = useCallback(async () => {
-    await flushSync();
+  const logout = useCallback(() => {
     pb.realtime.unsubscribe().catch(() => {});
     pb.authStore.clear();
   }, []);
 
-  return { user, login, logout };
+  return { user, login, logout, expired };
 }

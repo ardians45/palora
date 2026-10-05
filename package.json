@@ -12,7 +12,11 @@
     "setup": "node scripts/setup.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
-    "build:server": "vite build && node scripts/copy-dist.mjs"
+    "build:server": "vite build && node scripts/copy-dist.mjs",
+    "test:e2e": "playwright test",
+    "test:all": "vitest run && playwright test",
+    "photos": "node scripts/photos-cli.mjs",
+    "push": "scripts\\push.bat"
   },
   "dependencies": {
     "lucide-react": "^1.47.0",
@@ -23,6 +27,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
