@@ -94,8 +94,18 @@ export default function ReceivablesModule({
           ...o,
           dpAmount: newDp,
           remainingAmount: newRemaining,
-          paymentStatus: isNowLunas ? 'Lunas' : 'DP Bertambah',
-          deliveryStatus: isNowLunas ? 'Siap Dibuatkan Surat Jalan' : o.deliveryStatus,
+          paymentStatus: isNowLunas ? 'Lunas' : 'DP Terbayar (Tahan Pengiriman)',
+          deliveryStatus: isNowLunas && !o.deliveryStatus?.includes('Surat Jalan Terbit') && !o.deliveryStatus?.includes('Terkirim')
+            ? 'Siap Dibuatkan Surat Jalan'
+            : o.deliveryStatus,
+          // F-SO06: riwayat pembayaran (tanggal, jumlah, metode)
+          payments: [...(o.payments || []), {
+            id: `PAY-${Date.now()}`,
+            date: new Date().toISOString().split('T')[0],
+            amount,
+            method: 'Transfer / Tunai (Modul Piutang)',
+            recordedBy: currentUser || 'Keuangan'
+          }],
           notes: `${o.notes} | Diterima pembayaran ${formatRupiah(amount)} oleh ${currentUser}.`
         };
       }
@@ -103,7 +113,7 @@ export default function ReceivablesModule({
     }));
 
     if (addSystemLog) {
-      addSystemLog('PAYMENT_RECEIVED', currentUser || 'Bude', `Menerima cicilan ${formatRupiah(amount)} untuk SO ${selectedOrderForPay.orderNo}`);
+      addSystemLog('Piutang', 'Terima Pembayaran', `Menerima cicilan ${formatRupiah(amount)} untuk SO ${selectedOrderForPay.orderNo}`);
     }
 
     setSelectedOrderForPay(null);

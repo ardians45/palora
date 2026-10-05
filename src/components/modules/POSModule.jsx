@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { nextSequence, dueDateFromTerms } from '../../lib/schema';
 import { 
   ArrowLeft, Search, Plus, Minus, Trash2, 
   CreditCard, CheckCircle2, User, Package, Calculator,
@@ -230,7 +231,11 @@ const POSModule = ({ products, customers, orders = [], onClose, onSaveOrder, cur
       notes = 'Tahan pengiriman sampai sisa dilunasi!';
     }
 
-    const newOrderNo = isWalkIn ? `POS-${Date.now().toString().slice(-6)}` : `INV-SO-${Date.now().toString().slice(-4)}/PIM/${new Date().getFullYear()}`;
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const allNos = orders.map(o => o.orderNo);
+    const newOrderNo = isWalkIn
+      ? `POS-${today}-${String(nextSequence(allNos, new RegExp(`^POS-${today}-(\\d+)$`))).padStart(3, '0')}`
+      : `INV-SO-${String(nextSequence(allNos, /^INV-SO-(\d+)\/PIM\//)).padStart(4, '0')}/PIM/${new Date().getFullYear()}`;
 
     const newOrderData = {
       id: `ORD-${Date.now()}`,
@@ -247,7 +252,7 @@ const POSModule = ({ products, customers, orders = [], onClose, onSaveOrder, cur
       paymentType: paymentType,
       paymentStatus,
       deliveryStatus,
-      dueDate: remaining > 0 ? '2026-10-15' : null,
+      dueDate: remaining > 0 ? dueDateFromTerms(paymentType, customDate || new Date()) : null,
       notes,
       createdBy: currentUser || 'POS Kasir'
     };

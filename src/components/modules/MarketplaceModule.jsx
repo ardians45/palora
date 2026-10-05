@@ -156,7 +156,7 @@ export default function MarketplaceModule({
       }
 
       if (addSystemLog) {
-        addSystemLog('SYNC_MARKETPLACE', currentUser || 'Mas Heri', `Memotong stok massal untuk ${selectedRows.length} pesanan dari ${selectedChannel.toUpperCase()} (Total item: ${selectedRows.reduce((a, b) => a + b.qty, 0)})`);
+        addSystemLog('Marketplace', 'Potong Stok Marketplace', `Memotong stok massal untuk ${selectedRows.length} pesanan dari ${selectedChannel.toUpperCase()} (Total item: ${selectedRows.reduce((a, b) => a + b.qty, 0)})`);
       }
 
       setIsSimulatingUpload(false);

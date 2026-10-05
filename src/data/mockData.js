@@ -371,7 +371,7 @@ export const APP_MODULES = [
     category: 'Operasional Kasir',
     icon: 'Store',
     badge: '3 Pesanan',
-    roleAccess: ['all']
+    roleAccess: ['owner', 'gudang']
   },
   {
     id: 'purchases',
@@ -381,7 +381,7 @@ export const APP_MODULES = [
     category: 'Pengadaan Pabrik',
     icon: 'FileText',
     badge: '1 PO Pending',
-    roleAccess: ['Pak Yanto (Owner)', 'Mas Heri (Admin Gudang & POS)']
+    roleAccess: ['owner', 'gudang']
   },
   {
     id: 'inventory',
@@ -391,7 +391,7 @@ export const APP_MODULES = [
     category: 'Manajemen Gudang',
     icon: 'Boxes',
     badge: '1 Kritis',
-    roleAccess: ['all']
+    roleAccess: ['owner', 'gudang', 'finance']
   },
   {
     id: 'deliveries',
@@ -401,7 +401,7 @@ export const APP_MODULES = [
     category: 'Logistik Gudang',
     icon: 'Truck',
     badge: '1 Terkirim',
-    roleAccess: ['all']
+    roleAccess: ['owner', 'gudang']
   },
   {
     id: 'receivables',
@@ -411,7 +411,7 @@ export const APP_MODULES = [
     category: 'Keuangan & Finansial',
     icon: 'CreditCard',
     badge: 'Rp 11.75 Jt',
-    roleAccess: ['all']
+    roleAccess: ['owner', 'finance']
   },
   {
     id: 'documents',
@@ -421,7 +421,7 @@ export const APP_MODULES = [
     category: 'Administrasi',
     icon: 'FolderArchive',
     badge: '4 Berkas',
-    roleAccess: ['all']
+    roleAccess: ['owner', 'gudang', 'finance']
   },
   {
     id: 'marketplace',
@@ -431,7 +431,7 @@ export const APP_MODULES = [
     category: 'Penjualan Online',
     icon: 'FileSpreadsheet',
     badge: 'Excel Sync',
-    roleAccess: ['all']
+    roleAccess: ['owner', 'gudang']
   },
   {
     id: 'masterdata',
@@ -441,7 +441,7 @@ export const APP_MODULES = [
     category: 'Master Bisnis',
     icon: 'Users',
     badge: '4 Toko • 4 Pabrik',
-    roleAccess: ['Pak Yanto (Owner)', 'Bude (Keuangan)']
+    roleAccess: ['owner', 'gudang', 'finance']
   },
   {
     id: 'reports',
@@ -451,7 +451,7 @@ export const APP_MODULES = [
     category: 'Laporan Eksekutif',
     icon: 'BarChart3',
     badge: 'Rekap Realtime',
-    roleAccess: ['all']
+    roleAccess: ['owner', 'finance']
   },
   {
     id: 'systemlogs',
@@ -461,7 +461,17 @@ export const APP_MODULES = [
     category: 'Sistem Administrasi',
     icon: 'Activity',
     badge: 'Log Aktif',
-    roleAccess: ['Pak Yanto (Owner)']
+    roleAccess: ['owner']
+  },
+  {
+    id: 'users',
+    title: 'Pengguna & Akses',
+    subtitle: 'Akun Login & Role',
+    description: 'Kelola akun login tim (Owner, Admin Gudang, Keuangan), reset password, dan nonaktifkan akun.',
+    category: 'Sistem Administrasi',
+    icon: 'UserCog',
+    badge: 'Owner',
+    roleAccess: ['owner']
   }
 ];
 

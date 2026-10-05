@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import AppLauncher from './components/AppLauncher';
 import PrintModal from './components/PrintModal';
+import LoginScreen from './components/LoginScreen';
 
 // Modules
 import SalesModule from './components/modules/SalesModule';
@@ -15,102 +16,68 @@ import MarketplaceModule from './components/modules/MarketplaceModule';
 import MasterDataModule from './components/modules/MasterDataModule';
 import ReportsModule from './components/modules/ReportsModule';
 import SystemLogModule from './components/modules/SystemLogModule';
+import UsersModule from './components/modules/UsersModule';
 
-// Initial Mock Data
-import { 
-  INITIAL_PRODUCTS, 
-  INITIAL_CUSTOMERS, 
-  INITIAL_SUPPLIERS, 
-  INITIAL_ORDERS, 
-  INITIAL_PO, 
-  INITIAL_DELIVERIES, 
-  INITIAL_DOCUMENTS,
-  INITIAL_STOCK_MOVEMENTS,
-  INITIAL_SYSTEM_LOGS,
-  APP_MODULES
-} from './data/mockData';
+import { APP_MODULES } from './data/mockData';
+import { useAuth } from './lib/useAuth';
+import { usePbCollection, onSyncStatus } from './lib/usePbCollection';
+import { userLabel } from './lib/schema';
+
+// Indikator kecil di pojok kanan bawah saat ada data yang sedang disimpan ke server
+function SyncIndicator() {
+  const [pending, setPending] = useState(0);
+  useEffect(() => onSyncStatus(setPending), []);
+  if (!pending) return null;
+  return <div className="sync-indicator">Menyimpan {pending} perubahan...</div>;
+}
 
 export default function App() {
+  const { user, login, logout } = useAuth();
+  if (!user) return <LoginScreen onLogin={login} />;
+  // key = id user -> semua state di-reset bersih saat ganti akun
+  return <AuthenticatedApp key={user.id} user={user} onLogout={logout} />;
+}
+
+function AuthenticatedApp({ user, onLogout }) {
   const [activeModule, setActiveModule] = useState(null);
-  const [currentRole, setCurrentRole] = useState('Mas Heri (Admin Gudang & POS)');
   const [searchQuery, setSearchQuery] = useState('');
+  const currentRole = userLabel(user);
+  const role = user.role;
+  const isOwner = role === 'owner';
 
-  // Sync authentic data from data paletindo if first time or version changed
-  const DATA_VERSION = 'v9_numan_category';
-  if (typeof window !== 'undefined' && localStorage.getItem('palora_data_version') !== DATA_VERSION) {
-    localStorage.setItem('palora_data_version', DATA_VERSION);
-    localStorage.setItem('palora_products', JSON.stringify(INITIAL_PRODUCTS));
-    localStorage.setItem('palora_customers', JSON.stringify(INITIAL_CUSTOMERS));
-    localStorage.setItem('palora_suppliers', JSON.stringify(INITIAL_SUPPLIERS));
-    localStorage.setItem('palora_orders', JSON.stringify(INITIAL_ORDERS));
-    localStorage.setItem('palora_po', JSON.stringify(INITIAL_PO));
-    localStorage.setItem('palora_deliveries', JSON.stringify(INITIAL_DELIVERIES));
-    localStorage.setItem('palora_documents', JSON.stringify(INITIAL_DOCUMENTS));
-    localStorage.setItem('palora_stock_movements', JSON.stringify(INITIAL_STOCK_MOVEMENTS));
-    localStorage.setItem('palora_system_logs', JSON.stringify(INITIAL_SYSTEM_LOGS));
-  }
+  // Modul yang boleh dibuka sesuai role (PRD 6.7)
+  const allowedModules = useMemo(
+    () => APP_MODULES.filter(m => m.roleAccess.includes('all') || m.roleAccess.includes(role)),
+    [role]
+  );
+  const allowedModuleIds = useMemo(() => allowedModules.map(m => m.id), [allowedModules]);
 
-  // Main Persistent Data Stores
-  const [products, setProducts] = useState(() => {
-    const saved = localStorage.getItem('palora_products');
-    return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
-  });
+  // Data utama: tersimpan di server PocketBase & tersinkron realtime antar perangkat
+  const [products, setProducts, productsMeta] = usePbCollection('products');
+  const [customers, setCustomers] = usePbCollection('customers');
+  const [suppliers, setSuppliers] = usePbCollection('suppliers');
+  const [orders, setOrders] = usePbCollection('orders');
+  const [purchaseOrders, setPurchaseOrders] = usePbCollection('purchaseOrders');
+  const [deliveries, setDeliveries] = usePbCollection('deliveries');
+  const [documents, setDocuments] = usePbCollection('documents');
+  const [stockMovements, setStockMovements] = usePbCollection('stockMovements');
+  const [systemLogs, setSystemLogs] = usePbCollection('systemLogs', isOwner);
 
-  const [customers, setCustomers] = useState(() => {
-    const saved = localStorage.getItem('palora_customers');
-    return saved ? JSON.parse(saved) : INITIAL_CUSTOMERS;
-  });
-
-  const [suppliers, setSuppliers] = useState(() => {
-    const saved = localStorage.getItem('palora_suppliers');
-    return saved ? JSON.parse(saved) : INITIAL_SUPPLIERS;
-  });
-
-  const [orders, setOrders] = useState(() => {
-    const saved = localStorage.getItem('palora_orders');
-    return saved ? JSON.parse(saved) : INITIAL_ORDERS;
-  });
-
-  const [purchaseOrders, setPurchaseOrders] = useState(() => {
-    const saved = localStorage.getItem('palora_po');
-    return saved ? JSON.parse(saved) : INITIAL_PO;
-  });
-
-  const [deliveries, setDeliveries] = useState(() => {
-    const saved = localStorage.getItem('palora_deliveries');
-    return saved ? JSON.parse(saved) : INITIAL_DELIVERIES;
-  });
-
-  const [documents, setDocuments] = useState(() => {
-    const saved = localStorage.getItem('palora_documents');
-    return saved ? JSON.parse(saved) : INITIAL_DOCUMENTS;
-  });
-
-  const [stockMovements, setStockMovements] = useState(() => {
-    const saved = localStorage.getItem('palora_stock_movements');
-    return saved ? JSON.parse(saved) : INITIAL_STOCK_MOVEMENTS;
-  });
-
-  const [systemLogs, setSystemLogs] = useState(() => {
-    const saved = localStorage.getItem('palora_system_logs');
-    return saved ? JSON.parse(saved) : INITIAL_SYSTEM_LOGS;
-  });
-
-  const addSystemLog = (module, action, detail) => {
-    const nowStr = new Date().toLocaleString('id-ID', { 
+  const addSystemLog = useCallback((module, action, detail) => {
+    const nowStr = new Date().toLocaleString('id-ID', {
       year: 'numeric', month: '2-digit', day: '2-digit',
       hour: '2-digit', minute: '2-digit', second: '2-digit'
     }).replace(/\./g, ':').replace(',', '');
-    
+
     setSystemLogs(prev => [{
-      id: `LOG-${Date.now()}`,
+      id: `LOG-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       date: nowStr,
       user: currentRole,
       module,
       action,
       detail
     }, ...prev]);
-  };
+  }, [setSystemLogs, currentRole]);
 
   // Print Modal State
   const [printModal, setPrintModal] = useState({
@@ -119,42 +86,19 @@ export default function App() {
     data: null
   });
 
-  // Save to localStorage on state changes
-  useEffect(() => {
-    localStorage.setItem('palora_products', JSON.stringify(products));
-  }, [products]);
-
-  useEffect(() => {
-    localStorage.setItem('palora_orders', JSON.stringify(orders));
-  }, [orders]);
-
-  useEffect(() => {
-    localStorage.setItem('palora_po', JSON.stringify(purchaseOrders));
-  }, [purchaseOrders]);
-
-  useEffect(() => {
-    localStorage.setItem('palora_deliveries', JSON.stringify(deliveries));
-  }, [deliveries]);
-
-  useEffect(() => {
-    localStorage.setItem('palora_customers', JSON.stringify(customers));
-  }, [customers]);
-
-  useEffect(() => {
-    localStorage.setItem('palora_suppliers', JSON.stringify(suppliers));
-  }, [suppliers]);
-
-  useEffect(() => {
-    localStorage.setItem('palora_documents', JSON.stringify(documents));
-  }, [documents]);
-
-  useEffect(() => {
-    localStorage.setItem('palora_stock_movements', JSON.stringify(stockMovements));
-  }, [stockMovements]);
-
-  useEffect(() => {
-    localStorage.setItem('palora_system_logs', JSON.stringify(systemLogs));
-  }, [systemLogs]);
+  const handleSelectModule = useCallback((mod) => {
+    if (!mod) {
+      if (window.location.hash && window.location.hash !== '#/' && window.location.hash !== '') {
+        window.location.hash = '#/';
+      }
+      setActiveModule(null);
+    } else if (allowedModuleIds.includes(mod.id)) {
+      window.location.hash = `#/${mod.id}`;
+      setActiveModule(mod);
+    } else {
+      window.alert(`Akun Anda (${currentRole}) tidak punya akses ke modul "${mod.title}".`);
+    }
+  }, [allowedModuleIds, currentRole]);
 
   // URL Hash Routing Support (e.g. #/inventory, #/sales, #/purchases, etc.)
   useEffect(() => {
@@ -164,28 +108,14 @@ export default function App() {
         setActiveModule(null);
         return;
       }
-      const matched = APP_MODULES.find(m => m.id === hash);
-      if (matched) {
-        setActiveModule(matched);
-      }
+      const matched = allowedModules.find(m => m.id === hash);
+      setActiveModule(matched || null);
     };
 
     handleHashChange();
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
-
-  const handleSelectModule = (mod) => {
-    if (!mod) {
-      if (window.location.hash && window.location.hash !== '#/' && window.location.hash !== '') {
-        window.location.hash = '#/';
-      }
-      setActiveModule(null);
-    } else {
-      window.location.hash = `#/${mod.id}`;
-      setActiveModule(mod);
-    }
-  };
+  }, [allowedModules]);
 
   // Keyboard shortcut: Press Escape to return to App Launcher
   useEffect(() => {
@@ -196,7 +126,13 @@ export default function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [printModal.isOpen]);
+  }, [printModal.isOpen, handleSelectModule]);
+
+  const handleLogout = async () => {
+    if (!window.confirm('Keluar dari PALORA?')) return;
+    window.location.hash = '#/';
+    await onLogout();
+  };
 
   // Open Document Print Preview
   const handlePrintDocument = (type, data) => {
@@ -216,21 +152,25 @@ export default function App() {
     });
   };
 
+  if (!productsMeta.loaded) {
+    return <div className="app-loading">Memuat data PALORA dari server...</div>;
+  }
+
   return (
     <div className="app-viewport">
       {/* View Mode 1: Home Dashboard (App Launcher with Executive Metric Cards) */}
       {!activeModule ? (
         <div className="odoo-home-canvas">
-          <Navbar 
+          <Navbar
             activeModule={activeModule}
             setActiveModule={handleSelectModule}
             currentRole={currentRole}
-            setCurrentRole={setCurrentRole}
+            onLogout={handleLogout}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
           />
 
-          <AppLauncher 
+          <AppLauncher
             onSelectModule={(mod) => handleSelectModule(mod)}
             orders={orders}
             products={products}
@@ -242,38 +182,42 @@ export default function App() {
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             currentUser={currentRole}
+            allowedModuleIds={allowedModuleIds}
           />
         </div>
       ) : (
         /* View Mode 2: In-Module View with Left Sidebar & Main Content */
         <div className="app-shell">
           {/* Left In-Module Sidebar */}
-          <Sidebar 
+          <Sidebar
             activeModule={activeModule}
             setActiveModule={handleSelectModule}
             currentRole={currentRole}
-            setCurrentRole={setCurrentRole}
+            onLogout={handleLogout}
+            modules={allowedModules}
           />
 
           {/* Right Main Content Area */}
           <div className="app-main-content">
             <main>
               {activeModule.id === 'sales' && (
-                <SalesModule 
+                <SalesModule
                   orders={orders}
                   setOrders={setOrders}
                   products={products}
                   setProducts={setProducts}
                   customers={customers}
                   setCustomers={setCustomers}
+                  setStockMovements={setStockMovements}
                   onPrintDocument={handlePrintDocument}
                   currentUser={currentRole}
+                  userRole={role}
                   addSystemLog={addSystemLog}
                 />
               )}
 
               {activeModule.id === 'purchases' && (
-                <PurchaseModule 
+                <PurchaseModule
                   purchaseOrders={purchaseOrders}
                   setPurchaseOrders={setPurchaseOrders}
                   suppliers={suppliers}
@@ -290,7 +234,7 @@ export default function App() {
               )}
 
               {activeModule.id === 'inventory' && (
-                <InventoryModule 
+                <InventoryModule
                   products={products}
                   setProducts={setProducts}
                   suppliers={suppliers}
@@ -301,11 +245,12 @@ export default function App() {
                   initialTab={activeModule.initialTab}
                   initialFilter={activeModule.initialFilter}
                   addSystemLog={addSystemLog}
+                  readOnly={role === 'finance'}
                 />
               )}
 
               {activeModule.id === 'deliveries' && (
-                <DeliveryModule 
+                <DeliveryModule
                   deliveries={deliveries}
                   setDeliveries={setDeliveries}
                   orders={orders}
@@ -323,7 +268,7 @@ export default function App() {
               )}
 
               {activeModule.id === 'receivables' && (
-                <ReceivablesModule 
+                <ReceivablesModule
                   orders={orders}
                   setOrders={setOrders}
                   customers={customers}
@@ -334,7 +279,7 @@ export default function App() {
               )}
 
               {activeModule.id === 'documents' && (
-                <DocumentModule 
+                <DocumentModule
                   documents={documents}
                   setDocuments={setDocuments}
                   purchaseOrders={purchaseOrders}
@@ -346,14 +291,14 @@ export default function App() {
               )}
 
               {activeModule.id === 'systemlogs' && (
-                <SystemLogModule 
+                <SystemLogModule
                   systemLogs={systemLogs}
                   currentUser={currentRole}
                 />
               )}
 
               {activeModule.id === 'marketplace' && (
-                <MarketplaceModule 
+                <MarketplaceModule
                   products={products}
                   setProducts={setProducts}
                   stockMovements={stockMovements}
@@ -364,7 +309,7 @@ export default function App() {
               )}
 
               {activeModule.id === 'masterdata' && (
-                <MasterDataModule 
+                <MasterDataModule
                   customers={customers}
                   setCustomers={setCustomers}
                   suppliers={suppliers}
@@ -376,11 +321,18 @@ export default function App() {
               )}
 
               {activeModule.id === 'reports' && (
-                <ReportsModule 
+                <ReportsModule
                   orders={orders}
                   products={products}
                   purchaseOrders={purchaseOrders}
                   currentUser={currentRole}
+                />
+              )}
+
+              {activeModule.id === 'users' && (
+                <UsersModule
+                  currentUserId={user.id}
+                  addSystemLog={addSystemLog}
                 />
               )}
             </main>
@@ -389,12 +341,14 @@ export default function App() {
       )}
 
       {/* Official PT Paletindo Document Print Preview Modal */}
-      <PrintModal 
+      <PrintModal
         isOpen={printModal.isOpen}
         onClose={handleClosePrint}
         documentType={printModal.type}
         data={printModal.data}
       />
+
+      <SyncIndicator />
     </div>
   );
 }

@@ -13,7 +13,10 @@ import {
   User,
   ShieldCheck,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Activity,
+  UserCog,
+  LogOut
 } from 'lucide-react';
 import { APP_MODULES } from '../data/mockData';
 
@@ -26,14 +29,17 @@ const ICON_COMPONENTS = {
   FolderArchive,
   FileSpreadsheet,
   Users,
-  BarChart3
+  BarChart3,
+  Activity,
+  UserCog
 };
 
 export default function Sidebar({
   activeModule,
   setActiveModule,
   currentRole,
-  setCurrentRole
+  onLogout,
+  modules = APP_MODULES
 }) {
   const [collapsed, setCollapsed] = useState(false);
 
@@ -79,7 +85,7 @@ export default function Sidebar({
 
       {/* List of 9 ERP Modules */}
       <nav className="sidebar-menu-list">
-        {APP_MODULES.map((mod) => {
+        {modules.map((mod) => {
           const IconComp = ICON_COMPONENTS[mod.icon] || Boxes;
           const isActive = activeModule?.id === mod.id;
 
@@ -119,17 +125,19 @@ export default function Sidebar({
             <div style={{ fontSize: '0.7rem', color: '#94a3b8', fontWeight: '600' }}>
               Pengguna Aktif:
             </div>
-            <select
-              value={currentRole}
-              onChange={(e) => setCurrentRole(e.target.value)}
+            <div
               className="role-select"
-              style={{ fontSize: '0.78rem', width: '100%', textOverflow: 'ellipsis' }}
+              title={currentRole}
+              style={{ fontSize: '0.78rem', width: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
             >
-              <option value="Mas Heri (Admin Gudang & POS)">Mas Heri (Admin)</option>
-              <option value="Pak Yanto (Owner)">Pak Yanto (Owner)</option>
-              <option value="Bude (Keuangan)">Bude (Keuangan)</option>
-            </select>
+              {currentRole}
+            </div>
           </div>
+          {onLogout && (
+            <button className="sidebar-collapse-btn" onClick={onLogout} title="Keluar">
+              <LogOut size={15} />
+            </button>
+          )}
         </div>
       </div>
     </aside>

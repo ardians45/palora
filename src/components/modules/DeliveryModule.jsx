@@ -12,6 +12,7 @@ import {
   X,
   FileSpreadsheet
 } from 'lucide-react';
+import { nextSequence } from '../../lib/schema';
 
 export default function DeliveryModule({ 
   deliveries, 
@@ -39,6 +40,8 @@ export default function DeliveryModule({
                                o.deliveryStatus.includes('Terkirim')
                              ));
     if (isAlreadyShipped) return false;
+    // Nota kasir walk-in: barang sudah dibawa pulang & stok sudah dipotong saat bayar
+    if (o.orderNo?.startsWith('POS-') || o.deliveryStatus?.includes('Ambil di Tempat')) return false;
     return o.deliveryStatus?.includes('Siap') || o.paymentStatus === 'Lunas';
   });
 
@@ -68,10 +71,21 @@ export default function DeliveryModule({
     e.preventDefault();
     if (!selectedOrder) return alert('Pilih pesanan yang siap dikirim terlebih dahulu.');
 
+    // Barang hanya boleh keluar kalau stok fisik cukup (pesan jelas, bukan "Error 400")
+    const kurang = (selectedOrder.items || [])
+      .map(it => ({ it, prod: products.find(p => p.code === it.productCode || p.id === it.productId) }))
+      .filter(({ it, prod }) => !prod || prod.stock < Number(it.qty));
+    if (kurang.length > 0) {
+      return alert('Surat jalan belum bisa terbit, stok tidak cukup:\n' + kurang
+        .map(({ it, prod }) => `- ${it.name}: perlu ${it.qty}, tersedia ${prod ? prod.stock : 0} ${prod?.unit || 'pcs'}`)
+        .join('\n'));
+    }
+
     // Format Asli Paletindo: 0062/DO/PIM/V/2026
     const romanMonths = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
     const romanMonth = romanMonths[new Date().getMonth()];
-    const newSjNo = `${String(deliveries.length + 63).padStart(4, '0')}/DO/PIM/${romanMonth}/${new Date().getFullYear()}`;
+    const sjSeq = nextSequence(deliveries.map(d => d.sjNo), /^(\d+)\/DO\//, 63);
+    const newSjNo = `${String(sjSeq).padStart(4, '0')}/DO/PIM/${romanMonth}/${new Date().getFullYear()}`;
 
     // OTOMATISASI KONTROL STOK: Potong stok fisik gudang secara resmi saat Surat Jalan terbit
     let deductedDetails = [];
@@ -128,7 +142,8 @@ export default function DeliveryModule({
       driverName: driverName,
       vehiclePlate: vehiclePlate,
       status: 'Siap Berangkat (Stok Terpotong)',
-      taxInvoiceNo: selectedOrder.taxInvoiceNo || `04002600${String(deliveries.length + 191092115)}`,
+      // Faktur pajak diterbitkan terpisah via Coretax/e-Faktur (PRD 4.2), jangan dikarang di sini
+      taxInvoiceNo: selectedOrder.taxInvoiceNo || '',
       items: selectedOrder.items,
       signedBy: null
     };

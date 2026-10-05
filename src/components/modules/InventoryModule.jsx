@@ -43,8 +43,10 @@ export default function InventoryModule({
   currentUser,
   initialTab = 'inventory',
   initialFilter = 'all',
-  addSystemLog
+  addSystemLog,
+  readOnly = false
 }) {
+  const READ_ONLY_MSG = 'Akun Anda hanya bisa melihat stok. Perubahan data barang dilakukan oleh Owner atau Admin Gudang.';
   const [activeTab, setActiveTab] = useState(initialTab || 'inventory'); // 'inventory' | 'opname' | 'movements'
   const [categoryFilter, setCategoryFilter] = useState(initialFilter || 'all');
   const [colorFilter, setColorFilter] = useState('all'); // 'all' | 'Merah' | 'Biru' | etc.
@@ -420,6 +422,8 @@ export default function InventoryModule({
   const fileInputRef = React.useRef(null);
   
   const handleImportExcel = (e) => {
+    e?.preventDefault?.();
+    if (readOnly) return alert(READ_ONLY_MSG);
     const file = e.target.files[0];
     if (!file) return;
 
@@ -503,6 +507,8 @@ export default function InventoryModule({
 
   // Form Add Product Submission with Duplicate SKU Check and Reset
   const handleAddProduct = (e) => {
+    e?.preventDefault?.();
+    if (readOnly) return alert(READ_ONLY_MSG);
     e.preventDefault();
     const cleanCode = productCode.trim().toUpperCase();
     const cleanName = productName.trim();
@@ -581,6 +587,8 @@ export default function InventoryModule({
 
   // Save manual edit & log adjustment if stock changed
   const handleSaveEdit = (e) => {
+    e?.preventDefault?.();
+    if (readOnly) return alert(READ_ONLY_MSG);
     e.preventDefault();
     if (!editingProduct) return;
 
@@ -623,7 +631,8 @@ export default function InventoryModule({
 
   // Delete product with confirmation
   const handleDeleteProduct = (product) => {
-    if (!confirm(`Konfirmasi Hapus Barang:\n\nApakah Anda yakin ingin menghapus "${product.name}" (${product.code}) dari master data?\n\nPerhatian: Produk ini akan dihapus permanen.`)) {
+    if (readOnly) return alert(READ_ONLY_MSG);
+    if (!confirm(`Konfirmasi Hapus Barang:\n\nApakah Anda yakin ingin menghapus "${product.name}" (${product.code}) dari master data?\n\nProduk akan diarsipkan (tidak tampil lagi), riwayat transaksinya tetap tersimpan.`)) {
       return;
     }
 
@@ -645,10 +654,10 @@ export default function InventoryModule({
       }, ...(prev || [])]);
     }
 
-    setProducts(products.filter(p => p.id !== product.id));
+    setProducts(products.filter(p => p.id !== product.id), { allowRemove: true });
     
     if (addSystemLog) {
-      addSystemLog('Gudang & Stok', 'Hapus Produk', `Menghapus permanen produk ${product.name} (${product.code}) dari master data`);
+      addSystemLog('Gudang & Stok', 'Hapus Produk', `Mengarsipkan produk ${product.name} (${product.code}) dari master data`);
     }
     
     alert(`Produk "${product.name}" (${product.code}) telah dihapus dari sistem.`);
@@ -656,6 +665,7 @@ export default function InventoryModule({
 
   // Stock Opname: Apply and create OPNAME movement logs for any changed items
   const handleApplyOpname = () => {
+    if (readOnly) return alert(READ_ONLY_MSG);
     if (!confirm('Simpan hasil Stock Opname ini? Stok sistem akan disesuaikan dengan hitungan fisik riil Mas Heri.')) return;
 
     const nowTimeStr = new Date().toISOString().split('T')[0] + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });

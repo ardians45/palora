@@ -9,14 +9,14 @@ import {
   Clock,
   Wrench,
   Building2,
-  ChevronDown
+  LogOut
 } from 'lucide-react';
 
-export default function Navbar({ 
-  activeModule, 
-  setActiveModule, 
-  currentRole, 
-  setCurrentRole,
+export default function Navbar({
+  activeModule,
+  setActiveModule,
+  currentRole,
+  onLogout,
   searchQuery,
   setSearchQuery
 }) {
@@ -85,22 +85,20 @@ export default function Navbar({
           </div>
 
           <div className="nav-user-wrapper">
-            <div className="nav-user-dropdown">
+            <div className="nav-user-dropdown" title={currentRole}>
               <User size={14} className="user-icon" />
-              <select 
-                value={currentRole} 
-                onChange={(e) => setCurrentRole(e.target.value)}
-              >
-                <option value="Mas Heri (Admin Gudang & POS)">Mas Heri (Admin)</option>
-                <option value="Pak Yanto (Owner)">Pak Yanto (Owner)</option>
-                <option value="Bude (Keuangan)">Bude (Keuangan)</option>
-              </select>
-              <ChevronDown size={14} className="dropdown-caret" />
+              <span className="user-chip-name">{currentRole}</span>
             </div>
 
             <div className="nav-avatar" title={currentRole}>
-              {currentRole.includes('Heri') ? 'MH' : currentRole.includes('Yanto') ? 'PY' : 'BK'}
+              {currentRole.split(' ').filter(w => /^[A-Z]/.test(w)).slice(0, 2).map(w => w[0]).join('')}
             </div>
+
+            {onLogout && (
+              <button className="nav-home-btn" onClick={onLogout} title="Keluar">
+                <LogOut size={16} />
+              </button>
+            )}
           </div>
 
           {activeModule && (

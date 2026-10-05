@@ -1,0 +1,11 @@
+node_modules
+dist
+backend/pb_data
+backend/pb_public
+backend/pocketbase
+backend/pocketbase.exe
+backend/.env
+.git
+*.docx
+*.pdf
+data paletindo

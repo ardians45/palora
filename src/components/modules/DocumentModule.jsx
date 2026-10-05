@@ -32,6 +32,7 @@ export default function DocumentModule({
   const [docType, setDocType] = useState('Invoice Resmi');
   const [taxAmount, setTaxAmount] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [uploadFile, setUploadFile] = useState(null);
 
   React.useEffect(() => {
     if (initialFilter !== undefined) setSearchTerm(initialFilter);
@@ -91,15 +92,20 @@ export default function DocumentModule({
       refNo: selectedPO.poNo,
       date: new Date().toISOString().split('T')[0],
       partner: selectedPO.supplier,
-      fileName: `UPLOAD_${docType.replace(/ /g, '_').toUpperCase()}.pdf`,
+      fileName: uploadFile?.name || '',
+      _file: uploadFile || undefined,
       uploadedBy: currentUser || 'Bude',
-      category: docType.includes('Invoice') ? 'Invoice' : 'Surat Jalan'
+      category: docType.includes('Invoice') ? 'Invoice' : docType.includes('Faktur') ? 'Faktur Pajak' : 'Surat Jalan',
+      ...(docType.includes('Invoice') ? { taxAmount: Number(taxAmount) || 0, dueDate } : {})
     };
 
+    if (!uploadFile && !confirm('Belum ada file foto/PDF yang dipilih. Simpan catatan arsip tanpa file?')) return;
+
     setDocuments([newDoc, ...documents]);
+    setUploadFile(null);
     
     if (addSystemLog) {
-      addSystemLog('DOCUMENT_UPLOADED', currentUser || 'Bude', `Mengunggah ${docType} untuk ${selectedPO.poNo}`);
+      addSystemLog('Arsip Dokumen', 'Unggah Dokumen', `Mengunggah ${docType} untuk ${selectedPO.poNo}`);
     }
 
     setIsModalOpen(false);
@@ -112,12 +118,23 @@ export default function DocumentModule({
   };
 
   const handleDownloadDoc = (doc) => {
+    // File asli tersimpan di server -> unduh langsung
+    if (doc.fileUrl) {
+      const link = document.createElement('a');
+      link.href = `${doc.fileUrl}?download=1`;
+      link.download = doc.fileName || '';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return;
+    }
+    // Arsip lama tanpa file: unduh ringkasan data arsipnya saja
     const content = `PT PALETINDO PRAKARSA UNGGUL\nARSIP DOKUMEN DIGITAL RESMI\n\nJudul: ${doc.title}\nNomor Referensi: ${doc.refNo}\nJenis: ${doc.type}\nMitra / Pihak: ${doc.partner}\nTanggal Terbit: ${doc.date}\nPengunggah: ${doc.uploadedBy}\nBerkas: ${doc.fileName}\n\nStatus: Terverifikasi Digital Valid.`;
     const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = doc.fileName || 'dokumen_paletindo.txt';
+    link.download = `Ringkasan_${(doc.refNo || doc.id).replace(/[^a-zA-Z0-9]/g, '_')}.txt`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -125,10 +142,15 @@ export default function DocumentModule({
   };
 
   const handleDownloadZip = (folder) => {
-    // Mock downloading a ZIP file
-    alert(`Mengunduh berkas ZIP untuk PO ${folder.poNo} yang berisi ${folder.relatedDocs.length + 1} dokumen...`);
+    // Unduh semua file asli yang terlampir di folder PO ini satu per satu
+    const withFile = folder.relatedDocs.filter(d => d.fileUrl);
+    if (withFile.length === 0) {
+      return alert(`Belum ada file foto/PDF yang terupload untuk PO ${folder.poNo}.`);
+    }
+    withFile.forEach((d, i) => setTimeout(() => handleDownloadDoc(d), i * 400));
+    alert(`Mengunduh ${withFile.length} file untuk PO ${folder.poNo}.${withFile.length < folder.relatedDocs.length ? `\n${folder.relatedDocs.length - withFile.length} arsip lama tidak punya file.` : ''}`);
     if (addSystemLog) {
-      addSystemLog('DOCUMENT_DOWNLOADED', currentUser || 'Bude', `Mengunduh ZIP Arsip untuk ${folder.poNo}`);
+      addSystemLog('Arsip Dokumen', 'Unduh Arsip PO', `Mengunduh ZIP Arsip untuk ${folder.poNo}`);
     }
   };
 
@@ -141,7 +163,7 @@ export default function DocumentModule({
       // Mark PO as Verified/Ready to pay (This logic might map to keeping it as is, just user verification action)
       alert(`PO ${folder.poNo} berhasil diverifikasi (3-Way Matching cocok)! Siap dibayarkan.`);
       if (addSystemLog) {
-        addSystemLog('DOCUMENT_VERIFIED', currentUser || 'Bude', `Verifikasi 3-Way Matching selesai untuk PO ${folder.poNo}`);
+        addSystemLog('Arsip Dokumen', 'Verifikasi 3-Way Matching', `Verifikasi 3-Way Matching selesai untuk PO ${folder.poNo}`);
       }
     }
   };
@@ -371,17 +393,38 @@ export default function DocumentModule({
 
                 <div className="form-group">
                   <label className="form-label">File Scan / Foto</label>
-                  <div style={{
+                  <label style={{
+                    display: 'block',
                     border: '2px dashed #cbd5e1',
                     borderRadius: '8px',
                     padding: '24px',
                     textAlign: 'center',
                     cursor: 'pointer',
-                    background: '#f8fafc'
+                    background: uploadFile ? '#ecfdf5' : '#f8fafc'
                   }}>
                     <Upload size={28} color="#5c59f7" style={{ margin: '0 auto 8px' }} />
-                    <div style={{ fontWeight: '600', fontSize: '0.85rem' }}>Klik untuk memilih foto / PDF</div>
-                  </div>
+                    <div style={{ fontWeight: '600', fontSize: '0.85rem' }}>
+                      {uploadFile ? `✓ ${uploadFile.name}` : 'Klik untuk memilih foto / PDF'}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: 4 }}>
+                      {uploadFile ? `${(uploadFile.size / 1024 / 1024).toFixed(2)} MB • klik untuk ganti` : 'Maks 5 MB (JPG/PNG/PDF) • di HP bisa langsung foto'}
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*,.pdf"
+                      capture="environment"
+                      style={{ display: 'none' }}
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (!file) return;
+                        if (file.size > 5 * 1024 * 1024) {
+                          e.target.value = '';
+                          return alert(`Ukuran file ${(file.size / 1024 / 1024).toFixed(1)} MB terlalu besar. Maksimal 5 MB.`);
+                        }
+                        setUploadFile(file);
+                      }}
+                    />
+                  </label>
                 </div>
               </div>
 
@@ -438,8 +481,24 @@ export default function DocumentModule({
                   {previewDoc.title}
                 </h4>
                 <div style={{ fontSize: '0.85rem', color: '#64748b' }}>
-                  {previewDoc.fileName} • Terarsip oleh <strong>{previewDoc.uploadedBy}</strong>
+                  {previewDoc.fileName || 'Tanpa file'} • Terarsip oleh <strong>{previewDoc.uploadedBy}</strong>
                 </div>
+
+                {previewDoc.fileUrl && (
+                  /\.(png|jpe?g|webp|gif)$/i.test(previewDoc.fileUrl) ? (
+                    <a href={previewDoc.fileUrl} target="_blank" rel="noreferrer">
+                      <img
+                        src={previewDoc.fileUrl}
+                        alt={previewDoc.title}
+                        style={{ maxWidth: '100%', maxHeight: '320px', marginTop: '16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                      />
+                    </a>
+                  ) : (
+                    <a href={previewDoc.fileUrl} target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ marginTop: '16px', display: 'inline-flex' }}>
+                      Buka file di tab baru
+                    </a>
+                  )
+                )}
 
                 <div style={{
                   display: 'grid',

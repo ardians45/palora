@@ -22,6 +22,7 @@ import {
   Building2
 } from 'lucide-react';
 import POSModule from './POSModule';
+import { nextSequence, dueDateFromTerms } from '../../lib/schema';
 
 export default function SalesModule({ 
   orders, 
@@ -34,6 +35,7 @@ export default function SalesModule({
   setStockMovements,
   onPrintDocument,
   currentUser,
+  userRole,
   addSystemLog
 }) {
   const [activeTab, setActiveTab] = useState('all');
@@ -94,7 +96,8 @@ export default function SalesModule({
       if (!proceed) return;
     }
 
-    const newOrderNo = `INV-${String(orders.length + 91).padStart(4, '0')}/PIM/${new Date().getFullYear()}`;
+    const seq = nextSequence(orders.map(o => o.orderNo), /^INV-(\d+)\/PIM\//, 91);
+    const newOrderNo = `INV-${String(seq).padStart(4, '0')}/PIM/${new Date().getFullYear()}`;
     
     let paymentStatus = 'Lunas';
     let deliveryStatus = 'Siap Dibuatkan Surat Jalan';
@@ -124,7 +127,7 @@ export default function SalesModule({
       paymentType,
       paymentStatus,
       deliveryStatus,
-      dueDate: remaining > 0 ? '2026-10-15' : null,
+      dueDate: remaining > 0 ? dueDateFromTerms(paymentType) : null,
       notes: orderNotes || (remaining > 0 ? 'Tahan pengiriman sampai sisa dilunasi!' : 'Lunas. Siap kirim.'),
       createdBy: currentUser || 'Mas Heri'
     };
@@ -145,6 +148,22 @@ export default function SalesModule({
     setOrders([newOrder, ...orders]);
     setIsModalOpen(false);
     alert(`Pesanan ${newOrderNo} berhasil dibuat!\n\n✓ Status Alur: ${deliveryStatus}\n✓ Kontrol Stok: Barang dicatat sebagai "Dipesan (Reserved)". Stok fisik gudang baru akan dipotong saat Surat Jalan (DO) resmi terbit.`);
+  };
+
+  // Owner (Pak De) boleh mengizinkan pengiriman sebelum lunas untuk pelanggan tempo
+  const handleApproveRelease = (ord) => {
+    if (!confirm(`Izinkan ${ord.orderNo} (${ord.customer}) dikirim walau masih ada sisa tagihan ${formatRupiah(ord.remainingAmount)}?
+
+Sisa tagihan tetap tercatat di Piutang.`)) return;
+    setOrders(prev => prev.map(o => o.id === ord.id ? {
+      ...o,
+      releaseApproved: true,
+      deliveryStatus: 'Siap Dibuatkan Surat Jalan (Disetujui Owner)',
+      notes: `${o.notes || ''} | Pengiriman sebelum lunas disetujui oleh ${currentUser}.`
+    } : o));
+    if (addSystemLog) {
+      addSystemLog('Penjualan', 'Izin Kirim Sebelum Lunas', `Menyetujui pengiriman ${ord.orderNo} dengan sisa tagihan ${formatRupiah(ord.remainingAmount)}`);
+    }
   };
 
   const handleRecordPayment = (e) => {
@@ -170,14 +189,13 @@ export default function SalesModule({
       if (o.id === order.id) {
         const newRemaining = o.remainingAmount - payAmount;
         const newDp = (o.dpAmount || 0) + payAmount;
-        const payments = o.payments || [];
-        payments.push({
+        const payments = [...(o.payments || []), {
           id: `PAY-${Date.now()}`,
           date,
           amount: payAmount,
           method,
           recordedBy: currentUser || 'Finance'
-        });
+        }];
 
         return {
           ...o,
@@ -504,6 +522,17 @@ export default function SalesModule({
                           >
                             <CreditCard size={13} />
                             <span>Bayar</span>
+                          </button>
+                        )}
+                        {userRole === 'owner' && ord.remainingAmount > 0 && !ord.releaseApproved && (
+                          <button 
+                            className="btn-action-pay-modern" 
+                            style={{ background: '#fef3c7', color: '#92400e' }}
+                            onClick={() => handleApproveRelease(ord)} 
+                            title="Izinkan barang dikirim sebelum lunas (pelanggan tempo terpercaya)"
+                          >
+                            <ShieldAlert size={13} />
+                            <span>Izinkan Kirim</span>
                           </button>
                         )}
                         <button 
@@ -968,6 +997,49 @@ export default function SalesModule({
           mode={posMode}
           onClose={() => setIsModalOpen(false)}
           onSaveOrder={(orderData, remainingAmount, customerName) => {
+            // POS walk-in: pastikan stok terkini masih cukup sebelum menyimpan apa pun
+            if (posMode === 'pos') {
+              const kurang = orderData.items
+                .map(it => ({ it, prod: products.find(p => p.code === it.productCode) }))
+                .filter(({ it, prod }) => !prod || prod.stock < it.qty);
+              if (kurang.length > 0) {
+                alert('Stok tidak cukup:\n' + kurang.map(({ it, prod }) => `- ${it.name}: diminta ${it.qty}, tersedia ${prod ? prod.stock : 0} ${prod?.unit || 'pcs'}`).join('\n'));
+                return;
+              }
+            }
+
+            // Walk-in POS: potong stok DULU, supaya kalau server menolak (stok habis) nota tidak ikut tersimpan
+            if (posMode === 'pos' && setProducts) {
+               const newMovements = [];
+               const nowTimeStr = new Date().toISOString().split('T')[0] + ' ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+               setProducts(prev => prev.map(prod => {
+                 const qtyOut = orderData.items
+                   .filter(it => it.productCode === prod.code)
+                   .reduce((sum, it) => sum + Number(it.qty), 0);
+                 if (!qtyOut) return prod;
+                 const afterStock = prod.stock - qtyOut;
+                 newMovements.push({
+                   id: `MV-${Date.now()}-${prod.code}`,
+                   date: nowTimeStr,
+                   type: 'OUT',
+                   productId: prod.id,
+                   productCode: prod.code,
+                   productName: prod.name,
+                   qty: -qtyOut,
+                   refNo: orderData.orderNo,
+                   reason: 'Penjualan POS Kasir Langsung (walk-in)',
+                   beforeStock: prod.stock,
+                   afterStock,
+                   operator: currentUser || 'Kasir'
+                 });
+                 return { ...prod, stock: afterStock };
+               }));
+               
+               if (setStockMovements && newMovements.length > 0) {
+                 setStockMovements(prev => [...newMovements, ...prev]);
+               }
+            }
+
             // Update customer debt if remaining balance exists
             if (remainingAmount > 0 && setCustomers) {
               setCustomers(prev => prev.map(c => {
@@ -979,45 +1051,12 @@ export default function SalesModule({
             }
             setOrders([orderData, ...orders]);
             
-            // If Walk-In POS Mode, cut stock immediately
-            if (posMode === 'pos' && setProducts) {
-               const newMovements = [];
-               setProducts(prev => {
-                 let updated = [...prev];
-                 orderData.items.forEach(it => {
-                    const idx = updated.findIndex(p => p.code === it.productCode);
-                    if (idx !== -1) {
-                      updated[idx] = { ...updated[idx], stock: Math.max(0, updated[idx].stock - it.qty) };
-                      newMovements.push({
-                        id: `MOV-${Date.now()}-${it.productCode}`,
-                        date: new Date().toISOString().split('T')[0],
-                        productCode: it.productCode,
-                        productName: it.name,
-                        type: 'OUT',
-                        qty: it.qty,
-                        reference: orderData.orderNo,
-                        notes: 'Penjualan POS Kasir Langsung',
-                        balance: updated[idx].stock
-                      });
-                    }
-                 });
-                 return updated;
-               });
-               
-               if (setStockMovements && newMovements.length > 0) {
-                 setStockMovements(prev => [...newMovements, ...prev]);
-               }
-               
-               if (addSystemLog) {
-                 addSystemLog('SALES_POS_CHECKOUT', currentUser || 'POS Kasir', `Menyelesaikan nota POS ${orderData.orderNo} senilai ${orderData.totalAmount}`);
-                 orderData.items.forEach(it => {
-                   if (it.price !== it.originalPrice && it.originalPrice !== undefined) {
-                     addSystemLog('PRICE_OVERRIDE', currentUser || 'POS Kasir', `Harga diubah manual untuk ${it.productCode}: Asli ${it.originalPrice} menjadi ${it.price} di POS ${orderData.orderNo}`);
-                   }
-                 });
-               }
-            } else if (posMode === 'so' && addSystemLog) {
-               addSystemLog('SALES_SO_CREATED', currentUser || 'Admin', `Membuat Sales Order ${orderData.orderNo} B2B senilai ${orderData.totalAmount}`);
+            if (addSystemLog) {
+              orderData.items.forEach(it => {
+                if (it.price !== it.originalPrice && it.originalPrice !== undefined) {
+                  addSystemLog('Penjualan', 'Ubah Harga Manual', `Harga diubah manual untuk ${it.productCode}: Asli ${it.originalPrice} menjadi ${it.price} di ${orderData.orderNo}`);
+                }
+              });
             }
             
             if (addSystemLog) {

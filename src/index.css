@@ -2358,3 +2358,84 @@ body {
   gap: 3px;
 }
 
+
+/* ========================================================= */
+/* Login & status sinkronisasi                               */
+/* ========================================================= */
+.login-canvas {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: var(--bg-app);
+}
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.login-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.login-logo { width: 48px; height: 48px; object-fit: contain; border-radius: var(--radius-sm); }
+.login-title { font-size: 1.4rem; font-weight: 800; color: var(--text-main); letter-spacing: 0.02em; }
+.login-sub { font-size: 0.8rem; color: var(--text-muted); }
+.login-input-wrap { position: relative; display: flex; align-items: center; }
+.login-input-wrap svg { position: absolute; left: 12px; color: var(--text-subtle); pointer-events: none; }
+.login-input-wrap .form-input { width: 100%; padding-left: 36px; }
+.login-error {
+  background: var(--status-danger-bg);
+  color: var(--status-danger);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 0.85rem;
+}
+.login-submit { justify-content: center; width: 100%; padding: 12px; }
+.login-help { font-size: 0.75rem; color: var(--text-subtle); text-align: center; }
+
+.app-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  background: var(--bg-app);
+}
+
+.sync-indicator {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 2000;
+  background: var(--brand-dark);
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-md);
+  opacity: 0.9;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-main);
+}
+.user-chip-name { font-weight: 600; line-height: 1.1; }
+.user-chip-role { font-size: 0.7rem; color: var(--text-muted); }
+.nav-user-dropdown .user-chip-name {
+  white-space: nowrap;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.8rem;
+  font-weight: 600;
+}

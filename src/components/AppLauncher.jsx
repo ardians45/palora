@@ -400,6 +400,34 @@ export const PALORA_APPS = [
         <path d="M22 17l-12 12v4h4v-2h2v-2h2l4-4" stroke="#13c2c2" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     )
+  },
+  {
+    id: 'system_logs',
+    title: 'Aktivitas Sistem',
+    subtitle: 'Audit Trail & Log',
+    targetModuleId: 'systemlogs',
+    icon: (
+      // Pulse line in violet over card (Audit trail)
+      <svg width="42" height="42" viewBox="0 0 40 40" fill="none">
+        <rect x="7" y="9" width="26" height="22" rx="5" fill="#722ed1" />
+        <path d="M11 21h5l3-6 4 11 3-5h4" stroke="#ffd666" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    )
+  },
+  {
+    id: 'user_access',
+    title: 'Pengguna',
+    subtitle: 'Akun Login & Role',
+    targetModuleId: 'users',
+    icon: (
+      // Two people in orange & purple (User management)
+      <svg width="42" height="42" viewBox="0 0 40 40" fill="none">
+        <circle cx="16" cy="14" r="5" fill="#fa8c16" />
+        <path d="M7 31c0-5 4-9 9-9s9 4 9 9H7z" fill="#fa8c16" />
+        <circle cx="27" cy="16" r="4" fill="#722ed1" />
+        <path d="M22 31c0-4 2.5-7.5 6-7.5s6 3.5 6 7.5H22z" fill="#722ed1" />
+      </svg>
+    )
   }
 ];
 
@@ -414,7 +442,8 @@ export default function AppLauncher({
   documents = [],
   searchQuery = '',
   setSearchQuery,
-  currentUser = ''
+  currentUser = '',
+  allowedModuleIds = null
 }) {
   const [internalSearch, setInternalSearch] = useState('');
   const query = searchQuery !== undefined ? searchQuery : internalSearch;
@@ -422,6 +451,7 @@ export default function AppLauncher({
 
   // Filter apps based on search
   const filteredApps = PALORA_APPS.filter(app => {
+    if (allowedModuleIds && !allowedModuleIds.includes(app.targetModuleId)) return false;
     if (!query || query.trim() === '') return true;
     const q = query.toLowerCase().trim();
     return app.title.toLowerCase().includes(q) || 

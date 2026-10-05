@@ -22,6 +22,7 @@ import {
   User
 } from 'lucide-react';
 import POBuilderModule from './POBuilderModule';
+import { nextSequence } from '../../lib/schema';
 
 export default function PurchaseModule({ 
   purchaseOrders, 
@@ -203,7 +204,8 @@ export default function PurchaseModule({
           refNo: receiptForm.sjNo,
           date: receiptForm.date,
           partner: po.supplier,
-          fileName: `Surat_Jalan_Terima_${receiptForm.sjNo.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
+          fileName: receiptForm.file?.name || `Surat_Jalan_Terima_${receiptForm.sjNo.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
+          _file: receiptForm.file || undefined, // foto/scan surat jalan asli, diupload ke server
           uploadedBy: currentUser || 'Mas Heri',
           category: 'Delivery Order'
         },
@@ -663,7 +665,8 @@ export default function PurchaseModule({
           currentUser={currentUser}
           onClose={() => setIsModalOpen(false)}
           onSavePO={(supplier, items, total, expectedDate, notes, isDirectShip) => {
-            const newPoNo = `PO-${String(purchaseOrders.length + 38).padStart(3, '0')}/PIM/${new Date().getFullYear()}`;
+            const poSeq = nextSequence(purchaseOrders.map(p => p.poNo), /^PO-(\d+)\//, 38);
+            const newPoNo = `PO-${String(poSeq).padStart(3, '0')}/PIM/${new Date().getFullYear()}`;
             const newPO = {
               id: `PO-${Date.now()}`,
               poNo: newPoNo,
@@ -778,10 +781,20 @@ export default function PurchaseModule({
                   <div style={{ background: '#e0e7ff', padding: '12px', borderRadius: '50%', color: '#4f46e5' }}>
                     <Camera size={24} />
                   </div>
-                  <div style={{ fontWeight: '600', color: '#334155' }}>Ambil Foto via HP atau Upload Dokumen</div>
-                  <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Maks 5 MB (JPG/PNG/PDF)</div>
+                  <div style={{ fontWeight: '600', color: '#334155' }}>
+                    {receiptForm.file ? `✓ ${receiptForm.file.name}` : 'Ambil Foto via HP atau Upload Dokumen'}
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                    {receiptForm.file ? `${(receiptForm.file.size / 1024 / 1024).toFixed(2)} MB • klik untuk ganti` : 'Maks 5 MB (JPG/PNG/PDF)'}
+                  </div>
                   <input type="file" id="camera-upload" accept="image/*,.pdf" capture="environment" style={{ display: 'none' }} onChange={(e) => {
-                    if (e.target.files.length > 0) alert('Dokumen terpilih: ' + e.target.files[0].name + ' (Disimulasikan terupload ke cloud)');
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    if (file.size > 5 * 1024 * 1024) {
+                      e.target.value = '';
+                      return alert(`Ukuran file ${(file.size / 1024 / 1024).toFixed(1)} MB terlalu besar. Maksimal 5 MB.`);
+                    }
+                    setReceiptForm(prev => ({ ...prev, file }));
                   }} />
                 </div>
               </div>
