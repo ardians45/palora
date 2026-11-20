@@ -29,6 +29,7 @@ function actorName(auth) {
 function requireRole(auth, roles, what) {
   if (!auth) throw new UnauthorizedError("Silakan login dulu.");
   if (auth.collection().name === "_superusers") return;
+  if (!auth.getBool("active")) throw new ForbiddenError("Akun Anda sudah dinonaktifkan.");
   if (roles.indexOf(auth.getString("role")) === -1) {
     throw new ForbiddenError("Akun Anda tidak punya akses untuk " + (what || "aksi ini") + ".");
   }
@@ -37,6 +38,7 @@ function requireRole(auth, roles, what) {
 function role(auth) {
   if (!auth) return "";
   if (auth.collection().name === "_superusers") return "owner";
+  if (!auth.getBool("active")) return "";
   return auth.getString("role");
 }
 

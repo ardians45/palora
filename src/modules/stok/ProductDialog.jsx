@@ -7,8 +7,9 @@ import { Button, Field, Input, MoneyInput, Textarea } from '../../ui/core';
 import { Dialog, useToast } from '../../ui/feedback';
 
 export default function ProductDialog({ product, onClose }) {
-  const { products } = useSession();
+  const { products, can } = useSession();
   const toast = useToast();
+  const isOwner = can('owner');
   const groups = useMemo(() => [...new Set(products.map((p) => p.group_name).filter(Boolean))].sort(), [products]);
   const [f, setF] = useState(() => ({
     code: product?.code || '',
@@ -43,13 +44,14 @@ export default function ProductDialog({ product, onClose }) {
       color: f.color.trim(),
       size: f.size.trim(),
       unit: f.unit.trim() || 'pcs',
-      buy_price: Number(f.buy_price) || 0,
       sell_price: Number(f.sell_price) || 0,
       min_stock: Number(f.min_stock) || 0,
       location: f.location.trim(),
       factory: f.factory.trim(),
       notes: f.notes.trim(),
     };
+    // Harga modal hanya boleh ditulis Owner (server menolak bila akun lain mengirimnya)
+    if (isOwner) body.buy_price = Number(f.buy_price) || 0;
     setBusy(true);
     try {
       if (product) {
@@ -92,9 +94,11 @@ export default function ProductDialog({ product, onClose }) {
             <Field label="Ukuran" hint="mis. 60*40*35,5">
               <Input value={f.size} onChange={(e) => set({ size: e.target.value })} />
             </Field>
-            <Field label="Harga modal">
-              <MoneyInput value={f.buy_price} onChange={(v) => set({ buy_price: v })} />
-            </Field>
+            {isOwner && (
+              <Field label="Harga modal">
+                <MoneyInput value={f.buy_price} onChange={(v) => set({ buy_price: v })} />
+              </Field>
+            )}
             <Field label="Harga jual">
               <MoneyInput value={f.sell_price} onChange={(v) => set({ sell_price: v })} />
             </Field>

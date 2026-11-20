@@ -1,6 +1,6 @@
 // Akses data dari PocketBase: daftar + realtime, satu record, dan pemanggilan aksi server.
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { pb } from './pb';
+import { pb, fileUrl as pbFileUrl } from './pb';
 
 /**
  * Daftar record dengan pembaruan realtime.
@@ -108,7 +108,7 @@ export function action(path, body = {}) {
 }
 
 export const fileUrl = (record, filename, download = false) =>
-  filename ? pb.files.getURL(record, filename, download ? { download: 1 } : undefined) : '';
+  filename ? pbFileUrl(record, filename, download ? { download: 1 } : undefined) : '';
 
 /** Escape nilai untuk filter PocketBase. */
 export const q = (value) => JSON.stringify(String(value ?? ''));

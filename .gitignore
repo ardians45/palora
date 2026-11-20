@@ -50,3 +50,9 @@ backend/backups/
 # Playwright
 test-results/
 playwright-report/
+
+# Log launcher bimbingan
+backend/*-bimbingan.log*
+
+# Password hasil scripts/ganti-password.mjs
+backend/PASSWORD-BARU.txt

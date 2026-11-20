@@ -1260,7 +1260,7 @@ routerAdd(
         setText("unit", "unit");
         setText("factory", "factory");
         setText("notes", "notes");
-        setNum("buy_price", "buy_price");
+        if (u.role(e.auth) === "owner") setNum("buy_price", "buy_price"); // harga modal hanya boleh ditulis Owner
         setNum("sell_price", "sell_price");
         setNum("min_stock", "min_stock");
         tx.save(p);
@@ -1430,4 +1430,23 @@ routerAdd(
 // --- Endpoint kesehatan ---
 routerAdd("GET", "/api/palora/health", (e) => {
   return e.json(200, { ok: true, app: "PALORA", time: new Date().toISOString() });
+});
+
+// ===========================================================================
+// 9. Pengamanan lapisan HTTP
+// ===========================================================================
+// - Dashboard admin (/_/) & login superuser tidak boleh dibuka dari internet. Lewat Cloudflare Tunnel
+//   setiap request membawa header Cf-Ray / Cf-Connecting-Ip -> dijawab 404. Akses lokal/LAN tetap normal.
+// - Akun yang dinonaktifkan langsung ditolak di endpoint /api/palora/* walau token lamanya masih berlaku.
+routerUse((e) => {
+  const path = e.request.url.path || "";
+  const h = e.request.header;
+  const viaCloudflare = !!(h.get("Cf-Ray") || h.get("Cf-Connecting-Ip"));
+  if (viaCloudflare && (path === "/_" || path.indexOf("/_/") === 0 || path.indexOf("/api/collections/_superusers/") === 0)) {
+    throw new NotFoundError();
+  }
+  if (e.auth && path.indexOf("/api/palora/") === 0 && e.auth.collection().name === "users" && !e.auth.getBool("active")) {
+    throw new ForbiddenError("Akun Anda sudah dinonaktifkan.");
+  }
+  return e.next();
 });

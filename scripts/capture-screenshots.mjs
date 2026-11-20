@@ -6,6 +6,11 @@ import { BACKEND_DIR, startServer } from './pb-utils.mjs';
 
 const WEB_PORT = 5173;
 const PB_PORT = 8090;
+// Password akun contoh dibaca dari environment (SCREENSHOT_PASSWORD atau SEED_USER_PASSWORD), tidak ditulis di kode.
+if (!(process.env.SCREENSHOT_PASSWORD || process.env.SEED_USER_PASSWORD)) {
+  console.error('Set SCREENSHOT_PASSWORD (password akun contoh di database) sebelum menjalankan script ini.');
+  process.exit(1);
+}
 const OUTPUT_DIR = path.resolve('manual_book/assets/screenshots');
 
 async function waitForHttp(url, timeout = 30000) {
@@ -65,7 +70,7 @@ async function run() {
       }
 
       await page.getByLabel('Email').fill(email);
-      await page.getByLabel('Password', { exact: true }).fill('palora-dev-123');
+      await page.getByLabel('Password', { exact: true }).fill(process.env.SCREENSHOT_PASSWORD || process.env.SEED_USER_PASSWORD || '');
       await page.getByRole('button', { name: 'Masuk' }).click();
       await page.waitForFunction(() => !document.querySelector('.loading-screen'), { timeout: 15000 });
       await page.waitForTimeout(800);

@@ -9,13 +9,14 @@ beforeAll(async () => {
 afterAll(() => S?.stop());
 
 /** Barang baru khusus satu test, supaya stok tidak saling ganggu. */
+// Harga modal hanya boleh ditulis Owner, jadi barang dengan buy_price dibuat lewat akun Owner.
 async function freshProduct(code, stock, extra = {}) {
-  return S.gudang.collection('products').create({
+  const client = extra.buy_price !== undefined ? S.owner : S.gudang;
+  return client.collection('products').create({
     code,
     name: `Barang Test ${code}`,
     unit: 'pcs',
     stock,
-    buy_price: 10000,
     sell_price: 15000,
     ...extra,
   });
@@ -513,6 +514,31 @@ describe('Audit trail & hak akses', () => {
     });
     await errorOf(S.login('off@palora.local'));
     await errorOf(S.gudang.collection('users').update(S.gudang.authStore.record.id, { role: 'owner' }));
+  });
+
+  it('akun yang dinonaktifkan langsung ditolak walau token lamanya masih ada', async () => {
+    const u = await S.owner.collection('users').create({
+      email: 'cut@palora.local', password: USER_PASSWORD, passwordConfirm: USER_PASSWORD, name: 'Cut', role: 'gudang', active: true,
+    });
+    const any = await product(S.owner, 'T-KSR');
+    const c = await S.login('cut@palora.local');
+    expect((await c.collection('products').getList(1, 1)).totalItems).toBeGreaterThan(0);
+    await S.owner.collection('users').update(u.id, { active: false });
+    expect((await c.collection('products').getList(1, 1)).totalItems).toBe(0); // aturan list menolak = daftar kosong
+    await errorOf(c.collection('products').getOne(any.id));
+    await errorOf(post(c, '/api/palora/print', { collection: 'products', id: 'x', doc: 'x' }));
+    await S.owner.collection('users').update(u.id, { active: true });
+    expect((await c.collection('products').getList(1, 1)).totalItems).toBeGreaterThan(0);
+  });
+
+  it('harga modal hanya boleh ditulis Owner; harga jual tetap bisa oleh Admin Gudang', async () => {
+    const p = await freshProduct('T-HM', 0);
+    await errorOf(S.gudang.collection('products').update(p.id, { buy_price: 1 }));
+    await errorOf(S.finance.collection('products').update(p.id, { buy_price: 1 }));
+    await errorOf(S.gudang.collection('products').create({ code: 'T-HM2', name: 'x', buy_price: 5 }));
+    await S.gudang.collection('products').update(p.id, { sell_price: 16000 });
+    const r = await S.owner.collection('products').update(p.id, { buy_price: 9000 });
+    expect(r.buy_price).toBe(9000);
   });
 
   it('nama di log diambil dari akun login', async () => {

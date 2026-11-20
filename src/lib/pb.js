@@ -46,4 +46,58 @@ export function errorMessage(err) {
   return msg || 'Terjadi kesalahan.';
 }
 
-export const fileUrl = (record, filename) => pb.files.getURL(record, filename);
+
+// --- File dilindungi (dokumen, bukti bayar, invoice, surat jalan) ---------------------------------
+// File itu hanya bisa dibuka dengan file token (berlaku ~2 menit). Token di-cache sebentar dan
+// diambil ulang otomatis. fileUrl() memberi URL + token yang masih segar; link yang sudah terlanjur
+// lama di layar ditangani pencegat klik di bawah (ambil token baru lalu buka file).
+let fileToken = { value: '', at: 0 };
+const TOKEN_TTL_MS = 60 * 1000;
+
+export async function getFileToken() {
+  if (!pb.authStore.isValid) return '';
+  if (fileToken.value && Date.now() - fileToken.at < TOKEN_TTL_MS) return fileToken.value;
+  fileToken = { value: await pb.files.getToken(), at: Date.now() };
+  return fileToken.value;
+}
+
+const withToken = (url, token) => (token && url ? url + (url.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(token) : url);
+
+/** URL file (sinkron). Menyertakan token bila ada yang masih segar; sisanya diurus pencegat klik. */
+export const fileUrl = (record, filename, opts) => {
+  const url = pb.files.getURL(record, filename, opts);
+  return Date.now() - fileToken.at < TOKEN_TTL_MS ? withToken(url, fileToken.value) : url;
+};
+
+/** URL file dengan token segar (async), untuk kode yang butuh URL pasti valid. */
+export async function fileUrlAsync(record, filename, opts) {
+  return withToken(pb.files.getURL(record, filename, opts), await getFileToken());
+}
+
+if (typeof document !== 'undefined') {
+  document.addEventListener(
+    'click',
+    (ev) => {
+      const a = ev.target instanceof Element ? ev.target.closest('a[href*="/api/files/"]') : null;
+      if (!a || ev.defaultPrevented || ev.button !== 0 || ev.ctrlKey || ev.metaKey || ev.shiftKey) return;
+      if (/[?&]thumb=/.test(a.href)) return;
+      ev.preventDefault();
+      // Buka tab dulu (sinkron) supaya tidak diblokir popup blocker, lalu isi alamatnya setelah token siap.
+      const blank = a.target === '_blank' ? window.open('', '_blank') : null;
+      const url = a.href.replace(/([?&])token=[^&]*&?/, '$1').replace(/[?&]$/, '');
+      pb.files
+        .getToken()
+        .then((t) => {
+          fileToken = { value: t, at: Date.now() };
+          const target = withToken(url, t);
+          if (blank) blank.location.href = target;
+          else window.location.href = target;
+        })
+        .catch(() => {
+          if (blank) blank.close();
+          window.alert('Tidak bisa membuka file. Silakan login ulang lalu coba lagi.');
+        });
+    },
+    true
+  );
+}

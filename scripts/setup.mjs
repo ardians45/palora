@@ -3,6 +3,7 @@
 //   npm run setup                                  -> server lokal (backend/pb_data)
 //   npm run setup -- --url https://palora.domain   -> server yang sudah online (cloud / server gudang)
 //   tambah --demo untuk membuat beberapa transaksi contoh (presentasi)
+//   tambah --allow-default hanya untuk development lokal (mengizinkan password bawaan .env.example)
 //
 // Kredensial dibaca dari backend/.env (salin dari backend/.env.example lalu ganti password-nya).
 import path from 'node:path';
@@ -17,6 +18,16 @@ if (env.__file.endsWith('.env.example')) {
 }
 for (const k of ['PB_ADMIN_EMAIL', 'PB_ADMIN_PASSWORD', 'SEED_USER_PASSWORD']) {
   if (!env[k]) throw new Error(`${k} belum diisi di ${env.__file}`);
+}
+
+// Tolak password bawaan dari .env.example (sudah ada di repo & manual, jadi dianggap publik).
+const DEFAULTS = { PB_ADMIN_PASSWORD: 'palora-admin-dev-123', SEED_USER_PASSWORD: 'palora-dev-123' };
+const usingDefault = Object.entries(DEFAULTS).filter(([k, v]) => env[k] === v).map(([k]) => k);
+if (usingDefault.length && !process.argv.includes('--allow-default')) {
+  console.error(`Setup dibatalkan: ${usingDefault.join(', ')} masih memakai password bawaan dari .env.example.
+Ganti di ${env.__file} (atau jalankan scripts/ganti-password.mjs setelah server berjalan).
+Untuk development lokal saja, tambahkan --allow-default.`);
+  process.exit(1);
 }
 
 const urlArg = process.argv.indexOf('--url');

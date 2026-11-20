@@ -33,6 +33,8 @@ npm run dev            # terminal 2: http://localhost:5173
 ```
 
 `npm run setup -- --demo` menambahkan beberapa transaksi contoh untuk presentasi.
+`setup` menolak password bawaan `.env.example`; untuk development lokal tambahkan `--allow-default`.
+Setelah server produksi berjalan, jalankan `node scripts/ganti-password.mjs` untuk mengganti semua password (hasil di `backend/PASSWORD-BARU.txt`).
 Kredensial development ada di `backend/.env.example` (salin ke `backend/.env` & ganti untuk produksi).
 
 | Email | Role | Persona |
