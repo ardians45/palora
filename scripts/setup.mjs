@@ -49,7 +49,7 @@ async function fill(url) {
       await c.collection('users').authWithPassword(email, env.SEED_USER_PASSWORD);
       return c;
     };
-    await seedDemo(await login('heri@palora.local'), await login('bude@palora.local'), (m) => console.log('  ' + m));
+    await seedDemo(await login('heri@palora.paletindo.id'), await login('finance@palora.paletindo.id'), (m) => console.log('  ' + m));
   }
 }
 

@@ -8,9 +8,9 @@ import { fixColor, fixName } from '../backend/seed/product-names.js';
 /** Akun awal sesuai persona PRD. Password diambil dari env SEED_USER_PASSWORD. */
 export function defaultUsers(password) {
   return [
-    { email: 'yanto@palora.local', name: 'Pak Yanto', role: 'owner' },
-    { email: 'heri@palora.local', name: 'Mas Heri', role: 'gudang' },
-    { email: 'bude@palora.local', name: 'Bude', role: 'finance' },
+    { email: 'suryanto@palora.paletindo.id', name: 'Pak Yanto', role: 'owner' },
+    { email: 'heri@palora.paletindo.id', name: 'Mas Heri', role: 'gudang' },
+    { email: 'finance@palora.paletindo.id', name: 'Bude', role: 'finance' },
   ].map((u) => ({ ...u, password, passwordConfirm: password, active: true, emailVisibility: true }));
 }
 

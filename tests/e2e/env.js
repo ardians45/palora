@@ -7,7 +7,7 @@ export const ADMIN = { email: 'admin@e2e.local', password: 'e2e-admin-12345' };
 export const USER_PASSWORD = 'e2e-user-12345';
 export const STATE_FILE = path.join(os.tmpdir(), 'palora-e2e-state.json');
 export const USERS = {
-  owner: 'yanto@palora.local',
-  gudang: 'heri@palora.local',
-  finance: 'bude@palora.local',
+  owner: 'suryanto@palora.paletindo.id',
+  gudang: 'heri@palora.paletindo.id',
+  finance: 'finance@palora.paletindo.id',
 };

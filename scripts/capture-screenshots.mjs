@@ -103,7 +103,7 @@ async function run() {
     await snap('00_login.png');
 
     // --- 01. LOGIN SEBAGAI OWNER (PAK YANTO) ---
-    await loginAs('yanto@palora.local', 'Owner (Pak Yanto)');
+    await loginAs('suryanto@palora.paletindo.id', 'Owner (Pak Yanto)');
     await snap('01_launcher_owner.png');
 
     // --- 02. PENJUALAN ---
@@ -266,10 +266,10 @@ async function run() {
     await snap('27_admin_pengaturan.png');
 
     // --- 11. ROLE GUDANG & FINANCE LAUNCHER ---
-    await loginAs('heri@palora.local', 'Admin Gudang (Mas Heri)');
+    await loginAs('heri@palora.paletindo.id', 'Admin Gudang (Mas Heri)');
     await snap('28_launcher_gudang.png');
 
-    await loginAs('bude@palora.local', 'Keuangan (Bude)');
+    await loginAs('finance@palora.paletindo.id', 'Keuangan (Bude)');
     await snap('29_launcher_keuangan.png');
 
     await browser.close();

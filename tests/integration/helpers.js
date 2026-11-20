@@ -32,9 +32,9 @@ export async function startTestServer({ productCount = 30 } = {}) {
     url: server.url,
     admin,
     login,
-    owner: await login('yanto@palora.local'),
-    gudang: await login('heri@palora.local'),
-    finance: await login('bude@palora.local'),
+    owner: await login('suryanto@palora.paletindo.id'),
+    gudang: await login('heri@palora.paletindo.id'),
+    finance: await login('finance@palora.paletindo.id'),
     async stop() {
       await server.stop();
       rmSync(dataDir, { recursive: true, force: true });

@@ -39,9 +39,9 @@ Kredensial development ada di `backend/.env.example` (salin ke `backend/.env` & 
 
 | Email | Role | Persona |
 |---|---|---|
-| yanto@palora.local | Owner | Pak Yanto / Pak De |
-| heri@palora.local | Admin Gudang & Kasir | Mas Heri |
-| bude@palora.local | Keuangan | Bude |
+| suryanto@palora.paletindo.id | Owner | Pak Yanto / Pak De |
+| heri@palora.paletindo.id | Admin Gudang & Kasir | Mas Heri |
+| finance@palora.paletindo.id | Keuangan | Bude |
 
 ## Perintah
 
