@@ -15,6 +15,9 @@ export default async function globalSetup() {
   const admin = new PocketBase(server.url);
   admin.autoCancellation(false);
   await admin.collection('_superusers').authWithPassword(ADMIN.email, ADMIN.password);
+  // Hanya di database test sementara: semua test login dari 1 IP dalam hitungan detik, jadi batas login
+  // 10x/menit (migrasi security_hardening) akan menolak dengan 429. Server asli tetap memakai batasnya.
+  await admin.settings.update({ rateLimits: { enabled: false } });
   await seed(admin, { users: defaultUsers(USER_PASSWORD) });
   await applyPhotos(admin);
   writeFileSync(STATE_FILE, JSON.stringify({ dataDir, pid: server.pid }));

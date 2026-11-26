@@ -111,6 +111,13 @@ function Form({ existing }) {
       });
     } else set({ customer: name });
   };
+  // Daftar customer bisa baru selesai dimuat setelah namanya diketik: begitu cocok, isi datanya.
+  const matched = known.get(form.customer.trim().toLowerCase());
+  const [applied, setApplied] = useState(existing?.customer || '');
+  if (matched && !existing && applied !== matched.name) {
+    setApplied(matched.name);
+    onCustomer(matched.name);
+  }
 
   const save = async (asDraft) => {
     setErr('');

@@ -47,6 +47,41 @@ File foto: `backend/seed/foto-produk/` · pemetaan: `backend/seed/foto-produk/ma
 | pail-20l-pullup.jpg | BIO-0430, BIO-0431, BIO-0432, BIO-0433 | Pail pull up, warna putih/hitam/kuning/navy sama persis dengan stok | [Pail 20 Liter Pull Up](https://www.paletindo.com/2021/07/pail-20-liter-pull-up.html) |
 | keranjang-lengkeng.jpg | SKU-0441 | Keranjang buah kelengkeng | [Keranjang Buah Baru Untuk Klengkeng , Jeruk, Sawo & Lain Lain](https://www.paletindo.com/2021/11/keranjang-buah-baru-untuk-klengkeng.html) |
 
+## Tambahan dari toko Shopee paletindo (26 November 2026): 20 model, 39 barang
+
+Sumber: https://shopee.co.id/paletindo (toko resmi mitra). Hanya 2 dari 18 halaman daftar produk yang terambil:
+Shopee meminta verifikasi CAPTCHA saat halaman berikutnya dibuka. Foto dipasang hanya bila nama, merek, atau ukuran
+yang tertulis di foto cocok dengan data stok.
+
+| Foto | Barang (kode) | Alasan cocok | Judul di Shopee |
+|---|---|---|---|
+| ember-mizu-15l.jpg | BIO-0422, BIO-0423, BIO-0424 | Tulisan "Ember MIZU 15 Ltr" di foto, warna biru/hijau/pink sama dengan stok | Ember Plastik 15 Liter MIZU |
+| futari-solid-51x34x10.jpg | PLT-0025, PLT-0026, PLT-0027, PLT-0028 | Tertulis "Brand: Futari No 481" di foto (container solid 51x34x10 cm) | Container Plastik Solid Serbaguna & Ekonomis - Futari 51 x 34 x 10 Cm Food Grade |
+| gayung-panjang.jpg | SKU-0224 | Gayung gagang panjang | Gayung Plastik Gagang Panjang |
+| gelas-gagang-boston.jpg | SKU-0411 | Tertulis "Boston 450 ml" di foto | Gelas Plastik Resto/ Gelas Gagang Plastik BPA Free 450 ML Boston |
+| hanger-30-stick.jpg | SKU-0220 | Hanger lipat 30 stick | PROMO Folding Hanger 30 Stick/ Gantungan Baju Bayi Global Eagle |
+| kaca-helm-bogo.jpg | SKU-0152, SKU-0153 | Kaca helm clear & smoke, sama dengan 2 varian di stok | Kaca Helm Bogo Retro Flat/ Datar Coating Injak |
+| lurebox-85.jpg | BOX-0030 | Lure Box #8.5 (kode stok L - 85) | Lure Box # 8.5 Double Side |
+| pail-20l-tutup.jpg | BIO-0427, BIO-0428, BIO-0429 | Pail 20 liter, variasi putih/hitam/navy sama persis dengan stok | Ember/ Pail 20 Liter Tutup FOOD SAFE |
+| palet-120x60x13.jpg | RBT-0382 | Tertulis ukuran 120 x 60 x 13,2 cm di foto (sama dengan NPS 1206) | Palet Plastik Berlubang 120 x 60 x 13,2 Cm - Kualitas TOP |
+| partcase-medium.jpg | PRT-0094, PRT-0095 | Tertulis "PART CASE MEDIUM 33.5 x 20 x 15 Cm" di foto | Part Case Medium Tempat Spare Part Mobil & Motor |
+| snackbox-500.jpg | SKU-0173, SKU-0174, SKU-0175, SKU-0176, SKU-0177, SKU-0178, SKU-0179, SKU-0180 | Tertulis "Food Box 500 ml" (Victory) di foto | KOTAK MAKANAN ATAU SNACK BOX 500 ML |
+| tempat-sendok-maspion.jpg | SKU-0405 | Tempat sendok merek Maspion (logo di foto) | Tempat Sendok Garpu Maspion - Cutlery Set Star |
+| toolbox-greenleaf-1455.jpg | SKU-0445 | Tertulis "Green Leaf TIPE 1455" di foto | Tool Box Kotak Pancing Kotak Jahit Green Leaf 1455 |
+| toples-bio-1000.jpg | BIO-0436 | Tertulis "Toples Plastik Jar PET 1000 ml - Bio" di foto | Toples Plastik PET Jar/ Tabung 1000 ml Premium Merk BIO |
+| toples-bio-500.jpg | BIO-0434 | Tertulis "Toples Plastik Jar PET 500 ml - Bio" di foto | Toples Plastik PET Jar/ Tabung 500 ml Premium Merk BIO |
+| victory-multikip-5l.jpg | SKU-0164, SKU-0165, SKU-0166, SKU-0167 | Victory Multi Kip Box kapasitas 5 liter | Kotak Penyimpanan - Victory Multi Kip Box 5L |
+| victory-ttr10.jpg | SKU-0154 | Tertulis "Kip It TTR 10" di foto | Kotak Makan Anti Tumpah Victory Kip It - TTR 10 |
+| victory-ttr10-sekat.jpg | SKU-0155 | Tertulis "Kip It TTR 10 + sekat" di foto | Kotak Makan Anti Tumpah Victory Kip It - TTR 10 Plus Sekat |
+| victory-ttr20.jpg | SKU-0156 | Tertulis "Kip It TTR 20" di foto | Kotak Makan Anti Tumpah Victory Kip It - TTR 20 |
+| victory-ttr30-sekat.jpg | SKU-0159 | Tertulis "Kip It TTR 30 + sekat" di foto | Kotak Makan Anti Tumpah Victory Kip It - TTR 30 Plus Sekat |
+
+Tidak dipasang karena ragu: Kotak Alat Pancing DS 450 (stok: SS - 450), Lure Box Besar 2 Tingkat, Krat Telur isi 30,
+Kontainer Lipat Medium (ukuran di stok tidak tertulis).
+
+**Cara melengkapi sisanya:** minta mitra mengunduh daftar produk dari Shopee Seller Centre (Produk Saya, Alat Massal,
+unduh data produk beserta tautan foto), atau upload foto langsung dari halaman barang (Stok, klik barang, panel Foto).
+
 ## Perlu dicek klien (TIDAK dipasang)
 
 Ada postingan yang mirip, tapi belum bisa dipastikan sama barangnya. Kalau klien konfirmasi cocok,

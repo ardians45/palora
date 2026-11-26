@@ -210,6 +210,20 @@ onRecordCreateRequest((e) => {
   e.next();
 }, "documents");
 
+// Pelanggan: piutang dihitung dari pesanan (bukan diketik); limit kredit hanya Owner & Keuangan
+onRecordCreateRequest((e) => {
+  const u = require(`${__hooks}/utils.js`);
+  e.record.set("current_debt", 0);
+  if (["owner", "finance"].indexOf(u.role(e.auth)) === -1) e.record.set("credit_limit", 0);
+  e.next();
+}, "customers");
+
+onRecordUpdateRequest((e) => {
+  const u = require(`${__hooks}/utils.js`);
+  if (["owner", "finance"].indexOf(u.role(e.auth)) === -1) e.record.set("credit_limit", e.record.original().get("credit_limit"));
+  e.next();
+}, "customers");
+
 // ===========================================================================
 // 3. Pesanan customer: nomor, total, status dihitung server
 // ===========================================================================
@@ -219,7 +233,7 @@ onRecordCreateRequest((e) => {
   const s = u.getSettings(e.app);
   // draft: boleh belum lengkap, belum dapat nomor invoice (nomor dibuat saat disimpan final)
   const isDraft = !!(e.requestInfo().body || {}).is_draft;
-  const items = u.cleanItems(u.getJSON(r, "items"), { requireCode: true, draft: isDraft });
+  const items = u.stampSaleItems(e.app, u.cleanItems(u.getJSON(r, "items"), { requireCode: true, draft: isDraft }), e.auth, isDraft);
   const taxMode = r.getString("tax_mode") || "none";
   const t = u.computeTotals(items, taxMode, s ? s.getFloat("ppn_rate") : 11);
   const date = u.parseDate(r.getString("date")).iso;
@@ -246,6 +260,8 @@ onRecordCreateRequest((e) => {
   r.set("remaining_amount", t.total);
   r.set("status", isDraft ? "draft" : "baru");
   r.set("channel", "pesanan");
+  // kolom lama (sebelum v2) tidak dipakai lagi: jangan sampai diisi bebas lewat API
+  ["payments", "payment_status", "delivery_status"].forEach((k) => r.set(k, k === "payments" ? [] : ""));
   u.checkOnlineOrder(e.app, r, "", isDraft);
   r.set("release_approved", false);
   r.set("created_by", u.actorName(e.auth));
@@ -275,6 +291,7 @@ onRecordUpdateRequest((e) => {
   [
     "order_no", "channel", "uid", "status", "paid_amount", "dp_amount", "remaining_amount", "subtotal", "tax_amount",
     "total_amount", "release_approved", "dp_override_by", "store", "marketplace_order_no", "created_by", "cancel_reason", "items", "tax_mode", "returns",
+    "payments", "payment_status", "delivery_status",
   ].forEach((k) => r.set(k, orig.get(k)));
   if (orig.getString("channel") === "pesanan" && ["draft", "baru", "dp"].indexOf(status) !== -1) {
     if (reqBody.store !== undefined) r.set("store", String(reqBody.store || ""));
@@ -295,7 +312,7 @@ onRecordUpdateRequest((e) => {
     if (reqBody.items !== undefined) r.set("items", typeof reqBody.items === "string" ? JSON.parse(reqBody.items) : reqBody.items);
     if (reqBody.tax_mode !== undefined) r.set("tax_mode", reqBody.tax_mode);
     const s = u.getSettings(e.app);
-    const items = u.cleanItems(u.getJSON(r, "items"), { requireCode: true, draft: !finalize });
+    const items = u.stampSaleItems(e.app, u.cleanItems(u.getJSON(r, "items"), { requireCode: true, draft: !finalize }), e.auth, !finalize);
     const t = u.computeTotals(items, r.getString("tax_mode") || "none", s ? s.getFloat("ppn_rate") : 11);
     r.set("items", items);
     r.set("subtotal", t.subtotal);
@@ -338,7 +355,7 @@ onRecordUpdateRequest((e) => {
     if (reqBody.items !== undefined) r.set("items", typeof reqBody.items === "string" ? JSON.parse(reqBody.items) : reqBody.items);
     if (reqBody.tax_mode !== undefined) r.set("tax_mode", reqBody.tax_mode);
     const s = u.getSettings(e.app);
-    const items = u.cleanItems(u.getJSON(r, "items"), { requireCode: true });
+    const items = u.stampSaleItems(e.app, u.cleanItems(u.getJSON(r, "items"), { requireCode: true }), e.auth, false);
     const t = u.computeTotals(items, r.getString("tax_mode") || "none", s ? s.getFloat("ppn_rate") : 11);
     const paid = orig.getFloat("paid_amount");
     if (t.total < paid) {
@@ -784,6 +801,7 @@ routerAdd(
         const product = u.findProductByCode(tx, it.productCode);
         if (!product) throw new BadRequestError("Kode " + it.productCode + " (" + it.name + ") tidak ada di master barang.");
         it.sentQty = u.sentQty(status, it) + x.qty;
+        it.cost = product.getFloat("buy_price"); // harga modal saat barang keluar (dasar laporan laba kotor)
         u.moveStock(
           tx,
           product,
@@ -1067,7 +1085,7 @@ routerAdd(
     let out;
     e.app.runInTransaction((tx) => {
       const s = u.getSettings(tx);
-      const items = u.cleanItems(body.items, { requireCode: true });
+      const items = u.stampSaleItems(tx, u.cleanItems(body.items, { requireCode: true }), e.auth, false);
       const taxMode = String(body.tax_mode || "none");
       const t = u.computeTotals(items, taxMode, s ? s.getFloat("ppn_rate") : 11);
       const received = Math.round(Number(body.received_amount));
@@ -1386,6 +1404,7 @@ routerAdd(
             price: x.row.price || 0,
           }))
         );
+        u.stampSaleItems(tx, items, e.auth, true); // harga modal saat terjual (laporan laba kotor)
         const total = items.reduce((s, it) => s + it.total, 0);
         const no = u.docNumber(tx, "MP", date);
         const order = new Record(tx.findCollectionByNameOrId("sales_orders"));
@@ -1523,8 +1542,9 @@ routerAdd(
       // moveStock menolak bila stok tidak cukup (barang batch ini sudah terjual)
       u.moveStock(tx, p, -qty, { type: "PRODUKSI", refNo: rec.getString("batch_no"), refType: "production", refId: rec.id, reason: "Batal produksi: " + reason, date: body.date }, e.auth);
       const left = stock - qty;
-      const restored = left > 0 ? Math.round((stock * oldCost - rec.getFloat("total_cost")) / left) : 0;
-      if (restored > 0 && restored !== oldCost) {
+      // stok habis setelah batal -> kembali ke harga modal sebelum batch ini
+      const restored = left > 0 ? Math.round((stock * oldCost - rec.getFloat("total_cost")) / left) : rec.getFloat("cost_before");
+      if (restored !== oldCost && (restored > 0 || left === 0)) {
         p.set("buy_price", restored);
         tx.save(p);
         u.writeAudit(tx, "products", p, "cost_update", e.auth, { buy_price: { from: oldCost, to: restored, ref: rec.getString("batch_no") + " batal" } });

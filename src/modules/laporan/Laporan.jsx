@@ -37,19 +37,30 @@ export default function Laporan() {
     const byChannel = {};
     const byDay = new Map();
     const byProduct = new Map();
+    // laba kotor: hanya baris yang punya harga modal saat barang keluar (transaksi lama belum punya)
+    let hpp = 0;
+    let costed = 0;
+    let noCost = 0;
     for (const o of orders.items) {
       const ch = channelOf(o);
       byChannel[ch] = (byChannel[ch] || 0) + o.total_amount;
-      const day = byDay.get(o.date) || { date: o.date, count: 0, total: 0, paid: 0 };
+      const day = byDay.get(o.date) || { date: o.date, count: 0, total: 0, paid: 0, profit: 0 };
       day.count++;
       day.total += o.total_amount;
       day.paid += o.paid_amount;
       byDay.set(o.date, day);
       for (const it of o.items || []) {
         const k = String(it.productCode);
-        const p = byProduct.get(k) || { code: k, name: it.name, qty: 0, total: 0 };
+        const p = byProduct.get(k) || { code: k, name: it.name, qty: 0, total: 0, profit: 0 };
         p.qty += Number(it.qty) || 0;
         p.total += Number(it.total) || 0;
+        if (it.cost > 0) {
+          const profit = (Number(it.total) || 0) - it.cost * (Number(it.qty) || 0);
+          hpp += it.cost * (Number(it.qty) || 0);
+          costed += Number(it.total) || 0;
+          p.profit += profit;
+          day.profit += profit;
+        } else noCost++;
         byProduct.set(k, p);
       }
     }
@@ -64,6 +75,10 @@ export default function Laporan() {
     const stockValue = products.reduce((s, p) => s + p.stock * (p.buy_price || 0), 0);
     return {
       byChannel,
+      hpp,
+      gross: costed - hpp,
+      grossPct: costed > 0 ? Math.round(((costed - hpp) / costed) * 100) : 0,
+      noCost,
       days: [...byDay.values()],
       top: [...byProduct.values()].sort((a, b) => b.qty - a.qty).slice(0, 20),
       cashIn,
@@ -90,6 +105,7 @@ export default function Laporan() {
           Total: o.total_amount,
           Dibayar: o.paid_amount,
           Sisa: o.remaining_amount,
+          'HPP (harga modal)': (o.items || []).reduce((s, it) => s + (it.cost > 0 ? it.cost * (Number(it.qty) || 0) : 0), 0),
           Status: o.status,
         }))
       ),
@@ -140,12 +156,17 @@ export default function Laporan() {
       </div>
       <div className="kpis">
         <Kpi label="Omzet (semua saluran)" value={rp(stats.omzet)} to={['penjualan']} />
+        <Kpi label={`Laba kotor (margin ${stats.grossPct}%)`} value={stats.hpp > 0 ? rp(stats.gross) : 'belum ada data'} tone={stats.gross < 0 ? 'bad' : stats.hpp > 0 ? 'ok' : undefined} />
         <Kpi label="Kas masuk" value={rp(stats.cashIn)} />
         <Kpi label="Kas keluar (bayar supplier)" value={rp(stats.cashOut)} />
         <Kpi label="Piutang saat ini" value={rp(stats.receivable)} to={['piutang']} />
         <Kpi label="Hutang saat ini" value={rp(stats.payable)} to={['hutang']} />
         <Kpi label="Nilai stok (harga modal)" value={rp(stats.stockValue)} to={['stok']} />
       </div>
+      <p className="small muted mb-3">
+        Laba kotor = nilai jual dikurangi harga modal saat barang keluar (HPP {rp(stats.hpp)}), sebelum biaya operasional dan pajak.
+        {stats.noCost > 0 && ` ${num(stats.noCost)} baris penjualan lama belum punya data harga modal dan tidak ikut dihitung.`}
+      </p>
       <div className="two-col">
         <Panel title="Omzet per saluran" bodyClass="">
           <table className="dt">
@@ -179,6 +200,7 @@ export default function Laporan() {
               { key: 'name', label: 'Nama Barang' },
               { key: 'qty', label: 'Qty', align: 'right', render: (t) => num(t.qty) },
               { key: 'total', label: 'Nilai', align: 'right', render: (t) => num(t.total) },
+              { key: 'profit', label: 'Laba Kotor', align: 'right', render: (t) => <span className={t.profit < 0 ? 'text-bad' : ''}>{num(t.profit)}</span> },
             ]}
           />
         </Panel>
@@ -196,6 +218,7 @@ export default function Laporan() {
               { key: 'count', label: 'Transaksi', align: 'right', total: true },
               { key: 'total', label: 'Omzet', align: 'right', render: (d) => num(d.total), total: true },
               { key: 'paid', label: 'Sudah dibayar', align: 'right', render: (d) => num(d.paid), total: true },
+              { key: 'profit', label: 'Laba Kotor', align: 'right', render: (d) => num(d.profit), total: true },
             ]}
           />
         </Panel>

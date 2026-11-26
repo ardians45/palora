@@ -900,6 +900,9 @@ describe('Revisi mitra: PPN supplier, order online, produksi', () => {
     cur = await product(S.owner, 'T-PRD');
     expect(cur).toMatchObject({ stock: 100, buy_price: 10000 });
     await errorOf(post(S.gudang, '/api/palora/production/cancel', { id: b2.id, reason: 'dua kali' }));
+    // batal batch pertama juga: stok habis, modal kembali ke nilai sebelum produksi (0)
+    await post(S.gudang, '/api/palora/production/cancel', { id: b1.id, reason: 'uji' });
+    expect(await product(S.owner, 'T-PRD')).toMatchObject({ stock: 0, buy_price: 0 });
   });
 
   it('produksi: input salah ditolak; Keuangan tidak bisa mencatat; tidak bisa dibuat lewat API biasa', async () => {
@@ -910,6 +913,56 @@ describe('Revisi mitra: PPN supplier, order online, produksi', () => {
     await errorOf(post(S.gudang, '/api/palora/production', { product_id: p.id, qty: 10, material_cost: -5 }));
     await errorOf(post(S.finance, '/api/palora/production', { product_id: p.id, qty: 10, material_cost: 1000 }));
     await errorOf(S.owner.collection('productions').create({ batch_no: 'X', qty: 5 }));
-    expect((await product(S.owner, 'T-PRD')).stock).toBe(100);
+    expect((await product(S.owner, 'T-PRD')).stock).toBe(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('Pengamanan tambahan: harga, kolom bebas, backup, ganti password', () => {
+  it('kasir: harga 0 hanya Owner; harga normal & harga modal dicap server, bukan dari klien', async () => {
+    const p = await freshProduct('T-HRG', 20, { sell_price: 10000, buy_price: 6000 });
+    const zero = { items: [{ ...line(p, 1), price: 0 }], received_amount: 0, method: 'Tunai' };
+    const err = await errorOf(post(S.gudang, '/api/palora/kasir/checkout', zero));
+    expect(err.response.message).toMatch(/hanya boleh dicatat Owner/);
+    await post(S.owner, '/api/palora/kasir/checkout', zero);
+
+    const r = await post(S.gudang, '/api/palora/kasir/checkout', {
+      items: [{ ...line(p, 2), price: 9000, originalPrice: 9000, cost: 1 }], received_amount: 18000, method: 'Tunai',
+    });
+    expect(r.order.items[0]).toMatchObject({ price: 9000, originalPrice: 10000, cost: 6000 });
+  });
+
+  it('pesanan: harga modal dicap saat dibuat; kolom lama tidak bisa diisi lewat REST', async () => {
+    const p = await freshProduct('T-CST', 20, { sell_price: 10000, buy_price: 7000 });
+    const o = await S.gudang.collection('sales_orders').create({ customer: 'Cost', items: [line(p, 2)], payment_status: 'Lunas', delivery_status: 'Terkirim', payments: [{ amount: 99 }] });
+    expect(o.items[0]).toMatchObject({ cost: 7000, originalPrice: 10000 });
+    expect(o).toMatchObject({ payment_status: '', delivery_status: '' });
+    const upd = await S.gudang.collection('sales_orders').update(o.id, { payment_status: 'Lunas', delivery_status: 'Terkirim', notes: 'ok' });
+    expect(upd).toMatchObject({ payment_status: '', delivery_status: '', notes: 'ok' });
+    await errorOf(S.gudang.collection('sales_orders').create({ customer: 'Gratis', items: [{ ...line(p, 1), price: 0 }] }));
+  });
+
+  it('pelanggan: piutang tidak bisa diketik; limit kredit hanya Owner & Keuangan', async () => {
+    const c = await S.gudang.collection('customers').create({ uid: 'CUST-T1', name: 'Toko Limit', current_debt: 999999, credit_limit: 5000000 });
+    expect(c).toMatchObject({ current_debt: 0, credit_limit: 0 });
+    const byGudang = await S.gudang.collection('customers').update(c.id, { credit_limit: 9000000, phone: '0812' });
+    expect(byGudang).toMatchObject({ credit_limit: 0, phone: '0812' });
+    const byFinance = await S.finance.collection('customers').update(c.id, { credit_limit: 3000000 });
+    expect(byFinance.credit_limit).toBe(3000000);
+  });
+
+  it('backup otomatis harian aktif dan menyimpan 14 backup terakhir', async () => {
+    const s = await S.admin.settings.getAll();
+    expect(s.backups).toMatchObject({ cron: '0 16 * * *', cronMaxKeep: 14 });
+  });
+
+  it('pengguna bisa ganti password sendiri hanya dengan password lama yang benar', async () => {
+    const u = await S.owner.collection('users').create({ email: 'pw@palora.local', password: USER_PASSWORD, passwordConfirm: USER_PASSWORD, name: 'Pw', role: 'gudang', active: true });
+    const c = await S.login('pw@palora.local');
+    await errorOf(c.collection('users').update(u.id, { oldPassword: 'salah-salah', password: 'baru-12345678', passwordConfirm: 'baru-12345678' }));
+    await c.collection('users').update(u.id, { oldPassword: USER_PASSWORD, password: 'baru-12345678', passwordConfirm: 'baru-12345678' });
+    await c.collection('users').authWithPassword('pw@palora.local', 'baru-12345678');
+    expect(c.authStore.isValid).toBe(true);
+    await errorOf(c.collection('users').update(u.id, { role: 'owner' }));
   });
 });

@@ -1,19 +1,22 @@
 // Kartu stok: data barang + riwayat masuk/keluar per tanggal dengan no. dokumen.
 import React, { useState } from 'react';
-import { Archive, Pencil, SlidersHorizontal } from 'lucide-react';
+import { Archive, Factory, Pencil, SlidersHorizontal } from 'lucide-react';
 import { pb } from '../../lib/pb';
 import { useRecord, useRecords, q } from '../../lib/data';
-import { navigate, replaceQuery, useRoute } from '../../lib/router';
+import { href, navigate, replaceQuery, useRoute } from '../../lib/router';
 import { useSession } from '../../lib/session';
 import { date, dateTime, num, numOrDash } from '../../lib/format';
 import { MOVEMENT_TYPE } from '../../lib/status';
-import { Badge, Button, DescList, Empty, ErrorBox, Input, Loading, PageHeader, Panel, Select, StatusBadge } from '../../ui/core';
+import { Badge, Button, DescList, Empty, ErrorBox, Input, LinkButton, Loading, PageHeader, Panel, Select, StatusBadge } from '../../ui/core';
 import DataTable, { matchText } from '../../ui/DataTable';
 import Activity from '../../ui/Activity';
 import { useConfirm, useToast } from '../../ui/feedback';
 import ProductDialog, { AdjustDialog } from './ProductDialog';
 import ProductPhoto from '../../ui/ProductPhoto';
 import { FilePick } from '../../ui/core';
+
+// halaman dokumen asal mutasi (pesanan / PO / batch produksi)
+const REF_PAGE = { order: 'penjualan', po: 'pembelian', production: 'produksi' };
 
 const movementColumns = (withProduct) => [
   { key: 'created', label: 'Waktu', render: (m) => <span className="nowrap">{dateTime(m.created)}</span> },
@@ -24,7 +27,18 @@ const movementColumns = (withProduct) => [
       ]
     : []),
   { key: 'type', label: 'Jenis', render: (m) => <StatusBadge map={MOVEMENT_TYPE} value={m.type} /> },
-  { key: 'ref_no', label: 'Dokumen', render: (m) => <span className="mono small">{m.ref_no}</span> },
+  {
+    key: 'ref_no',
+    label: 'Dokumen',
+    render: (m) =>
+      REF_PAGE[m.ref_type] && m.ref_id ? (
+        <a className="mono small" href={href([REF_PAGE[m.ref_type], m.ref_id])} onClick={(e) => e.stopPropagation()} title="Buka dokumennya">
+          {m.ref_no}
+        </a>
+      ) : (
+        <span className="mono small">{m.ref_no}</span>
+      ),
+  },
   { key: 'reason', label: 'Keterangan' },
   {
     key: 'qty',
@@ -77,6 +91,11 @@ export default function StokCard({ id }) {
             <Button icon={SlidersHorizontal} onClick={() => setDlg('adjust')}>
               Koreksi Stok
             </Button>
+            {p.produced && (
+              <LinkButton to={['produksi', 'baru']} query={{ p: p.id }} icon={Factory}>
+                Catat Produksi
+              </LinkButton>
+            )}
             <Button variant="danger" icon={Archive} onClick={archive}>
               Arsipkan
             </Button>
@@ -122,6 +141,7 @@ export default function StokCard({ id }) {
                   ['Stok minimum', p.min_stock ? <span key="m">{num(p.min_stock)} {low && <Badge tone="bad">Menipis</Badge>}</span> : null],
                   ['Lokasi', p.location],
                   ['Pabrik', p.factory],
+                  ['Asal barang', p.produced ? <Badge key="a" tone="info">Produksi sendiri</Badge> : null],
                   ['Keterangan', p.notes],
                 ]}
               />

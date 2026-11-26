@@ -35,7 +35,7 @@ const CONFIG = {
       { key: 'default_terms', label: 'Syarat bayar biasa', options: ['', ...TERMS] },
       { key: 'address', label: 'Alamat (penagihan)', span: 'span-all', textarea: true },
       { key: 'shipping_address', label: 'Alamat kirim', span: 'span-all', textarea: true },
-      { key: 'credit_limit', label: 'Limit kredit', money: true },
+      { key: 'credit_limit', label: 'Limit kredit', money: true, roles: ['owner', 'finance'], hint: 'Diisi Owner / Keuangan' },
     ],
   },
   suppliers: {
@@ -106,6 +106,7 @@ export default function Master({ collection }) {
 }
 
 function EditDialog({ cfg, collection, record, onClose }) {
+  const { can } = useSession();
   const toast = useToast();
   const confirm = useConfirm();
   const [f, setF] = useState(() => Object.fromEntries(cfg.fields.map((x) => [x.key, record?.[x.key] ?? (x.check ? false : '')])));
@@ -117,7 +118,8 @@ function EditDialog({ cfg, collection, record, onClose }) {
     e.preventDefault();
     setErr('');
     if (!String(f.name || '').trim()) return setErr('Nama wajib diisi.');
-    const body = Object.fromEntries(Object.entries(f).map(([k, v]) => [k, typeof v === 'string' ? v.trim() : v === '' ? 0 : v]));
+    const allowed = new Set(cfg.fields.filter((x) => !x.roles || can(...x.roles)).map((x) => x.key));
+    const body = Object.fromEntries(Object.entries(f).filter(([k]) => allowed.has(k)).map(([k, v]) => [k, typeof v === 'string' ? v.trim() : v === '' ? 0 : v]));
     setBusy(true);
     try {
       if (record) await pb.collection(collection).update(record.id, body);
@@ -156,7 +158,7 @@ function EditDialog({ cfg, collection, record, onClose }) {
       <form onSubmit={submit}>
         <div className="dialog-body">
           <div className="form-grid cols-3">
-            {cfg.fields.map((x) => (
+            {cfg.fields.filter((x) => !x.roles || can(...x.roles)).map((x) => (
               <Field key={x.key} label={x.label} required={x.required} hint={x.hint} className={x.span || ''}>
                 {x.check ? (
                   <label className="check">

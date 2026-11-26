@@ -27,7 +27,7 @@ describe('pemetaan foto barang', () => {
         expect(seen.has(code), `${code} dipetakan ke ${seen.get(code)} dan ${m.file}`).toBe(false);
         seen.set(code, m.file);
       }
-      expect(m.source_url).toMatch(/^https:\/\/www\.paletindo\.com\//);
+      expect(m.source_url).toMatch(/^https:\/\/(www\.paletindo\.com\/|shopee\.co\.id\/paletindo)/) // katalog web atau toko Shopee mitra;
       expect(m.reason.length).toBeGreaterThan(5);
     }
   });

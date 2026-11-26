@@ -8,6 +8,7 @@ Backend: **PocketBase 0.40** (SQLite). Definisi: `backend/pb_migrations/`, atura
 |---|---|
 | Ikuti alur lama | Nomor & format dokumen meniru kertas Paletindo (PO-038/PPU/2026, 0063/DO/PPU/X/2026). |
 | Stok & uang aman | `stock`, status & semua nilai uang pesanan (total, dibayar, sisa), `receipts`/total PO, status surat jalan, `paid_amount` invoice **tidak bisa** diubah lewat API biasa (termasuk modifier `field+`): hook server selalu mengembalikan nilainya. Hanya lewat endpoint `/api/palora/*` dalam **satu transaksi**. Kode barang tidak bisa diganti; barang yang masih dipakai pesanan/PO berjalan tidak bisa diarsipkan. Qty harus bilangan bulat. |
+| Harga jual tidak bisa dipalsukan | Di setiap baris penjualan, harga normal (`originalPrice`) dan harga modal (`cost`) dicap server dari master barang, bukan dari klien. `cost` diperbarui saat barang benar-benar keluar; ini dasar **laba kotor** di Laporan. Barang gratis (harga 0) hanya boleh dicatat Owner. |
 | Tidak ada hapus permanen | `deleteRule = null`; arsip memakai `deleted = true`. |
 | Riwayat lengkap | Setiap perubahan tercatat di `audit_trail` (pelaku, waktu, nilai sebelum → sesudah) dan tampil sebagai panel "Riwayat" di tiap dokumen. |
 | Baris barang bersama dokumennya | `items`, `receipts` disimpan JSON di dokumen induk; total dihitung ulang oleh server. |
@@ -32,6 +33,13 @@ Backend: **PocketBase 0.40** (SQLite). Definisi: `backend/pb_migrations/`, atura
 | `productions` | batch produksi sendiri: barang, qty jadi, biaya material/jasa/lain, HPP per unit, harga jual & harga modal sebelum/sesudah, asal produksi, status (selesai/batal) | hanya via endpoint; stok masuk sebagai mutasi `PRODUKSI` (bukan pembelian: tanpa PO & hutang) |
 | `opname_sessions` | hasil stok opname: per barang stok sistem, hitung fisik, selisih | |
 | `audit_trail`, `system_logs` | riwayat perubahan | riwayat akun & pengaturan khusus Owner |
+
+## Pengamanan operasional
+
+- **Backup otomatis** setiap hari 23.00 WIB, 14 backup terakhir disimpan di `pb_data/backups` (migrasi `1700000800`). Backup masih di disk yang sama: salin berkala ke flashdisk / Google Drive.
+- **Ganti password sendiri**: tombol kunci di pojok kanan atas, wajib password lama.
+- **Pelanggan**: saldo piutang tidak bisa diketik (dihitung dari pesanan); limit kredit hanya Owner & Keuangan.
+- Kolom lama pesanan (`payments`, `payment_status`, `delivery_status`) tidak bisa diisi lewat API.
 
 ## Order offline & online
 

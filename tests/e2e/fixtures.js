@@ -10,6 +10,8 @@ export const test = base.extend({
       if (msg.type() === 'error') errors.push(msg.text());
     });
     page.on('pageerror', (err) => errors.push(`pageerror: ${err.message}`));
+    // `use` di sini fixture Playwright, bukan hook React
+    // oxlint-disable-next-line react-hooks/rules-of-hooks
     await use(page);
     // test yang sengaja memicu penolakan server / jaringan putus menyalakan page.__allowHttpErrors
     const real = errors.filter((e) => !(page.__allowHttpErrors && /(status of [45]\d\d|net::ERR_|Failed to fetch)/.test(e)));

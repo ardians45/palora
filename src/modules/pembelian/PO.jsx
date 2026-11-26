@@ -184,6 +184,13 @@ function POFormInner({ existing }) {
     if (s) set({ supplier: s.name, ppn: !!s.pkp, up_person: s.sales_person || f.up_person, supplier_phone: s.whatsapp || s.phone || '', supplier_email: s.email || '' });
     else set({ supplier: name });
   };
+  // Daftar supplier bisa baru selesai dimuat setelah namanya diketik: begitu cocok, isi datanya (Up, WA, PPN).
+  const matched = byName.get(f.supplier.trim().toLowerCase());
+  const [applied, setApplied] = useState(existing?.supplier || '');
+  if (matched && applied !== matched.name) {
+    setApplied(matched.name);
+    onSupplier(matched.name);
+  }
 
   // asDraft: simpan dulu walau belum lengkap (barang/qty/harga dilengkapi nanti sebelum dikirim ke supplier)
   const save = async (asDraft) => {

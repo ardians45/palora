@@ -330,6 +330,25 @@ function requireCompletePo(po) {
   if (bad.length) throw new BadRequestError(label + " masih draft: qty " + bad.map((it) => it.name).join(", ") + " belum diisi.");
 }
 
+/**
+ * Baris penjualan: harga normal (originalPrice) & harga modal (cost) diambil dari master barang, bukan dari
+ * klien, supaya catatan "harga dinego" dan laporan laba kotor bisa dipercaya. Barang gratis (harga 0) hanya Owner.
+ */
+function stampSaleItems(app, items, auth, allowZero) {
+  const isOwner = role(auth) === "owner";
+  items.forEach((it) => {
+    const p = it.productCode ? findProductByCode(app, it.productCode) : null;
+    if (p) {
+      it.originalPrice = p.getFloat("sell_price");
+      it.cost = p.getFloat("buy_price");
+    }
+    if (!allowZero && !isOwner && it.qty > 0 && !(it.price > 0)) {
+      throw new BadRequestError("Harga " + (it.name || it.productCode) + " masih 0. Barang gratis hanya boleh dicatat Owner.");
+    }
+  });
+  return items;
+}
+
 /** Total PO: subtotal (DPP) + PPN bila PO-nya PPN (supplier PKP). */
 function setPoTotals(app, po, items) {
   const s = getSettings(app);
@@ -394,6 +413,7 @@ function checkPoInvoice(app, po, record, excludeId) {
 }
 
 module.exports = {
+  stampSaleItems,
   setPoTotals,
   checkOnlineOrder,
   checkPoInvoice,
