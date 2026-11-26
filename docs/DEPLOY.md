@@ -137,3 +137,27 @@ Selesai. Semua akun, data, dan file ikut pindah.
 - **Server gudang:** `npm run build:server` di laptop, lalu copy ulang folder `pb_public`, `pb_migrations`,
   `pb_hooks` ke PC gudang (**jangan** timpa `pb_data`). Restart server sebagai administrator:
   `schtasks /end /tn "PALORA Server"` lalu `schtasks /run /tn "PALORA Server"`.
+
+## Update otomatis PC gudang (rilis dari laptop)
+
+Supaya perubahan di laptop sampai ke PC gudang tanpa remote / salin file manual.
+
+**Di laptop, setiap ada versi baru**
+1. Commit dan push ke `main`.
+2. `npm run rilis` (opsional: `npm run rilis -- --catatan "isi perubahan"`). Perintah ini menjalankan test, build,
+   mengemas `pb_migrations` + `pb_hooks` + `pb_public` + `windows` menjadi `palora-update.zip`, lalu menerbitkannya
+   di GitHub Releases. Database (`pb_data`) tidak ikut.
+
+**Di PC gudang, sekali saja**
+1. Taruh `pasang-update-otomatis.bat` di folder `windows` milik PALORA (mis. `C:\PALORA\windows`).
+2. Klik kanan, *Run as administrator*. File ini mengunduh skrip update, mendaftarkan task **PALORA Update**
+   (tiap 10 menit), dan langsung memasang versi terbaru.
+
+**Yang terjadi saat ada rilis baru:** backup database ke `backups\sebelum-update-*.zip` (10 terakhir disimpan),
+server berhenti kurang dari 1 menit, kode baru dipasang, server dinyalakan, lalu dicek sehat. Bila tidak sehat,
+kode dan database dikembalikan ke sebelum update dan rilis itu tidak dicoba lagi (`update-gagal.txt`).
+
+- Riwayat: `update-palora.log`. Versi terpasang: `versi-terpasang.txt`.
+- Hentikan update otomatis: `schtasks /delete /tn "PALORA Update" /f`.
+- Rilis ditarik dari repo GitHub publik `ardians45/palora`: siapa pun yang menguasai akun itu bisa mengirim kode ke
+  PC gudang. Aktifkan verifikasi 2 langkah di akun GitHub tersebut.

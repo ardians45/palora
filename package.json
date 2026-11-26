@@ -16,6 +16,7 @@
     "test:e2e": "playwright test",
     "test:all": "vitest run && playwright test",
     "photos": "node scripts/photos-cli.mjs",
+    "rilis": "node scripts/rilis.mjs",
     "push": "scripts\\push.bat"
   },
   "dependencies": {

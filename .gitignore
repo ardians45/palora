@@ -57,3 +57,6 @@ backend/*-bimbingan.log*
 # Password hasil scripts/ganti-password.mjs
 backend/PASSWORD-BARU.txt
 graphify-out/
+backend/update-palora.log
+backend/versi-terpasang.txt
+backend/update-gagal.txt
