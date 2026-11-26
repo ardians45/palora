@@ -44,6 +44,12 @@ export const SJ_STATUS = {
 };
 
 export const CHANNEL_LABEL = { pesanan: 'Pesanan', kasir: 'Kasir', marketplace: 'Marketplace' };
+// Toko marketplace (order online): dipakai import laporan & form pesanan online
+export const STORES = ['Shopee 1', 'Shopee 2', 'Shopee 3', 'Tokopedia 1', 'Tokopedia 2', 'TikTok Shop', 'Lazada', 'Blibli'];
+/** Order online = marketplace: hasil import laporan, atau pesanan yang diketik manual dengan toko marketplace. */
+export const isOnline = (o) => o.channel === 'marketplace' || !!o.store;
+/** Saluran untuk laporan: pesanan online manual dihitung sebagai marketplace. */
+export const channelOf = (o) => (isOnline(o) ? 'marketplace' : o.channel || 'pesanan');
 
 export const MOVEMENT_TYPE = {
   IN: { label: 'Masuk', tone: 'ok' },
@@ -51,6 +57,7 @@ export const MOVEMENT_TYPE = {
   OPNAME: { label: 'Opname', tone: 'warn' },
   ADJUSTMENT: { label: 'Koreksi', tone: 'neutral' },
   RETUR: { label: 'Retur', tone: 'warn' },
+  PRODUKSI: { label: 'Produksi', tone: 'ok' },
 };
 
 /** Status tagihan berdasarkan jatuh tempo */

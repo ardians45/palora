@@ -549,13 +549,13 @@ describe('Audit trail & hak akses', () => {
 
 // ---------------------------------------------------------------------------
 describe('Celah API biasa tertutup (kolom milik server)', () => {
-  it('pesanan: sisa, nilai uang & data marketplace tidak bisa diubah lewat REST', async () => {
+  it('pesanan: sisa & nilai uang tidak bisa diubah lewat REST (toko online boleh selama pesanan masih terbuka)', async () => {
     const p = await freshProduct('T-SEC1', 50, { sell_price: 10000 });
     const o = await S.gudang.collection('sales_orders').create({ customer: 'Sec', payment_type: 'Tempo 14 Hari', items: [line(p, 5)] });
     const upd = await S.gudang.collection('sales_orders').update(o.id, {
       remaining_amount: 0, dp_amount: 50000, subtotal: 1, tax_amount: 1, marketplace_order_no: 'X1', store: 'Shopee', notes: 'boleh',
     });
-    expect(upd).toMatchObject({ remaining_amount: 50000, dp_amount: 0, subtotal: 50000, tax_amount: 0, marketplace_order_no: '', store: '', notes: 'boleh' });
+    expect(upd).toMatchObject({ remaining_amount: 50000, dp_amount: 0, subtotal: 50000, tax_amount: 0, marketplace_order_no: 'X1', store: 'Shopee', notes: 'boleh' });
     const plus = await S.owner.send(`/api/collections/sales_orders/records/${o.id}`, { method: 'PATCH', body: { 'paid_amount+': 50000 } }).catch((e) => e);
     expect((await S.owner.collection('sales_orders').getOne(o.id)).paid_amount).toBe(0);
     expect(plus).toBeDefined();
@@ -842,5 +842,74 @@ describe('Invoice dobel per PO (kasus PO-039)', () => {
     await S.gudang.collection('supplier_invoices').create({ po_id: po.id, invoice_no: 'I-2', total_amount: 4000, date: today(), sj_nos: ['S2'] });
     const e2 = await errorOf(S.gudang.collection('supplier_invoices').create({ po_id: po.id, invoice_no: 'I-3', total_amount: 1000, date: today(), sj_nos: ['S2'] }));
     expect(e2.message).toMatch(/S2 sudah ditagih di invoice I-2/);
+  });
+});
+
+// ---------------------------------------------------------------------------
+describe('Revisi mitra: PPN supplier, order online, produksi', () => {
+  it('PO PPN: subtotal + PPN 11% dihitung server; PO non-PPN tanpa pajak; centang bisa diubah sebelum ada penerimaan', async () => {
+    const p = await freshProduct('T-PPN', 0);
+    const items = [{ productCode: 'T-PPN', name: p.name, qty: 10, price: 100000 }];
+    const non = await S.gudang.collection('purchase_orders').create({ date: '2026-11-26', supplier: 'CV NON PKP', items });
+    expect(non).toMatchObject({ ppn: false, subtotal: 1000000, tax_amount: 0, total_amount: 1000000 });
+    const ppn = await S.gudang.collection('purchase_orders').create({ date: '2026-11-26', supplier: 'PT PKP', ppn: true, items, total_amount: 1, tax_amount: 1 });
+    expect(ppn).toMatchObject({ ppn: true, subtotal: 1000000, tax_amount: 110000, total_amount: 1110000 });
+    const off = await S.gudang.collection('purchase_orders').update(ppn.id, { ppn: false });
+    expect(off).toMatchObject({ tax_amount: 0, total_amount: 1000000 });
+
+    await post(S.gudang, '/api/palora/po/state', { po_id: non.id, state: 'dikirim' });
+    await post(S.gudang, '/api/palora/po/receive', { po_id: non.id, sj_no: 'SJ-PPN-1', lines: [{ index: 0, good: 10 }] });
+    const locked = await S.gudang.collection('purchase_orders').update(non.id, { ppn: true });
+    expect(locked).toMatchObject({ ppn: false, total_amount: 1000000 }); // terkunci setelah barang diterima
+    expect((await product(S.owner, 'T-PPN')).buy_price).toBe(100000); // harga modal = DPP, tanpa PPN
+  });
+
+  it('order online: wajib toko + no. pesanan marketplace, tidak boleh dobel', async () => {
+    const p = await freshProduct('T-ONL', 20, { sell_price: 10000 });
+    const base = { date: '2026-11-26', customer: 'Pembeli Shopee', items: [line(p, 1)] };
+    const err = await errorOf(S.gudang.collection('sales_orders').create({ ...base, store: 'Shopee 1' }));
+    expect(err.response.message).toMatch(/No\. pesanan marketplace/);
+    const o = await S.gudang.collection('sales_orders').create({ ...base, store: 'Shopee 1', marketplace_order_no: 'SHP-777' });
+    expect(o).toMatchObject({ channel: 'pesanan', store: 'Shopee 1', marketplace_order_no: 'SHP-777', status: 'baru' });
+    const dup = await errorOf(S.gudang.collection('sales_orders').create({ ...base, store: 'Shopee 1', marketplace_order_no: 'SHP-777' }));
+    expect(dup.response.message).toMatch(/sudah tercatat/);
+    // jadi offline lagi selama masih bisa diubah
+    const back = await S.gudang.collection('sales_orders').update(o.id, { store: '', marketplace_order_no: '' });
+    expect(back).toMatchObject({ store: '', marketplace_order_no: '' });
+  });
+
+  it('produksi: stok masuk sebagai mutasi PRODUKSI, HPP per batch, harga modal rata-rata tertimbang, tanpa PO/hutang', async () => {
+    const p = await freshProduct('T-PRD', 0, { sell_price: 20000 });
+    const b1 = await post(S.gudang, '/api/palora/production', { product_id: p.id, qty: 100, material_cost: 800000, service_cost: 200000, date: '2026-11-26', source: 'PT Kiana' });
+    expect(b1.batch_no).toMatch(/^PRD-\d{3}\/PPU\/2026$/);
+    expect(b1).toMatchObject({ total_cost: 1000000, unit_cost: 10000, sell_price: 20000, cost_after: 10000, status: 'selesai' });
+    let cur = await product(S.owner, 'T-PRD');
+    expect(cur).toMatchObject({ stock: 100, buy_price: 10000, produced: true });
+    const mv = await movementsOf('T-PRD');
+    expect(mv[mv.length - 1]).toMatchObject({ type: 'PRODUKSI', qty: 100, ref_no: b1.batch_no });
+
+    // batch 2 lebih mahal, stok batch 1 masih 100 -> modal = (100*10000 + 100*14000) / 200
+    const b2 = await post(S.owner, '/api/palora/production', { product_id: p.id, qty: 100, material_cost: 1400000 });
+    expect(b2).toMatchObject({ unit_cost: 14000, cost_before: 10000, cost_after: 12000 });
+    expect((await product(S.owner, 'T-PRD')).buy_price).toBe(12000);
+
+    // batal batch 2: stok & modal kembali
+    await errorOf(post(S.gudang, '/api/palora/production/cancel', { id: b2.id }));
+    const c = await post(S.gudang, '/api/palora/production/cancel', { id: b2.id, reason: 'salah input' });
+    expect(c.status).toBe('batal');
+    cur = await product(S.owner, 'T-PRD');
+    expect(cur).toMatchObject({ stock: 100, buy_price: 10000 });
+    await errorOf(post(S.gudang, '/api/palora/production/cancel', { id: b2.id, reason: 'dua kali' }));
+  });
+
+  it('produksi: input salah ditolak; Keuangan tidak bisa mencatat; tidak bisa dibuat lewat API biasa', async () => {
+    const p = await product(S.owner, 'T-PRD');
+    await errorOf(post(S.gudang, '/api/palora/production', { product_id: p.id, qty: 0, material_cost: 1000 }));
+    await errorOf(post(S.gudang, '/api/palora/production', { product_id: p.id, qty: 1.5, material_cost: 1000 }));
+    await errorOf(post(S.gudang, '/api/palora/production', { product_id: p.id, qty: 10 }));
+    await errorOf(post(S.gudang, '/api/palora/production', { product_id: p.id, qty: 10, material_cost: -5 }));
+    await errorOf(post(S.finance, '/api/palora/production', { product_id: p.id, qty: 10, material_cost: 1000 }));
+    await errorOf(S.owner.collection('productions').create({ batch_no: 'X', qty: 5 }));
+    expect((await product(S.owner, 'T-PRD')).stock).toBe(100);
   });
 });

@@ -160,6 +160,7 @@ function docNumber(txApp, type, dateStr) {
   if (type === "INV") return "INV/" + code + "/" + d.y + d.m + "/" + pad(nextNumber(txApp, "INV-" + d.y + d.m), 4);
   if (type === "NT") return "NT/" + code + "/" + d.y + d.m + "/" + pad(nextNumber(txApp, "NT-" + d.y + d.m), 4);
   if (type === "MP") return "MP/" + code + "/" + d.y + d.m + "/" + pad(nextNumber(txApp, "MP-" + d.y + d.m), 4);
+  if (type === "PRD") return "PRD-" + pad(nextNumber(txApp, "PRD"), 3) + "/" + code + "/" + d.y;
   if (type === "OP") return "OP/" + code + "/" + d.y + d.m + d.d + "/" + pad(nextNumber(txApp, "OP-" + d.y + d.m + d.d), 2);
   throw new Error("Jenis nomor tidak dikenal: " + type);
 }
@@ -329,6 +330,37 @@ function requireCompletePo(po) {
   if (bad.length) throw new BadRequestError(label + " masih draft: qty " + bad.map((it) => it.name).join(", ") + " belum diisi.");
 }
 
+/** Total PO: subtotal (DPP) + PPN bila PO-nya PPN (supplier PKP). */
+function setPoTotals(app, po, items) {
+  const s = getSettings(app);
+  const t = computeTotals(items, po.getBool("ppn") ? "exclude" : "none", s ? s.getFloat("ppn_rate") : 11);
+  po.set("subtotal", t.subtotal);
+  po.set("tax_amount", t.tax);
+  po.set("total_amount", t.total);
+}
+
+/**
+ * Order online (marketplace) yang diketik manual: toko + no. pesanan harus berpasangan dan tidak boleh dobel
+ * (juga terhadap hasil import laporan marketplace).
+ */
+function checkOnlineOrder(app, order, excludeId, allowMissingNo) {
+  const store = order.getString("store").trim();
+  const no = order.getString("marketplace_order_no").trim();
+  order.set("store", store);
+  order.set("marketplace_order_no", no);
+  if (!store && !no) return;
+  if (!store) throw new BadRequestError("Pilih toko marketplace untuk order online.");
+  if (!no) {
+    if (allowMissingNo) return;
+    throw new BadRequestError("No. pesanan marketplace wajib diisi untuk order online.");
+  }
+  let dup = null;
+  try {
+    dup = app.findFirstRecordByFilter("sales_orders", "store = {:s} && marketplace_order_no = {:n} && id != {:id}", { s: store, n: no, id: excludeId || "" });
+  } catch (_) {}
+  if (dup) throw new BadRequestError("Pesanan " + store + " no. " + no + " sudah tercatat sebagai " + dup.getString("order_no") + ".");
+}
+
 /**
  * Cegah tagihan dobel per PO:
  * - total semua invoice PO tidak boleh melebihi nilai PO (termasuk PPN & barang lebih yang diterima)
@@ -362,6 +394,8 @@ function checkPoInvoice(app, po, record, excludeId) {
 }
 
 module.exports = {
+  setPoTotals,
+  checkOnlineOrder,
   checkPoInvoice,
   requireCompletePo,
   normalizeForOrders,

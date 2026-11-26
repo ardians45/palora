@@ -4,8 +4,8 @@ import { useRecords } from '../../lib/data';
 import { useRoute, navigate, replaceQuery } from '../../lib/router';
 import { useSession } from '../../lib/session';
 import { date, num } from '../../lib/format';
-import { ORDER_STATUS, CHANNEL_LABEL, dueTone, shipProgress } from '../../lib/status';
-import { Badge, Empty, Input, LinkButton, PageHeader, Select, StatusBadge, Tabs } from '../../ui/core';
+import { ORDER_STATUS, CHANNEL_LABEL, dueTone, isOnline, shipProgress } from '../../lib/status';
+import { Badge, Empty, Input, LinkButton, PageHeader, Segmented, StatusBadge, Tabs } from '../../ui/core';
 import DataTable, { matchText } from '../../ui/DataTable';
 
 const TABS = [
@@ -27,21 +27,37 @@ export default function PesananList() {
   const { query } = useRoute();
   const { can } = useSession();
   const tab = query.tab || 'semua';
-  const channel = query.ch || '';
+  const kind = query.jenis || ''; // '' | offline | online
   const search = query.q || '';
   const { items, loading, error, reload } = useRecords('sales_orders', { filter: 'deleted = false', sort: '-date,-created' });
 
-  const base = useMemo(
-    () => items.filter((o) => (!channel || o.channel === channel) && matchText(o, search, ['order_no', 'customer', 'po_customer_ref', 'marketplace_order_no'])),
-    [items, channel, search]
-  );
+  const found = useMemo(() => items.filter((o) => matchText(o, search, ['order_no', 'customer', 'po_customer_ref', 'marketplace_order_no', 'store'])), [items, search]);
+  const live = found.filter((o) => o.status !== 'draft');
+  const onlineCount = live.filter(isOnline).length;
+  const base = useMemo(() => found.filter((o) => !kind || isOnline(o) === (kind === 'online')), [found, kind]);
   const rows = base.filter(TABS.find((t) => t.key === tab)?.test || (() => true));
 
   const columns = [
     { key: 'order_no', label: 'No. Nota', render: (o) => (o.status === 'draft' ? <Badge tone="neutral">Draft</Badge> : <span className="mono">{o.order_no}</span>) },
     { key: 'date', label: 'Tanggal', render: (o) => <span className="nowrap">{date(o.date)}</span> },
     { key: 'customer', label: 'Customer' },
-    { key: 'channel', label: 'Saluran', render: (o) => CHANNEL_LABEL[o.channel] || 'Pesanan' },
+    {
+      key: 'channel',
+      label: 'Jenis',
+      value: (o) => (isOnline(o) ? `online ${o.store}` : `offline ${o.channel}`),
+      render: (o) =>
+        isOnline(o) ? (
+          <span className="row">
+            <Badge tone="info">Online</Badge>
+            <span className="small muted">{o.store || 'Marketplace'}</span>
+          </span>
+        ) : (
+          <span className="row">
+            <Badge tone="neutral">Offline</Badge>
+            <span className="small muted">{CHANNEL_LABEL[o.channel] || 'Pesanan'}</span>
+          </span>
+        ),
+    },
     { key: 'total_amount', label: 'Total', align: 'right', render: (o) => num(o.total_amount), total: true },
     { key: 'paid_amount', label: 'Dibayar', align: 'right', render: (o) => num(o.paid_amount), total: true },
     {
@@ -93,13 +109,16 @@ export default function PesananList() {
         }
       />
       <div className="table-tools">
-        <Input className="search" type="search" placeholder="Cari no. nota, customer, PO customer..." value={search} onChange={(e) => replaceQuery({ ...query, q: e.target.value })} aria-label="Cari pesanan" />
-        <Select value={channel} onChange={(e) => replaceQuery({ ...query, ch: e.target.value })} aria-label="Saluran" className="w-sm">
-          <option value="">Semua saluran</option>
-          <option value="pesanan">Pesanan</option>
-          <option value="kasir">Kasir</option>
-          <option value="marketplace">Marketplace</option>
-        </Select>
+        <Input className="search" type="search" placeholder="Cari no. nota, customer, no. PO, no. pesanan marketplace..." value={search} onChange={(e) => replaceQuery({ ...query, q: e.target.value })} aria-label="Cari pesanan" />
+        <Segmented
+          value={kind}
+          onChange={(v) => replaceQuery({ ...query, jenis: v })}
+          options={[
+            { value: '', label: `Semua (${live.length})` },
+            { value: 'offline', label: `Offline (${live.length - onlineCount})` },
+            { value: 'online', label: `Online · Marketplace (${onlineCount})` },
+          ]}
+        />
       </div>
       <Tabs tabs={TABS.map((t) => ({ key: t.key, label: t.label, count: base.filter(t.test).length }))} value={tab} onChange={(k) => replaceQuery({ ...query, tab: k })} />
       <DataTable
@@ -110,7 +129,7 @@ export default function PesananList() {
         onRetry={reload}
         onRowClick={(o) => navigate(['penjualan', o.id])}
         empty={
-          search || tab !== 'semua' || channel ? (
+          search || tab !== 'semua' || kind ? (
             <Empty title="Tidak ada pesanan yang cocok" />
           ) : (
             <Empty

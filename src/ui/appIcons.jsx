@@ -27,6 +27,16 @@ export const stok = (
   </svg>
 );
 
+export const produksi = (
+  <svg viewBox="0 0 40 40" fill="none">
+    <path d="M7 33V19l9 5v-5l9 5V11h6v22H7z" fill="#fa8c16" />
+    <rect x="25" y="7" width="6" height="6" rx="1.5" fill="#ad4e00" />
+    <rect x="11" y="27" width="4" height="4" rx="1" fill="#ffffff" />
+    <rect x="18" y="27" width="4" height="4" rx="1" fill="#ffffff" />
+    <rect x="25" y="27" width="4" height="4" rx="1" fill="#ffffff" />
+  </svg>
+);
+
 export const opname = (
   <svg viewBox="0 0 40 40" fill="none">
     <path d="M12 21l6 6L30 11" stroke="#00b96b" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round" />

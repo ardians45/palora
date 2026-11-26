@@ -8,7 +8,7 @@ import { href, navigate, replaceQuery, useRoute } from '../../lib/router';
 import { useSession } from '../../lib/session';
 import { date, num, rp, today, waLink } from '../../lib/format';
 import { PO_STATUS, PO_STEPS } from '../../lib/status';
-import { Button, DescList, Empty, ErrorBox, Field, FilePick, Input, LinkButton, Loading, PageHeader, Panel, Select, StatusBadge, Steps, Tabs, Textarea } from '../../ui/core';
+import { Badge, Button, DescList, Empty, ErrorBox, Field, FilePick, Input, LinkButton, Loading, PageHeader, Panel, Select, StatusBadge, Steps, Tabs, Textarea } from '../../ui/core';
 import DataTable, { matchText } from '../../ui/DataTable';
 import DateRange from '../../ui/DateRange';
 import ProductPicker, { sameMaker } from '../../ui/ProductPicker';
@@ -84,7 +84,7 @@ export function POList() {
         columns={[
           { key: 'po_no', label: 'No. PO', render: (po) => <span className="mono">{po.po_no}</span> },
           { key: 'date', label: 'Tanggal', render: (po) => date(po.date) },
-          { key: 'supplier', label: 'Supplier' },
+          { key: 'supplier', label: 'Supplier', render: (po) => (<>{po.supplier} {po.ppn && <Badge tone="info">PPN</Badge>}</>) },
           { key: 'total_amount', label: 'Total', align: 'right', render: (po) => num(po.total_amount), total: true },
           {
             key: 'progress',
@@ -116,12 +116,14 @@ export function POForm({ id }) {
 }
 
 function POFormInner({ existing }) {
-  const { products } = useSession();
+  const { products, settings } = useSession();
+  const rate = settings?.ppn_rate || 11;
   const suppliers = useRecords('suppliers', { filter: 'deleted = false', sort: 'name' });
   const toast = useToast();
   const [f, setF] = useState(() => ({
     date: existing?.date || today(),
     supplier: existing?.supplier || '',
+    ppn: !!existing?.ppn,
     up_person: existing?.up_person || '',
     supplier_phone: existing?.supplier_phone || '',
     supplier_email: existing?.supplier_email || '',
@@ -178,7 +180,8 @@ function POFormInner({ existing }) {
 
   const onSupplier = (name) => {
     const s = byName.get(name.trim().toLowerCase());
-    if (s) set({ supplier: s.name, up_person: s.sales_person || f.up_person, supplier_phone: s.whatsapp || s.phone || '', supplier_email: s.email || '' });
+    // PPN PO mengikuti status supplier di master (masih bisa diubah per PO)
+    if (s) set({ supplier: s.name, ppn: !!s.pkp, up_person: s.sales_person || f.up_person, supplier_phone: s.whatsapp || s.phone || '', supplier_email: s.email || '' });
     else set({ supplier: name });
   };
 
@@ -212,6 +215,8 @@ function POFormInner({ existing }) {
     save(false);
   };
   const isDraftPo = !existing || poState(existing) === 'draft';
+  const subtotal = lineTotal(f.items);
+  const tax = f.ppn ? Math.round((subtotal * rate) / 100) : 0;
 
   return (
     <form className="stack" onSubmit={submit}>
@@ -283,8 +288,19 @@ function POFormInner({ existing }) {
           hint='Enter untuk pindah kolom. Harga bisa diubah (nego). Lupa nama barang? Klik "Pilih dari Katalog".'
         />
         <div className="totals">
+          <label className="check totals-full" title="Ikut status supplier di Master Supplier, bisa diubah untuk PO ini">
+            <input type="checkbox" checked={f.ppn} onChange={(e) => set({ ppn: e.target.checked })} /> Supplier PPN: harga + PPN {rate}%
+          </label>
+          {f.ppn && (
+            <>
+              <span>Subtotal (DPP)</span>
+              <span className="right">{rp(subtotal)}</span>
+              <span>PPN {rate}%</span>
+              <span className="right">{rp(tax)}</span>
+            </>
+          )}
           <span className="grand">Total</span>
-          <span className="grand right">{rp(lineTotal(f.items))}</span>
+          <span className="grand right">{rp(subtotal + tax)}</span>
         </div>
         {otherMaker.length > 0 && (
           <div className="alert warn mt-3">
@@ -392,6 +408,7 @@ export function PODoc({ id }) {
     '',
     ...(po.items || []).map((it, i) => `${i + 1}. ${it.name}${it.size ? ` ${it.size}` : ''}${it.color ? ` ${it.color}` : ''} : ${num(it.qty)} x ${num(it.price)} = ${num(it.total)}`),
     '',
+    ...(po.ppn ? [`Subtotal (DPP): ${rp(po.subtotal)}`, `PPN: ${rp(po.tax_amount)}`] : []),
     `Total: ${rp(po.total_amount)}`,
     po.notes ? `Catatan: ${po.notes}` : null,
     '',
@@ -509,7 +526,7 @@ export function PODoc({ id }) {
           <div className="sheet">
             <div className="doc-no">{po.po_no}</div>
             <div className="two-col">
-              <DescList items={[['Supplier', <b key="s">{po.supplier}</b>], ['Up', po.up_person], ['WA', po.supplier_phone], ['Email', po.supplier_email]]} />
+              <DescList items={[['Supplier', <b key="s">{po.supplier}</b>], ['Pajak', <Badge key="p" tone={po.ppn ? 'info' : 'neutral'}>{po.ppn ? 'PPN' : 'Non-PPN'}</Badge>], ['Up', po.up_person], ['WA', po.supplier_phone], ['Email', po.supplier_email]]} />
               <DescList items={[['Tanggal', date(po.date)], ['Perkiraan siap', po.expected_date ? date(po.expected_date) : null], ['Dibuat oleh', po.created_by]]} />
             </div>
             <div className="table-wrap auto-h mt-4">
@@ -546,8 +563,22 @@ export function PODoc({ id }) {
                   })}
                 </tbody>
                 <tfoot>
+                  {po.ppn && (
+                    <>
+                      <tr>
+                        <td colSpan={6}>Subtotal (DPP)</td>
+                        <td className="right">{num(po.subtotal)}</td>
+                        <td />
+                      </tr>
+                      <tr>
+                        <td colSpan={6}>PPN</td>
+                        <td className="right">{num(po.tax_amount)}</td>
+                        <td />
+                      </tr>
+                    </>
+                  )}
                   <tr>
-                    <td colSpan={6}>Total</td>
+                    <td colSpan={6}>Total{po.ppn ? ' (termasuk PPN)' : ''}</td>
                     <td className="right">{num(po.total_amount)}</td>
                     <td />
                   </tr>

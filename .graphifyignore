@@ -1,0 +1,7 @@
+node_modules
+dist
+backend/pb_public
+backend/pb_data
+manual_book
+referensi
+temp_docx

@@ -6,7 +6,7 @@ import { useRecords } from '../../lib/data';
 import { replaceQuery, useRoute } from '../../lib/router';
 import { useSession } from '../../lib/session';
 import { date, num, rp, today } from '../../lib/format';
-import { CHANNEL_LABEL, ORDER_COMMITTED, RECEIVABLE_FILTER } from '../../lib/status';
+import { CHANNEL_LABEL, ORDER_COMMITTED, RECEIVABLE_FILTER, channelOf } from '../../lib/status';
 import { Button, Field, Input, Kpi, PageHeader, Panel, Select } from '../../ui/core';
 import DataTable from '../../ui/DataTable';
 
@@ -38,7 +38,7 @@ export default function Laporan() {
     const byDay = new Map();
     const byProduct = new Map();
     for (const o of orders.items) {
-      const ch = o.channel || 'pesanan';
+      const ch = channelOf(o);
       byChannel[ch] = (byChannel[ch] || 0) + o.total_amount;
       const day = byDay.get(o.date) || { date: o.date, count: 0, total: 0, paid: 0 };
       day.count++;
@@ -83,7 +83,9 @@ export default function Laporan() {
         orders.items.map((o) => ({
           Tanggal: o.date,
           'No. Nota': o.order_no,
-          Saluran: CHANNEL_LABEL[o.channel] || 'Pesanan',
+          Jenis: channelOf(o) === 'marketplace' ? 'Online' : 'Offline',
+          Saluran: CHANNEL_LABEL[channelOf(o)],
+          Toko: o.store || '',
           Customer: o.customer,
           Total: o.total_amount,
           Dibayar: o.paid_amount,
@@ -150,7 +152,9 @@ export default function Laporan() {
             <tbody>
               {['pesanan', 'kasir', 'marketplace'].map((ch) => (
                 <tr key={ch}>
-                  <td>{CHANNEL_LABEL[ch]}</td>
+                  <td>
+                    {CHANNEL_LABEL[ch]} <span className="small muted">({ch === 'marketplace' ? 'online' : 'offline'})</span>
+                  </td>
                   <td className="right">{num(stats.byChannel[ch] || 0)}</td>
                 </tr>
               ))}

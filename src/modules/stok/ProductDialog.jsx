@@ -23,6 +23,7 @@ export default function ProductDialog({ product, onClose }) {
     min_stock: product?.min_stock ?? '',
     location: product?.location || '',
     factory: product?.factory || '',
+    produced: !!product?.produced,
     notes: product?.notes || '',
     stock: '',
   }));
@@ -48,6 +49,7 @@ export default function ProductDialog({ product, onClose }) {
       min_stock: Number(f.min_stock) || 0,
       location: f.location.trim(),
       factory: f.factory.trim(),
+      produced: f.produced,
       notes: f.notes.trim(),
     };
     // Harga modal hanya boleh ditulis Owner (server menolak bila akun lain mengirimnya)
@@ -113,6 +115,11 @@ export default function ProductDialog({ product, onClose }) {
             </Field>
             <Field label="Pabrik / supplier">
               <Input value={f.factory} onChange={(e) => set({ factory: e.target.value })} />
+            </Field>
+            <Field label="Asal barang" hint="Barang produksi masuk stok lewat menu Produksi, bukan PO">
+              <label className="check">
+                <input type="checkbox" checked={f.produced} onChange={(e) => set({ produced: e.target.checked })} /> Produksi sendiri
+              </label>
             </Field>
             {!product && (
               <Field label="Stok awal" hint="Tercatat sebagai mutasi stok awal">

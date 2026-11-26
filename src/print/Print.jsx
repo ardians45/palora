@@ -359,6 +359,22 @@ export function POPrint({ id }) {
             ))}
           </tbody>
           <tfoot>
+            {po.ppn && (
+              <>
+                <tr>
+                  <td colSpan={6} className="r">
+                    Subtotal (DPP)
+                  </td>
+                  <td className="r">{num(po.subtotal)}</td>
+                </tr>
+                <tr>
+                  <td colSpan={6} className="r">
+                    PPN {settings?.ppn_rate || 11}%
+                  </td>
+                  <td className="r">{num(po.tax_amount)}</td>
+                </tr>
+              </>
+            )}
             <tr>
               <td colSpan={6} className="r strong">
                 Total

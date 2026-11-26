@@ -6,7 +6,7 @@ import { useRecords } from '../../lib/data';
 import { replaceQuery, useRoute } from '../../lib/router';
 import { useSession } from '../../lib/session';
 import { num } from '../../lib/format';
-import { Button, Empty, Field, Input, MoneyInput, PageHeader, Select, Textarea } from '../../ui/core';
+import { Badge, Button, Empty, Field, Input, MoneyInput, PageHeader, Select, Textarea } from '../../ui/core';
 import DataTable, { matchText } from '../../ui/DataTable';
 import { Dialog, useConfirm, useToast } from '../../ui/feedback';
 import { TERMS } from '../penjualan/PesananForm';
@@ -44,6 +44,7 @@ const CONFIG = {
     search: ['name', 'sales_person', 'phone', 'whatsapp', 'email'],
     columns: [
       { key: 'name', label: 'Nama', render: (s) => <b>{s.name}</b> },
+      { key: 'pkp', label: 'Pajak', value: (s) => (s.pkp ? 1 : 0), render: (s) => <Badge tone={s.pkp ? 'info' : 'neutral'}>{s.pkp ? 'PPN' : 'Non-PPN'}</Badge> },
       { key: 'sales_person', label: 'Up (Sales)' },
       { key: 'phone', label: 'Telepon / WA', render: (s) => s.whatsapp || s.phone },
       { key: 'email', label: 'Email' },
@@ -53,6 +54,7 @@ const CONFIG = {
     fields: [
       { key: 'name', label: 'Nama supplier / pabrik', required: true, span: 'span-2' },
       { key: 'terms', label: 'Syarat bayar', options: ['', 'Tunai / Lunas dulu', 'Tempo 14 Hari', 'Tempo 30 Hari', 'Tempo 45 Hari'] },
+      { key: 'pkp', label: 'Pajak', check: 'Supplier PPN (PKP)', hint: 'Centang bila supplier menagih PPN. PO ke supplier ini otomatis dihitung + PPN.' },
       { key: 'sales_person', label: 'Up (sales)' },
       { key: 'whatsapp', label: 'No. WhatsApp', hint: 'Untuk tombol Kirim PO via WA' },
       { key: 'email', label: 'Email', hint: 'Untuk tombol Kirim PO via Email' },
@@ -106,7 +108,7 @@ export default function Master({ collection }) {
 function EditDialog({ cfg, collection, record, onClose }) {
   const toast = useToast();
   const confirm = useConfirm();
-  const [f, setF] = useState(() => Object.fromEntries(cfg.fields.map((x) => [x.key, record?.[x.key] ?? (x.money ? '' : '')])));
+  const [f, setF] = useState(() => Object.fromEntries(cfg.fields.map((x) => [x.key, record?.[x.key] ?? (x.check ? false : '')])));
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const set = (k, v) => setF((x) => ({ ...x, [k]: v }));
@@ -156,7 +158,11 @@ function EditDialog({ cfg, collection, record, onClose }) {
           <div className="form-grid cols-3">
             {cfg.fields.map((x) => (
               <Field key={x.key} label={x.label} required={x.required} hint={x.hint} className={x.span || ''}>
-                {x.options ? (
+                {x.check ? (
+                  <label className="check">
+                    <input type="checkbox" checked={!!f[x.key]} onChange={(e) => set(x.key, e.target.checked)} /> {x.check}
+                  </label>
+                ) : x.options ? (
                   <Select value={f[x.key] || ''} onChange={(e) => set(x.key, e.target.value)} options={x.options.includes(f[x.key]) || !f[x.key] ? x.options : [f[x.key], ...x.options]} />
                 ) : x.money ? (
                   <MoneyInput value={f[x.key]} onChange={(v) => set(x.key, v)} />

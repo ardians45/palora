@@ -20,7 +20,7 @@ const ACTION = {
   return: 'mencatat retur',
   print: 'mencetak',
   close_short: 'menutup PO (barang kurang)',
-  cost_update: 'memperbarui harga modal dari PO',
+  cost_update: 'memperbarui harga modal',
 };
 
 const FIELD = {

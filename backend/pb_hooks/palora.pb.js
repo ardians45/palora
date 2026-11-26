@@ -246,6 +246,7 @@ onRecordCreateRequest((e) => {
   r.set("remaining_amount", t.total);
   r.set("status", isDraft ? "draft" : "baru");
   r.set("channel", "pesanan");
+  u.checkOnlineOrder(e.app, r, "", isDraft);
   r.set("release_approved", false);
   r.set("created_by", u.actorName(e.auth));
   if (!r.getString("uid")) r.set("uid", u.uid("ORD"));
@@ -275,6 +276,12 @@ onRecordUpdateRequest((e) => {
     "order_no", "channel", "uid", "status", "paid_amount", "dp_amount", "remaining_amount", "subtotal", "tax_amount",
     "total_amount", "release_approved", "dp_override_by", "store", "marketplace_order_no", "created_by", "cancel_reason", "items", "tax_mode", "returns",
   ].forEach((k) => r.set(k, orig.get(k)));
+  if (orig.getString("channel") === "pesanan" && ["draft", "baru", "dp"].indexOf(status) !== -1) {
+    if (reqBody.store !== undefined) r.set("store", String(reqBody.store || ""));
+    if (reqBody.marketplace_order_no !== undefined) r.set("marketplace_order_no", String(reqBody.marketplace_order_no || ""));
+    // draft boleh belum punya no. pesanan marketplace; saat difinalkan wajib
+    u.checkOnlineOrder(e.app, r, r.id, status === "draft" && reqBody.is_draft !== false);
+  }
   if (reqBody.deleted !== undefined) {
     const draftDelete = status === "draft"; // draft boleh dihapus pembuatnya (belum bernomor, belum ada uang)
     if (!draftDelete && (u.role(e.auth) !== "owner" || ["baru", "batal"].indexOf(status) === -1 || orig.getFloat("paid_amount") > 0)) {
@@ -362,7 +369,7 @@ onRecordCreateRequest((e) => {
   const date = u.parseDate(r.getString("date")).iso;
   r.set("date", date);
   r.set("items", items);
-  r.set("total_amount", items.reduce((s, it) => s + it.total, 0));
+  u.setPoTotals(e.app, r, items);
   r.set("state", "draft");
   r.set("status", "Draft");
   r.set("receipts", []);
@@ -382,8 +389,10 @@ onRecordUpdateRequest((e) => {
   const reqBody = e.requestInfo().body || {};
   const state = orig.getString("state");
   // kolom milik server (penerimaan, status, total) hanya berubah lewat endpoint
-  ["po_no", "uid", "state", "status", "receipts", "total_amount", "created_by", "items"].forEach((k) => r.set(k, orig.get(k)));
+  ["po_no", "uid", "state", "status", "receipts", "total_amount", "subtotal", "tax_amount", "created_by", "items"].forEach((k) => r.set(k, orig.get(k)));
   const editable = state === "draft" || state === "dikirim";
+  // PPN PO ikut terkunci setelah ada penerimaan (nilai PO sudah jadi dasar invoice)
+  if (!editable) r.set("ppn", orig.get("ppn"));
   if (!editable) {
     ["supplier", "date"].forEach((k) => {
       if (reqBody[k] !== undefined && String(reqBody[k]) !== orig.getString(k)) {
@@ -407,8 +416,8 @@ onRecordUpdateRequest((e) => {
       return it;
     });
     r.set("items", items);
-    r.set("total_amount", items.reduce((s, it) => s + it.total, 0));
   }
+  if (editable && (itemsChanged || r.getBool("ppn") !== orig.getBool("ppn"))) u.setPoTotals(e.app, r, u.getJSON(r, "items") || []);
   e.next();
 }, "purchase_orders");
 
@@ -1428,6 +1437,109 @@ routerAdd(
 );
 
 // --- Endpoint kesehatan ---
+// --- Produksi sendiri: barang jadi masuk stok per batch dengan HPP (bukan pembelian: tanpa PO, tanpa hutang) ---
+routerAdd(
+  "POST",
+  "/api/palora/production",
+  (e) => {
+    const u = require(`${__hooks}/utils.js`);
+    u.requireRole(e.auth, ["owner", "gudang"], "mencatat produksi");
+    const body = e.requestInfo().body || {};
+    const qty = Number(body.qty);
+    if (!isFinite(qty) || qty <= 0 || Math.floor(qty) !== qty) throw new BadRequestError("Qty hasil produksi harus bilangan bulat lebih dari 0.");
+    const cost = {};
+    ["material_cost", "service_cost", "other_cost"].forEach((k) => {
+      const v = Number(body[k] || 0);
+      if (!isFinite(v) || v < 0) throw new BadRequestError("Biaya tidak boleh minus.");
+      cost[k] = Math.round(v);
+    });
+    const total = cost.material_cost + cost.service_cost + cost.other_cost;
+    if (!(total > 0)) throw new BadRequestError("Isi biaya material atau jasa supaya HPP bisa dihitung.");
+    const date = u.parseDate(body.date).iso;
+    let out;
+    e.app.runInTransaction((tx) => {
+      const p = tx.findRecordById("products", String(body.product_id || ""));
+      if (p.getBool("deleted")) throw new BadRequestError("Barang ini sudah diarsipkan.");
+      const stock = p.getInt("stock");
+      const oldCost = p.getFloat("buy_price");
+      // harga modal = rata-rata tertimbang stok lama + batch ini (stok lama habis -> HPP batch ini)
+      const newCost = Math.round((stock * oldCost + total) / (stock + qty));
+      const batchNo = u.docNumber(tx, "PRD", date);
+
+      const rec = new Record(tx.findCollectionByNameOrId("productions"));
+      rec.set("batch_no", batchNo);
+      rec.set("date", date);
+      rec.set("status", "selesai");
+      rec.set("product_id", p.id);
+      rec.set("product_code", p.getString("code"));
+      rec.set("product_name", p.getString("name"));
+      rec.set("unit", p.getString("unit") || "pcs");
+      rec.set("qty", qty);
+      rec.set("material_cost", cost.material_cost);
+      rec.set("service_cost", cost.service_cost);
+      rec.set("other_cost", cost.other_cost);
+      rec.set("total_cost", total);
+      rec.set("unit_cost", Math.round(total / qty));
+      rec.set("sell_price", p.getFloat("sell_price"));
+      rec.set("cost_before", oldCost);
+      rec.set("cost_after", newCost);
+      rec.set("source", String(body.source || "").trim());
+      rec.set("notes", String(body.notes || "").trim());
+      rec.set("created_by", u.actorName(e.auth));
+      tx.save(rec);
+
+      p.set("produced", true);
+      if (newCost !== oldCost) {
+        p.set("buy_price", newCost);
+        u.writeAudit(tx, "products", p, "cost_update", e.auth, { buy_price: { from: oldCost, to: newCost, ref: batchNo } });
+      }
+      u.moveStock(tx, p, qty, { type: "PRODUKSI", refNo: batchNo, refType: "production", refId: rec.id, reason: "Hasil produksi sendiri", date: date }, e.auth);
+      u.writeAudit(tx, "productions", rec, "create", e.auth, { batch: { from: null, to: batchNo }, qty: { from: null, to: qty }, total_cost: { from: null, to: total } });
+      out = u.toPlain(rec);
+    });
+    return e.json(200, out);
+  },
+  $apis.requireAuth("users", "_superusers")
+);
+
+// Batal batch (salah input): stok ditarik lagi, harga modal dikembalikan ke rata-rata tanpa batch ini
+routerAdd(
+  "POST",
+  "/api/palora/production/cancel",
+  (e) => {
+    const u = require(`${__hooks}/utils.js`);
+    u.requireRole(e.auth, ["owner", "gudang"], "membatalkan produksi");
+    const body = e.requestInfo().body || {};
+    const reason = String(body.reason || "").trim();
+    if (!reason) throw new BadRequestError("Alasan pembatalan wajib diisi.");
+    let out;
+    e.app.runInTransaction((tx) => {
+      const rec = tx.findRecordById("productions", String(body.id || ""));
+      if (rec.getString("status") === "batal") throw new BadRequestError("Batch ini sudah dibatalkan.");
+      const p = tx.findRecordById("products", rec.getString("product_id"));
+      const qty = rec.getInt("qty");
+      const stock = p.getInt("stock");
+      const oldCost = p.getFloat("buy_price");
+      // moveStock menolak bila stok tidak cukup (barang batch ini sudah terjual)
+      u.moveStock(tx, p, -qty, { type: "PRODUKSI", refNo: rec.getString("batch_no"), refType: "production", refId: rec.id, reason: "Batal produksi: " + reason, date: body.date }, e.auth);
+      const left = stock - qty;
+      const restored = left > 0 ? Math.round((stock * oldCost - rec.getFloat("total_cost")) / left) : 0;
+      if (restored > 0 && restored !== oldCost) {
+        p.set("buy_price", restored);
+        tx.save(p);
+        u.writeAudit(tx, "products", p, "cost_update", e.auth, { buy_price: { from: oldCost, to: restored, ref: rec.getString("batch_no") + " batal" } });
+      }
+      rec.set("status", "batal");
+      rec.set("cancel_reason", reason);
+      tx.save(rec);
+      u.writeAudit(tx, "productions", rec, "cancel", e.auth, { status: { from: "selesai", to: "batal" }, reason: { from: null, to: reason } });
+      out = u.toPlain(rec);
+    });
+    return e.json(200, out);
+  },
+  $apis.requireAuth("users", "_superusers")
+);
+
 routerAdd("GET", "/api/palora/health", (e) => {
   return e.json(200, { ok: true, app: "PALORA", time: new Date().toISOString() });
 });

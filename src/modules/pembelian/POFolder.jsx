@@ -85,7 +85,8 @@ export function PoChecklist({ po, folder }) {
         detail={hasInv ? folder.invoices.map((i) => i.invoice_no).join(', ') : folder.receipts.length && sinceSj !== null ? `belum datang · ${-sinceSj} hari sejak SJ` : 'belum ada'}
         warn={!hasInv && folder.receipts.length > 0 && sinceSj !== null && -sinceSj > 14}
       />
-      <Tick on={hasFaktur} label="Faktur pajak" detail={hasFaktur ? folder.invoices.map((i) => i.tax_invoice_no).filter(Boolean).join(', ') || 'ada foto' : 'belum ada'} />
+      {/* faktur pajak hanya untuk PO PPN (PO lama sebelum ada centang PPN tetap ditampilkan) */}
+      {(po.ppn || hasFaktur || !po.subtotal) && <Tick on={hasFaktur} label="Faktur pajak" detail={hasFaktur ? folder.invoices.map((i) => i.tax_invoice_no).filter(Boolean).join(', ') || 'ada foto' : 'belum ada'} />}
       <Tick on={lunas} label="Lunas" detail={hasInv ? (lunas ? 'hutang selesai' : `sisa ${rp(folder.remaining)}`) : '-'} warn={hasInv && !lunas} />
     </div>
   );

@@ -26,10 +26,12 @@ export const MODULES = [
     nav: [
       { label: 'Stok Barang', to: ['stok'] },
       { label: 'Mutasi Stok', to: ['stok', 'mutasi'] },
+      { label: 'Produksi', to: ['produksi'] },
       { label: 'Stok Opname', to: ['opname'], roles: ['owner', 'gudang'] },
       { label: 'Harga Modal', to: ['stok', 'harga'], roles: ['owner'] },
     ],
   },
+  { id: 'produksi', title: 'Produksi', icon: icons.produksi, roles: ALL, navOf: 'stok' },
   { id: 'opname', title: 'Stok Opname', icon: icons.opname, roles: ['owner', 'gudang'], navOf: 'stok' },
   {
     id: 'pembelian',
@@ -104,7 +106,7 @@ export const canOpen = (id, role) => {
 // Menu utama dikelompokkan mengikuti alur kerja: beli -> gudang -> jual -> laporan -> sistem.
 export const GROUPS = [
   { key: 'beli', title: 'Beli barang', ids: ['pembelian', 'hutang', 'arsip'] },
-  { key: 'gudang', title: 'Gudang', ids: ['stok', 'opname'] },
+  { key: 'gudang', title: 'Gudang', ids: ['stok', 'produksi', 'opname'] },
   { key: 'jual', title: 'Jual barang', ids: ['penjualan', 'kasir', 'marketplace', 'surat-jalan', 'piutang'] },
   { key: 'data', title: 'Laporan & data', ids: ['laporan', 'pelanggan', 'supplier'] },
   { key: 'sistem', title: 'Sistem', ids: ['aktivitas', 'pengguna', 'pengaturan'] },

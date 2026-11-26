@@ -18,6 +18,7 @@ import { SuratJalanList, SuratJalanDoc } from './modules/penjualan/SuratJalan';
 import StokList from './modules/stok/StokList';
 import StokCard, { HargaModal, MutasiList } from './modules/stok/StokCard';
 import { OpnameDoc, OpnameList, OpnameNew } from './modules/stok/Opname';
+import { ProduksiDoc, ProduksiList, ProduksiNew } from './modules/stok/Produksi';
 import { PODoc, POForm, POList } from './modules/pembelian/PO';
 import { PiutangCustomer, PiutangList } from './modules/keuangan/Piutang';
 import { HutangDoc, HutangList } from './modules/keuangan/Hutang';
@@ -77,6 +78,10 @@ function page(parts, query, role) {
       if (a === 'mutasi') return <MutasiList />;
       if (a === 'harga') return role === 'owner' ? <HargaModal /> : <NoAccess />;
       return <StokCard id={a} />;
+    case 'produksi':
+      if (!a) return <ProduksiList />;
+      if (a === 'baru') return role === 'finance' ? <NoAccess /> : <ProduksiNew />;
+      return <ProduksiDoc id={a} />;
     case 'opname':
       if (!a) return <OpnameList />;
       if (a === 'baru') return <OpnameNew />;

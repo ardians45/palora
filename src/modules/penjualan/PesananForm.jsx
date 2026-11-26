@@ -6,7 +6,8 @@ import { action, q, useRecords, useRecord } from '../../lib/data';
 import { navigate } from '../../lib/router';
 import { useSession } from '../../lib/session';
 import { dueDateFromTerms, num, rp, today } from '../../lib/format';
-import { Button, Empty, ErrorBox, Field, FilePick, Input, Loading, MoneyInput, PageHeader, Panel, Select, Textarea } from '../../ui/core';
+import { Button, Empty, ErrorBox, Field, FilePick, Input, Loading, MoneyInput, PageHeader, Panel, Segmented, Select, Textarea } from '../../ui/core';
+import { STORES } from '../../lib/status';
 import LineItems, { lineTotal, validateLines } from '../../ui/LineItems';
 import { useToast } from '../../ui/feedback';
 import ProductPicker from '../../ui/ProductPicker';
@@ -35,6 +36,8 @@ const empty = () => ({
   up_person: '',
   customer_phone: '',
   po_customer_ref: '',
+  store: '',
+  marketplace_order_no: '',
   destination: '',
   payment_type: 'Tempo 14 Hari',
   due_date: dueDateFromTerms('Tempo 14 Hari'),
@@ -115,6 +118,7 @@ function Form({ existing }) {
       if (!form.customer.trim() && form.items.length === 0) return setErr('Isi minimal nama customer atau satu barang untuk menyimpan draft.');
     } else {
       if (!form.customer.trim()) return setErr('Nama customer wajib diisi.');
+      if (form.store && !form.marketplace_order_no.trim()) return setErr('Order online: isi no. pesanan dari marketplace.');
       const lineErr = validateLines(form.items);
       if (lineErr) return setErr(lineErr);
     }
@@ -178,6 +182,31 @@ function Form({ existing }) {
       />
       {err && <div className="alert error" role="alert">{err}</div>}
 
+      <Panel title="Jenis order">
+        <div className="form-grid cols-3">
+          <Field label="Order ini masuk lewat" hint={form.store ? 'Online: pesanan dari toko marketplace' : 'Offline: pesanan langsung (WA, telepon, datang ke gudang)'}>
+            <Segmented
+              value={form.store ? 'online' : 'offline'}
+              onChange={(v) => set(v === 'online' ? { store: form.store || STORES[0] } : { store: '', marketplace_order_no: '' })}
+              options={[
+                { value: 'offline', label: 'Offline' },
+                { value: 'online', label: 'Online (Marketplace)' },
+              ]}
+            />
+          </Field>
+          {form.store && (
+            <>
+              <Field label="Toko marketplace" required>
+                <Select value={form.store} onChange={(e) => set({ store: e.target.value })} options={STORES.includes(form.store) ? STORES : [form.store, ...STORES]} />
+              </Field>
+              <Field label="No. pesanan marketplace" required hint="Salin dari Seller Center. Tidak bisa dobel.">
+                <Input value={form.marketplace_order_no} onChange={(e) => set({ marketplace_order_no: e.target.value })} />
+              </Field>
+            </>
+          )}
+        </div>
+      </Panel>
+
       <Panel title="Customer & pengiriman">
         <div className="form-grid cols-3">
           <Field label="Customer" required className="span-2">
@@ -197,7 +226,7 @@ function Form({ existing }) {
           <Field label="Telepon / WA">
             <Input value={form.customer_phone} onChange={(e) => set({ customer_phone: e.target.value })} inputMode="tel" />
           </Field>
-          <Field label="No. PO dari customer" hint="Tercetak di surat jalan (PO #)">
+          <Field label="No. PO dari customer" hint="Tercetak di invoice/nota dan surat jalan (PO #)">
             <Input value={form.po_customer_ref} onChange={(e) => set({ po_customer_ref: e.target.value })} />
           </Field>
           <Field label="Alamat kirim" className="span-all">
@@ -307,6 +336,8 @@ function pick(o) {
     up_person: o.up_person,
     customer_phone: o.customer_phone,
     po_customer_ref: o.po_customer_ref,
+    store: o.store || '',
+    marketplace_order_no: o.marketplace_order_no || '',
     destination: o.destination,
     payment_type: o.payment_type || 'Tempo 14 Hari',
     due_date: o.due_date,

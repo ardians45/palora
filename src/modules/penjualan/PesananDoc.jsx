@@ -142,7 +142,7 @@ export default function PesananDoc({ id }) {
                   ['Telepon', o.customer_phone],
                   ['PO customer', o.po_customer_ref],
                   ['Kirim ke', o.destination],
-                  o.marketplace_order_no ? ['No. pesanan MP', `${o.store} #${o.marketplace_order_no}`] : null,
+                  ['Jenis order', o.store || o.channel === 'marketplace' ? `Online · ${o.store || 'Marketplace'}${o.marketplace_order_no ? ` #${o.marketplace_order_no}` : ''}` : 'Offline'],
                 ]}
               />
               <DescList

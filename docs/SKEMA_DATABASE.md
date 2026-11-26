@@ -21,16 +21,21 @@ Backend: **PocketBase 0.40** (SQLite). Definisi: `backend/pb_migrations/`, atura
 | `counters` | nomor urut dokumen per jenis | hanya server |
 | `products` | kode, nama, kelompok, warna, ukuran, satuan, stok, stok minimum, harga modal/jual, **foto** (+thumbnail otomatis) | stok hanya via endpoint |
 | `stock_movements` | mutasi IN/OUT/OPNAME/ADJUSTMENT: sebelum, sesudah, dokumen, petugas | hanya server |
-| `customers`, `suppliers` | master mitra (UP, WA, email, syarat bayar, aturan diskon) | arsip, bukan hapus |
+| `customers`, `suppliers` | master mitra (UP, WA, email, syarat bayar, aturan diskon); supplier punya centang `pkp` (Supplier PPN) | arsip, bukan hapus |
 | `sales_orders` | pesanan / nota kasir / penjualan marketplace: `status` (draft = disimpan belum lengkap, belum bernomor INV & tidak dihitung; baru, dp, lunas, dikirim, diambil, selesai, batal), `channel`, PPN, dibayar, sisa, jatuh tempo, izin kirim Owner; per baris `sentQty` (sudah keluar) & `returnedQty`; `returns` (riwayat retur) | nomor INV/NT/MP dibuat server. Pesanan baru tanpa DP belum dihitung omzet/piutang (dokumennya "Konfirmasi Pesanan") |
 | `payments` | DP, pelunasan, cicilan (customer), bayar invoice supplier, `refund` (dana retur dikembalikan) + foto bukti | hanya via endpoint |
 | `deliveries` | surat jalan customer + konfirmasi diterima + foto SJ bertanda tangan | dibuat saat barang keluar |
-| `purchase_orders` | PO supplier: `state` (draft, dikirim, sebagian, selesai, batal), baris barang + `receivedQty`, `receipts` per surat jalan supplier, `for_orders` (pesanan customer tujuan bila barang langsung dikirim ke customer) | penerimaan via endpoint; harga modal barang mengikuti harga PO terakhir yang diterima |
+| `purchase_orders` | PO supplier: `state` (draft, dikirim, sebagian, selesai, batal), baris barang + `receivedQty`, `receipts` per surat jalan supplier, `for_orders` (pesanan customer tujuan bila barang langsung dikirim ke customer), `ppn` (ikut supplier PKP): `subtotal` (DPP) + `tax_amount` = `total_amount` | penerimaan via endpoint; harga modal barang mengikuti harga PO terakhir yang diterima |
 | `supplier_invoices` | invoice & faktur supplier per PO: no. invoice, surat jalan yang ditagih (`sj_nos`), foto invoice & faktur, jatuh tempo, dibayar, diterima oleh | dicatat siapa saja yang menerima dokumen (biasanya Mas Heri); bayar hanya Owner & Keuangan; no. invoice per supplier tidak boleh dobel |
 | `documents` | arsip foto/PDF (surat jalan, invoice, faktur, bukti) per no. PO / dokumen | maks 5 MB |
 | `marketplace_imports`, `sku_mappings` | riwayat import laporan marketplace & pemetaan SKU → kode barang | anti dobel per toko + no. pesanan |
+| `productions` | batch produksi sendiri: barang, qty jadi, biaya material/jasa/lain, HPP per unit, harga jual & harga modal sebelum/sesudah, asal produksi, status (selesai/batal) | hanya via endpoint; stok masuk sebagai mutasi `PRODUKSI` (bukan pembelian: tanpa PO & hutang) |
 | `opname_sessions` | hasil stok opname: per barang stok sistem, hitung fisik, selisih | |
 | `audit_trail`, `system_logs` | riwayat perubahan | riwayat akun & pengaturan khusus Owner |
+
+## Order offline & online
+
+Order **online** = `channel = marketplace` (hasil import laporan) atau pesanan yang diketik manual dengan `store` + `marketplace_order_no` (wajib berpasangan, unik per toko, juga terhadap hasil import). Selain itu **offline** (pesanan langsung, kasir). Di laporan, order online manual dihitung sebagai Marketplace.
 
 ## Map PO (arsip per PO)
 
@@ -56,6 +61,8 @@ Meniru map kertas Paletindo: **PO → surat jalan 1..n → invoice → faktur �
 | `printed` | catat nota/invoice/surat jalan/PO yang dicetak ke riwayat dokumen | semua |
 | `kasir/checkout` | penjualan langsung: nota NT, stok terpotong, pembayaran tercatat | Owner, Gudang |
 | `stock/adjust` | koreksi stok satu barang (wajib alasan) | Owner, Gudang |
+| `production` | catat batch produksi sendiri: stok bertambah, HPP per unit = total biaya / qty, harga modal = rata-rata tertimbang stok lama + batch; barang ditandai `produced` | Owner, Gudang |
+| `production/cancel` | batalkan batch salah input (wajib alasan): stok ditarik, harga modal dikembalikan; ditolak bila stoknya sudah terjual | Owner, Gudang |
 | `opname/apply` | stok opname; hanya baris yang dihitung yang disesuaikan. Selisih = hitung fisik − stok sistem **saat dihitung** (`system_at_count`), jadi transaksi selama opname tidak ikut dikoreksi | Owner, Gudang |
 | `products/import` | import/update master barang dari Excel (kolom kosong tidak menimpa data) | Owner, Gudang |
 | `marketplace/import` | import laporan marketplace; `dry_run` untuk preview & SKU yang belum dikenal | Owner, Gudang |

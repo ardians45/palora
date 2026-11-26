@@ -12,8 +12,8 @@ import { Button, Empty, Field, FilePick, PageHeader, Panel, Select } from '../..
 import DataTable from '../../ui/DataTable';
 import { ProductCombo } from '../../ui/LineItems';
 import { useToast } from '../../ui/feedback';
+import { STORES } from '../../lib/status';
 
-export const STORES = ['Shopee 1', 'Shopee 2', 'Shopee 3', 'Tokopedia 1', 'Tokopedia 2', 'TikTok Shop', 'Lazada', 'Blibli'];
 
 export default function Marketplace() {
   const { products } = useSession();

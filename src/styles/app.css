@@ -239,6 +239,13 @@ table.dt { width: 100%; border-collapse: separate; border-spacing: 0; font-size:
 .totals { margin-left: auto; width: 320px; max-width: 100%; display: grid; grid-template-columns: 1fr auto; gap: 4px var(--s4); margin-top: var(--s3); font-variant-numeric: tabular-nums; }
 .totals .grand { font-size: var(--text-lg); font-weight: 700; padding-top: 6px; border-top: 1px solid var(--border); }
 .totals .grand + .grand { border-top: 0; padding-top: 0; }
+/* ProductCombo di dalam form biasa (di tabel baris barang tampil tanpa bingkai) */
+.field .combo .cell { width: 100%; height: 36px; padding: 0 10px; border: 1px solid var(--border-strong); border-radius: var(--radius); background: var(--surface); font-size: var(--text-md); }
+.field .combo .cell:focus { outline: none; border-color: var(--focus); box-shadow: 0 0 0 3px var(--brand-soft); }
+.hpp-box { background: var(--brand-soft); border-radius: var(--radius-lg); padding: var(--s3) var(--s4); margin-bottom: var(--s3); }
+.hpp-box .label { font-size: var(--text-sm); color: var(--text-2); }
+.hpp-box .value { font-size: var(--text-xl); font-weight: 700; font-variant-numeric: tabular-nums; }
+.totals .totals-full { grid-column: 1 / -1; justify-content: flex-end; margin-bottom: 4px; }
 
 /* ===================== combobox ===================== */
 .combo { position: relative; }
